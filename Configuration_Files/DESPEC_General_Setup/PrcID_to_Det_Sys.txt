@@ -1,0 +1,13 @@
+# conversion of PrcID to detector system
+# !!! keep the correct format !!!
+# !!! FRS,AIDA,PLASTIC,FATIMA,GALILEO !!!
+#
+#
+FRS	10 20 25 30 35 40 45 100
+AIDA	90 
+PLASTIC	80 
+FATIMA_VME  110
+FATIMA_TAMEX 75
+GALILEO	60 
+FINGER 50 
+BEAM_MONITOR 70

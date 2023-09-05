@@ -1,0 +1,4 @@
+
+# DO NOT DELETE
+./script/VFTX_calibration_C.so: /cvmfs/csee.gsi.de/root/618-04/include/RVersion.h /cvmfs/csee.gsi.de/root/618-04/include/RConfig.h /cvmfs/csee.gsi.de/root/618-04/include/TClass.h /cvmfs/csee.gsi.de/root/618-04/include/TDictAttributeMap.h /cvmfs/csee.gsi.de/root/618-04/include/TInterpreter.h /cvmfs/csee.gsi.de/root/618-04/include/TROOT.h /cvmfs/csee.gsi.de/root/618-04/include/TBuffer.h /cvmfs/csee.gsi.de/root/618-04/include/TMemberInspector.h /cvmfs/csee.gsi.de/root/618-04/include/TError.h /cvmfs/csee.gsi.de/root/618-04/include/RtypesImp.h /cvmfs/csee.gsi.de/root/618-04/include/TIsAProxy.h /cvmfs/csee.gsi.de/root/618-04/include/TFileMergeInfo.h /cvmfs/csee.gsi.de/root/618-04/include/TCollectionProxyInfo.h /cvmfs/csee.gsi.de/root/618-04/bin/rootcling
+VFTX_calibration_C__ROOTBUILDVERSION= 6.18/04

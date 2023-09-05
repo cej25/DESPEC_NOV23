@@ -1,0 +1,13 @@
+# Used detector systems (1 -> used, 0 -> not used)
+# !!! keep the correct format !!!
+# !!! FRS,AIDA,PLASTIC,FATIMA_VME, FATIMA_TAMEX,Germanium !!!
+#
+#
+FRS	1
+AIDA 1
+PLASTIC	1
+FATIMA_VME 0
+FATIMA_TAMEX 0
+GERMANIUM 1
+FINGER	0
+BEAM_MONITOR 1
