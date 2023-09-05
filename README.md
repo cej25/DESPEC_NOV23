@@ -1,24 +1,15 @@
-# DESPEC_S450
-DESPEC On/Nearline code for S450 (May 2022) (Zs. Podolyak)
+# DESPEC_NOV23
+DESPEC On/Nearline code for new BB7 DSSD layer tests (Nov 2023)
 
 
-Developed by A.K.Mistry
+Developed by C.E.Jones N.Hubbard M.Polettini
 
-Contact A.K.Mistry@gsi.de
+Contact c.jones@gsi.de n.hubbard@gsi.de marta.polettini@pd.infn.it
 
 Includes: 
-FRS
+FRS (SC41 and SC42)
 
-AIDA
+AIDA (+ new BB7 layer)
 
-bPlastic (Single)
-
-FATIMA VME
-
-FATIMA Twin-Peaks TAMEX
-
-Germanium
-
-FATIMA VME ToF position correction
-
-FATIMA VME Gainmatching 
+bPlastic (downstream)
+ 
