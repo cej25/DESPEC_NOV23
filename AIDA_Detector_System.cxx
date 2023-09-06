@@ -43,6 +43,7 @@ AIDA_Detector_System::AIDA_Detector_System()
   stats_d.resize(conf->FEEs());
   pauseTimes.resize(conf->FEEs());
   scaler.resize(conf->FEEs());
+  dssdGains.resize(conf->DSSDs());
 
 
   Energy = new double[AIDA_MAX_HITS];
