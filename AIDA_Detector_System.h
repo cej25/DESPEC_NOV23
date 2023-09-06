@@ -55,6 +55,7 @@ private:
   Int_t sub_evt_length;
 
   std::vector<std::array<int, 64>> adcOffsets;
+  std::vector<std::array<std::vector<double>, 2>> dssdGains;
   std::vector<int> adcTimeOffsets;
   std::vector<uint64_t> oldtime_d;
   std::vector<uint64_t> upperTime48_d;

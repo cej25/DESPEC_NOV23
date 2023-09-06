@@ -36,6 +36,7 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
   constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
   int sub_DSSD = -1;
   bool sub_Scaler = false;
+  bool sub_Analysis = false;
   while (cfg)
   {
     if (cfg.peek() == '#')
@@ -177,6 +178,7 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
     else if (option == "scalers")
     {
       sub_Scaler = true;
+      sub_Analysis = false;
     }
     else if (sub && sub_Scaler)
     {
@@ -184,6 +186,39 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
       std::getline(line, arg);
       int idx = std::strtol(option.c_str(), NULL, 0);
       scalers[idx] = arg;
+    }
+    else if (option == "analysis")
+    {
+      sub_Analysis = true;
+      sub_Scaler= false;
+    }
+    else if (option == "reducenoise" && sub && sub_Analysis)
+    {
+      line >> std::boolalpha >> reducenoise;
+    }
+    else if (option == "clusterimpants" && sub && sub_Analysis)
+    {
+      line >> std::boolalpha >> clusterimpants;
+    }
+    else if (option == "clusterdecays" && sub && sub_Analysis)
+    {
+      line >> std::boolalpha >> clusterdecays;
+    }
+    else if (option == "calibrate" && sub && sub_Analysis)
+    {
+      line >> std::boolalpha >> calibrate;
+    }
+    else if (option == "parallelcalibrate" && sub && sub_Analysis)
+    {
+      line >> std::boolalpha >> parallelcalibrate;
+    }
+    else if (option == "hugethreshold" && sub && sub_Analysis)
+    {
+      line >> hugethreshold;
+    }
+    else if (option == "pulserthreshold" && sub && sub_Analysis)
+    {
+      line >> pulserthreshold;
     }
   }
 
@@ -208,6 +243,16 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
 
   std::cout << "AIDA Windows: Event: " << eventwindow << " ns, Front/Back: " << fbwindow << " ns" << std::endl;
   std::cout << "AIDA Gates: Front/Back High: " << fbenergyh << " MeV, Low: " << fbenergyl << " keV" << std::endl;
+
+  std::cout << "Analysis Options: ";
+  if (reducenoise) std::cout << "ReduceNoise ";
+  if (clusterimpants && clusterdecays) std::cout << "ClusterImplantsDecays ";
+  if (clusterimpants && !clusterdecays) std::cout << "ClusterImplants";
+  if (!clusterimpants && clusterdecays) std::cout << "ClusterDecays ";
+  if (calibrate && parallelcalibrate) std::cout << "ParallelCalibrate ";
+  if (calibrate && !parallelcalibrate) std::cout << "Calibrate ";
+  std::cout << std::endl;
+  std::cout << "Analysis Thresholds: Nonsense: " << hugethreshold << ", Pulser: " << pulserthreshold << std::endl;
   std::cout << "/////////////////////////////////////////////////////" << std::endl;
 }
 

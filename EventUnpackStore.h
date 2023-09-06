@@ -94,6 +94,7 @@ public:
         //AIDA output
         std::vector<AidaUnpackData> Aida;
         std::vector<AidaScaler> fAidaScalers;
+        std::vector<bool> fAidaFeeDead;
 
          int      fAIDAHits;
          int      AIDAHits;

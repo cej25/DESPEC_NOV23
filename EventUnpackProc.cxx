@@ -160,6 +160,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   fAida.Decays.clear();
   aida_scaler_cur_sec.clear();
   aida_scaler_queue.clear();
+  aidaFeeDead.clear();
   last_deadtime = 0;
   /// Setup AIDA arrays
   if(Used_Systems[1])
@@ -167,11 +168,71 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
     TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
     adcLastTimestamp.resize(conf->FEEs());
     adcCounts.resize(conf->FEEs());
+    aidaStripThresholds.resize(conf->DSSDs());
+    aidaFeeDead.resize(conf->FEEs());
+    std::fill(aidaFeeDead.begin(), aidaFeeDead.end(), false);
+    for (int i = 0; i < conf->DSSDs(); ++i)
+    {
+      aidaStripThresholds[i][0].resize(conf->Wide() ? 386 : 128);
+      aidaStripThresholds[i][1].resize(128);
+      std::fill(aidaStripThresholds[i][0].begin(), aidaStripThresholds[i][0].end(), 0);
+      std::fill(aidaStripThresholds[i][1].begin(), aidaStripThresholds[i][1].end(), 0);
+    }
     for (auto i : conf->ScalerMap())
     {
       aida_scaler_cur_sec[i.first] = -1;
       aida_scaler_queue[i.first].clear();
     }
+    std::ifstream stripConfig("Configuration_Files/AIDA/AIDA_strips.txt");
+    while (stripConfig)
+    {
+      if (stripConfig.peek() == '#' || stripConfig.peek() == '\n')
+      {
+        stripConfig.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        continue;
+      }
+      int dssd, strip;
+      char side;
+      double threshold;
+      stripConfig >> dssd >> side >> strip >> threshold;
+      if (!stripConfig) {
+          break;
+      }
+      int sideidx = (side == 'Y') ? 1 : 0;
+      if (dssd == -1)
+      {
+        for (int i = 0; i < conf->DSSDs(); i++)
+        {
+          if (strip == -1)
+          {
+            for (size_t j = 0; j < aidaStripThresholds[i][sideidx].size(); j++)
+            {
+              aidaStripThresholds[i][sideidx][j] = threshold;
+            }
+          }
+          else
+          {
+            aidaStripThresholds[i][sideidx][strip] = threshold;
+          }
+        }
+      }
+      else
+      {
+        if (strip == -1)
+        {
+          for (size_t j = 0; j < aidaStripThresholds[dssd - 1][sideidx].size(); j++)
+          {
+            aidaStripThresholds[dssd - 1][sideidx][j] = threshold;
+          }
+        }
+        else
+        {
+          aidaStripThresholds[dssd - 1][sideidx][strip] = threshold;
+        }
+      }
+      stripConfig.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    TGo4Log::Info("AIDA: Loaded DSSD Strip Thresholds");
   }
 
 }
@@ -181,8 +242,7 @@ void EventUnpackProc::UserPostLoop()
   if (Used_Systems[1])
   {
     ((AIDA_Detector_System*)Detector_Systems[1])->PrintStatistics();
-  }
-}
+  }}
 
 
 //----------------------------------------------------------
@@ -565,6 +625,11 @@ for (int i=0; i<10; i++){
 
 	    fOutput->fAidaScalers = RAW->get_AIDA_scaler();
 
+          for (int i = 0; i < conf->FEEs(); i++)
+          {
+            fOutput->fAidaFeeDead[i] = aidaFeeDead[i];
+          }
+
           for(int i = 0; i<AIDA_Hits; i++){
       
             AIDA_Energy[i] = RAW->get_AIDA_Energy(i);
@@ -621,7 +686,10 @@ for (int i=0; i<10; i++){
             }
             else
             {
-              fAida.DecayEvents.push_back(evt);
+              double thrs = aidaStripThresholds[evt.DSSD - 1][evt.Side == -1 ? 0 : 1][evt.Strip];
+              if (thrs >= 0 && evt.Energy > thrs) {
+                fAida.DecayEvents.push_back(evt);
+              }
             }
 
             if (fAida.AIDATime == 0)
