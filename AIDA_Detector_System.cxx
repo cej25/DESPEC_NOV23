@@ -94,7 +94,14 @@ AIDA_Detector_System::AIDA_Detector_System()
   memset(&stats, 0, sizeof(UnpackProcStats));
 
 
-
+  // Default gains to nominal 0.7 keV/channel
+  for(int i = 0; i < conf->DSSDs(); i++)
+  {
+    dssdGains[i][0].resize(conf->Wide() ? 386 : 128);
+    dssdGains[i][1].resize(128);
+    std::fill(dssdGains[i][0].begin(), dssdGains[i][0].end(), 0.7);
+    std::fill(dssdGains[i][1].begin(), dssdGains[i][1].end(), 0.7);
+  }
 }
 
 //---------------------------------------------------------------
@@ -166,36 +173,9 @@ if(get_newfile()==1 || stats.MBSEvents==1){
   fs.close();
   
     
-  //*************************************************************  
-  // Deciding which file to open depending on the run number
-  char ch[100] = "Configuration_Files/AIDA/AIDA_times_S452f"; 
-  char ch2[10] = ".txt";
-  string data = "";
-  data = std::string(get_filename());
-  size_t pos1, pos2, pos3;
-  string filenum;
-
-  pos1 = data.find("S452");
-  if(pos1!=string::npos){
-     pos2 = data.find("f",pos1+1);
-     pos3 = data.find("_",pos2+1);
-     filenum = data.substr(pos2+1,(pos3-pos2)-1);
-  }
-
-  cout << "The filenumber is: " << filenum << endl;
-  strcat(ch,filenum.c_str());
-  strcat(ch,ch2);
-  cout << "Will load file " << ch << endl;  
   //*************************************************************
   
-  fs.open(ch);
-  if(fs){  
-    cout << "Found AIDA ADC clock correction file " << ch << endl;  
-  }
-  else {
-    cout << "Could not find AIDA ADC clock correction file. Using default AIDA_times.txt. " << endl;
-    fs.open("Configuration_Files/AIDA/AIDA_times.txt");   
-  }
+  fs.open("Configuration_Files/AIDA/AIDA_times.txt");   
       
   while (fs)
   {
@@ -373,18 +353,19 @@ bool AIDA_Detector_System::BuildAIDAADCEvent(TGo4MbsSubEvent* psubevt, Int_t wor
     }
 
     evt.Intensity = (evt.Data - 32768) * evt.Side;
+    evt.Intensity = (evt.Intensity - adcOffsets[feeID][channelID]);
     // if (evt.HighEnergy)
     // test->Fill(evt.Strip + (evt.Side == -1 ? 0 : 1) * 128);
 
     if (veto == 1)
     {
-      evt.Energy = (evt.Intensity - adcOffsets[feeID][channelID]) * 0.7; // Energy in MeV
-      Energy[Hits] = (evt.Intensity - adcOffsets[feeID][channelID]) * 0.7; // Energy in MeV
+      evt.Energy = evt.Intensity * 0.7; // Energy in MeV
+      Energy[Hits] = evt.Energy;
     }
     else
     {
-      evt.Energy = (evt.Intensity- adcOffsets[feeID][channelID]) * 0.7; // Energy in keV
-      Energy[Hits] = (evt.Intensity- adcOffsets[feeID][channelID]) * 0.7; // Energy in keV
+      evt.Energy = evt.Intensity * dssdGains[evt.DSSD - 1][evt.Side == conf->DSSD(evt.DSSD - 1).XSide ? 0 : 1][evt.Strip];
+      Energy[Hits] = evt.Energy;
     }
     // delete data without an offset (bad channels)		    }
     if (!adcOffsets[feeID][channelID])

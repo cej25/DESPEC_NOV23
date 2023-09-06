@@ -555,6 +555,7 @@ using namespace std;
       /* Multiplexer correction */
 						std::vector<std::array<uint64_t, 4>> adcLastTimestamp;
 						std::vector<std::array<int, 4>> adcCounts;
+                                                std::vector<std::array<std::vector<double>, 2>> aidaStripThresholds;
             void ResetMultiplexer();
             void CorrectTimeForMultiplexer(AidaEvent& evt);
 
@@ -582,6 +583,7 @@ using namespace std;
                                                 int64_t last_deadtime;
                                                 
 						TH1* hAIDA_TimeMachine;
+                                                std::vector<bool> aidaFeeDead;
 
       ///End AIDA
       ///Beam Monitor 

@@ -66,6 +66,14 @@ public:
     double FrontBackEnergyH() const;
     double FrontBackEnergyL() const;
 
+    bool ReduceNoise() const;
+    bool ClusterImplants() const;
+    bool ClusterDecays() const;
+    bool Calibrate() const;
+    bool ParallelCalibrate() const;
+    int HugeThreshold() const;
+    int PulserThreshold() const;
+
     DSSDConfiguration DSSD(int i) const;
     FEEConfiguration FEE(int i) const;
     std::string Scaler(int i) const;
@@ -90,6 +98,15 @@ private:
     double fbwindow;
     double fbenergyh;
     double fbenergyl;
+
+    // analysis options
+    bool reducenoise;
+    bool clusterimpants;
+    bool clusterdecays;
+    bool calibrate;
+    bool parallelcalibrate;
+    int hugethreshold;
+    int pulserthreshold;
 
     std::vector<DSSDConfiguration> dssd;
     std::vector<FEEConfiguration> fee;
@@ -170,6 +187,41 @@ inline double TAidaConfiguration::FrontBackEnergyH() const
 inline double TAidaConfiguration::FrontBackEnergyL() const
 {
   return fbenergyl;
+}
+
+inline bool TAidaConfiguration::ReduceNoise() const
+{
+  return reducenoise;
+}
+
+inline bool TAidaConfiguration::ClusterImplants() const
+{
+  return clusterimpants;
+}
+
+inline bool TAidaConfiguration::ClusterDecays() const
+{
+  return clusterdecays;
+}
+
+inline bool TAidaConfiguration::Calibrate() const
+{
+  return calibrate;
+}
+
+inline bool TAidaConfiguration::ParallelCalibrate() const
+{
+  return parallelcalibrate;
+}
+
+inline int TAidaConfiguration::HugeThreshold() const
+{
+  return hugethreshold;
+}
+
+inline int TAidaConfiguration::PulserThreshold() const
+{
+  return pulserthreshold;
 }
 
 inline DSSDConfiguration TAidaConfiguration::DSSD(int i) const

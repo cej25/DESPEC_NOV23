@@ -28,6 +28,17 @@ FrontBackWindow: 4400
 # Maximum energy difference for decays (in keV)
 FrontBackEnergyL: 350
 
+#--------------------------
+# Analysis Options
+#-------------------------
+Analysis:
+- ReduceNoise: true
+- ClusterImplants: true
+- ClusterDecays: true
+- Calibrate: false
+- ParallelCalibrate: false
+- HugeThreshold: 400
+- PulserThreshold: 700
 
 #---------------------------
 # DSSD Mapping

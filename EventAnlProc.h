@@ -411,6 +411,7 @@ class EventAnlProc : public TGo4EventProcessor {
             std::vector<TH2*> implants_e_xy;
             std::vector<TH1*> implants_time_delta;
             std::vector<TH1*> implants_strip_1d;
+            std::vector<TH2*> implants_strip_1d_energy;
             std::vector<TH1*> implants_per_event;
             std::vector<TH1*> implants_channels;
             std::vector<TH2*> implants_x_ex;
@@ -425,6 +426,7 @@ class EventAnlProc : public TGo4EventProcessor {
             std::vector<TH2*> decays_e_xy;
             std::vector<TH1*> decays_time_delta;
             std::vector<TH1*> decays_strip_1d;
+            std::vector<TH2*> decays_strip_1d_energy;
             std::vector<TH1*> decays_per_event;
             std::vector<TH1*> decays_channels;
 
