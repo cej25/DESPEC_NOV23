@@ -625,10 +625,7 @@ for (int i=0; i<10; i++){
 
 	    fOutput->fAidaScalers = RAW->get_AIDA_scaler();
 
-          for (int i = 0; i < conf->FEEs(); i++)
-          {
-            fOutput->fAidaFeeDead[i] = aidaFeeDead[i];
-          }
+            fOutput->fAidaFeeDead = aidaFeeDead;
 
           for(int i = 0; i<AIDA_Hits; i++){
       
