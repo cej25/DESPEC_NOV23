@@ -172,6 +172,27 @@ if(get_newfile()==1 || stats.MBSEvents==1){
   }
   TGo4Log::Info("AIDA: Loaded ADC Offsets");
   fs.close();
+
+  fs.open("Configuration_Files/AIDA/AIDA_gains.txt");
+  fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  while (fs)
+  {
+    if (fs.peek() == '#')
+    {
+      fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      continue;
+    }
+    int dssd, strip;
+    char side;
+    double offset;
+    fs >> dssd >> side >> strip >> offset;
+    if (!fs) break;
+    int sideidx = 0;
+    if (side == 'Y') sideidx = 1;
+    dssdGains[dssd][sideidx][strip] = offset;
+    fs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  }
+  TGo4Log::Info("AIDA: Loaded DSSD Gains");
   
     
   //*************************************************************
