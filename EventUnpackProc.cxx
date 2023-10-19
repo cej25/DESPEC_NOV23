@@ -51,6 +51,8 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "Germanium_Detector_System.h"
 #include "FRS_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
 
 #include "TAidaConfiguration.h"
 
@@ -116,6 +118,8 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   Detector_Systems[5] = !Used_Systems[5] ? nullptr : new Germanium_Detector_System();
   Detector_Systems[6] = !Used_Systems[6] ? nullptr : new FINGER_Detector_System();
   Detector_Systems[7] = !Used_Systems[7] ? nullptr : new Beam_Monitor_Detector_System();
+  Detector_Systems[8] = !Used_Systems[8] ? nullptr : new BB7_FEBEX_Detector_System();
+  Detector_Systems[9] = !Used_Systems[9] ? nullptr : new BB7_TWINPEAKS_Detector_System();
   
    frs_id = dynamic_cast<TIDParameter*> (an->GetParameter("IDPar"));
 
@@ -132,6 +136,11 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   
   if(Used_Systems[7]) Make_BeamMonitor_Histos();
 
+  if (Used_Systems[8]) Make_BB7_FEBEX_Histos();
+
+  if (Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+
+  
   RAW = new Raw_Event();
 
   load_PrcID_File();

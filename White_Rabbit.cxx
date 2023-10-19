@@ -44,7 +44,7 @@ void White_Rabbit::load_config_file(){
         getline(config_file,line,'\n');
         if(line[0] == '#') continue;
         sscanf(line.c_str(),format,s,&id);
-        for(int i = 0;i < 8;++i){
+        for(int i = 0;i < 10;++i){
             if(string(s) == names[i]){
                 ID[i] = id;
 
