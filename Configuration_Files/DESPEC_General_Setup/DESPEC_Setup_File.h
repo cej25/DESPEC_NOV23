@@ -61,6 +61,10 @@
 #define FatTAMEX_TimeMachineCh1 53
 #define FatTAMEX_TimeMachineCh2 54
 
+// BB7 LAYER
+#define BB7_MAX_HITS 10 // must be similar to AIDA
+#define BB7_FEBEX_MODULES 1
+
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 
 #define bPLASTIC_TWINPEAKS 1
