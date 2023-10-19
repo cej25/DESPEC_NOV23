@@ -31,6 +31,12 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         int unknown;
         int increase;
 
+        int am_fired[100];
+        int sfp_id[100];
+        int trigger_type[100];
+        int* iterator;
+        int tamex_id[100];
+
         int tamex_iter;
         
         ULong Pre_Trigger_Window;
