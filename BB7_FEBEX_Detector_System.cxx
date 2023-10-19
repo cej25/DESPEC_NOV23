@@ -183,3 +183,22 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
     }
 }
 
+void BB7_FEBEX_Detector_System::reset_fired_channels()
+{
+    fired_FEBEX_amount = 0;
+    num_channels_fired = 0;
+
+    for (int i = 0; i < max_am_dets; i++)
+    {
+        Sum_Time[i] = -1;
+        pileup_flags[i] = -1;
+        BB7_channels[i] = 0;
+        Pileup[i] = -1;
+        Hit_Pattern[i] = 0;
+        Chan_Time[i] = 0;
+        Chan_Energy[i] = 0;
+        Chan_CF[i] = 0;
+    }
+}
+
+int* BB7_FEBEX_Detector_System::get_pdata() { return pdata; }
