@@ -396,6 +396,9 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
            if(WR_d==4) fOutput->fFat_Tamex_WR = WR_tmp; //Fatima (TAMEX)
            if(WR_d==5) fOutput->fGe_WR = WR_tmp; //Geileo
            if(WR_d==6) fOutput->fFinger_WR = WR_tmp; //FINGER
+           if(WR_d==7) fOutput->fBM_WR = WR_tmp; // BeamMonitor 
+           if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX
+           if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS
 
             WR_main = WR_tmp;
 
@@ -1668,8 +1671,8 @@ void EventUnpackProc::load_FingerID_File(){
 //-----------------------------------------------------------------------------------------------------------------------------//
 Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 
-  for(int i = 0;i < 8;++i){
-    for(int j = 0;j < 8;++j){
+  for(int i = 0;i < 10;++i){
+    for(int j = 0;j < 10;++j){
         ///Fix for FRS
           if (PrcID==100) return -1;
       if(PrcID == PrcID_Array[i][j]) return i;
@@ -1680,7 +1683,7 @@ Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 }
 
 void EventUnpackProc::get_used_systems(){
-    for(int i = 0;i < 8;i++) Used_Systems[i] = false;
+    for(int i = 0;i < 10;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -1698,12 +1701,12 @@ void EventUnpackProc::get_used_systems(){
     Used_Systems[i] = (id == 1);
     i++;
   }
-  string DET_NAME[8] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor"};
+  string DET_NAME[8] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
     cout << "-----------------------------------------------------" << endl;
-    for(int j = 0;j < 8;++j){
+    for(int j = 0;j < 10;++j){
         if(Used_Systems[j]) cout <<"\t"<< DET_NAME[j] << endl;
     }
     cout << "=====================================================" << endl;
