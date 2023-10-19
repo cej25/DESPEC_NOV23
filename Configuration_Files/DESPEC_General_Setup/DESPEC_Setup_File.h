@@ -5,6 +5,7 @@
 ///Note that channels start from 0
 
 #define WHITE_RABBIT_ENABLED 1
+#define NUM_SUBSYS 10 // number of subsystems for wr/procid
 
 ///Use FRS MHTDC for Analysis (1) or NIM TAC (0)
 #define MHTDC_OR_TAC 0
@@ -62,8 +63,9 @@
 #define FatTAMEX_TimeMachineCh2 54
 
 // BB7 LAYER
-#define BB7_MAX_HITS 10 // must be similar to AIDA
+#define BB7_FEBEX_MAX_HITS 10 // must be similar to AIDA
 #define BB7_FEBEX_MODULES 1
+#define BB7_TAMEX_MODULES 1
 
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 

@@ -11,7 +11,7 @@
 BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
 {
     // set amount of detectors
-    max_am_dets = BB7_MAX_HITS;
+    max_am_dets = BB7_FEBEX_MAX_HITS;
 
     fired_FEBEX_amount = 0;
 

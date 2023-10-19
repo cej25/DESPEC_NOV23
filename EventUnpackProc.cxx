@@ -1701,7 +1701,7 @@ void EventUnpackProc::get_used_systems(){
     Used_Systems[i] = (id == 1);
     i++;
   }
-  string DET_NAME[8] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS"};
+  string DET_NAME[10] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
