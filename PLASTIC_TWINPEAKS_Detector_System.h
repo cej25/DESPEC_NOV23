@@ -49,6 +49,7 @@ private:
     int trigger_type[100];
     int* iterator;
     int tamex_id[100];
+    int** epoch_ch;
 
 
     int tamex_iter;
