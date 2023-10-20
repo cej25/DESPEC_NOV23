@@ -11,57 +11,65 @@ BB7_MADC_Detector_System::BB7_MADC_Detector_System()
     max_hits = BB7_MADC_MAX_HITS;
     num_modules = BB7_MADC_MODULES;
 
-    Module_ID = new int[max_hits];
-    Side = new int[max_hits];
-    Strip = new int[max_hits];
-    AdcData = new int[max_hits];
-    Hit_Pattern = new int[max_hits];
+    ADC_Data = new int[max_hits];
+    Channel_ID = new int[max_hits];
 
-
+    Hits = 0;
     for (int i = 0; i < max_hits; i++)
     {
-        Module_ID[i] = 0;
-        Side[i] = 0;
-        Strip[i] = 0;
-        AdcData[i] = 0;
-        Hit_Pattern[i] = 0;
+        ADC_Data[i] = 0;
+        Channel_ID[i] = 0;
     }
+
+    load_board_channel_file();
 
     // do we care about channel time?
 }
 
 BB7_MADC_Detector_System::~BB7_MADC_Detector_System()
 {
-    // BB7_MADC_Map.clear();
-    delete[] Module_ID;
-    delete[] Side;
-    delete[] Strip;
-    delete[] AdcData;
-    delete[] Hit_Pattern;
+    BB7_MADC_Map.clear();
+    delete[] ADC_Data;
+    delete[] Channel_ID;
 }
 
 void BB7_MADC_Detector_System::load_board_channel_file()
 {   
-    // CEJ:
-    // here we should load strip mapping
-    // we can make pair of module_id and channel_id
-    // and find which strip this maps to 
-    // horizontal or vertical? maybe its implicit 
-    // probably can't be assumed.
-    // Check AIDA mapping
+    std::ifstream file("Configuration_Files/BB7/BB7_MADC_Detector_Map.txt");
+    std::cout << "Loading BB7 MADC Detector Map" << std::endl;
+    if (file.fail())
+    {
+        std::cerr << "Could not find MADC Mapping!" << std::endl;
+        exit(0);
+    }
+
+    constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
+
+    while (file.good())
+    {
+        if (file.peek() == '#')
+        {
+            file.ignore(ignore, '\n');
+            continue;
+        }
+
+        // #module_id, channel_id, strip_number // side?
+        int mod, chan, strip;
+        file >> mod >> chan >> strip; // >> side;
+        file.ignore(ignore, '\n');
+
+        BB7_MADC_Map[std::make_pair(mod, chan)] = strip;
+    }
 }
 
 void BB7_MADC_Detector_System::get_Event_Data(Raw_Event* RAW)
 {
-    RAW->set_DATA_BB7_MADC(int* Module_ID, int* Side, int* Strip, int* AdcData, int* Hit_Pattern);
+    RAW->set_DATA_BB7_MADC(Hits, ADC_Data, Channel_ID);
 }
 
 void BB7_MADC_Detector_System::Process_MBS(int* pdata)
 {   
     this->pdata = pdata;
-
-    // we should match channel to strip here
-    // must match how AIDA deals with this.
 
     for (int i = 0; i < num_modules; i++)
     {
@@ -73,7 +81,7 @@ void BB7_MADC_Detector_System::Process_MBS(int* pdata)
         }
 
         adc_words = header->words;
-        module_id = header->module_id;
+        module_id = header->module_id; // needed for map
         pdata++;
 
         // loop over words
@@ -93,14 +101,15 @@ void BB7_MADC_Detector_System::Process_MBS(int* pdata)
             // CEJ: should we check adc measurement vs ext_ts?
 
             ADC_Measurement* data = (ADC_Measurement*) pdata;
-            AdcData[data->channel] = data->measurement;
-            Hit_Pattern[data->channel] = 1;
 
-            // match side and strip
-            // in AIDA...
-            // Side = conf->FEE(feeID).Side;
-            // Strip = {127 -} FeeToStrip[channelID];
+            // auto idx = std::make_pair(module_id, data->channel);
+            // Strip = BB7_MADC_Map.find(idx);
+            // if Strip isn't weird, we allow the hit?
 
+            ADC_Data[Hits] = data->measurement;
+            Channel_ID[Hits] = data->channel;
+
+            Hits++;
             pdata++;
 
         } // word loop

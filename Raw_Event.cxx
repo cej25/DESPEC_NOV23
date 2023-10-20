@@ -919,6 +919,25 @@ void Raw_Event::set_DATA_BB7_FEBEX(int BB7_FEBEX_hits,ULong64_t* sum_time,int* h
     
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- BB7 MADC  ------------------------------------------------//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Raw_Event::set_DATA_BB7_MADC(int hits, int* adcs, int* chans)
+{   
+    BB7_MADC_Hits = hits;
+    for (int i = 0; i < BB7_MADC_Hits; i++)
+    {
+        BB7_MADC_ADC_Data[i] = adcs[i];
+        BB7_MADC_Channel_ID[i] = chans[i];
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- BB7 TWINPEAKS  ------------------------------------------------//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coarse_BB7_TWINPEAKS, double** Edge_Fine_BB7_TWINPEAKS, UInt** ch_ed_BB7_TWINPEAKS, double* Coarse_Trigger_BB7_TWINPEAKS, double* Fine_Trigger_BB7_TWINPEAKS, int amount_hit_BB7_TWINPEAKS, int** Lead_Arr_BB7_TWINPEAKS)
 {
     this->amount_hit_BB7_TWINPEAKS = amount_hit_BB7_TWINPEAKS;
@@ -1469,6 +1488,10 @@ int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trai
 
     int Raw_Event::get_bPLAST_TWINPEAKS_physical_trail_hits(int i,int j){return trailing_hits_ch_bPlastTwinPeaks[i][j];}
 
+
+int Raw_Event::get_BB7_MADC_hits() { return BB7_MADC_Hits; }
+int Raw_Event::get_BB7_MADC_value(int i) { return BB7_ADC_Data[i]; }
+int Raw_Event::get_BB7_MADC_channel(int i) { return BB7_Channel_ID[i]; }
 
 
 //------------------------------------------ BB7 FEBEX ------------------------------------------//

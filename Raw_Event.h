@@ -388,6 +388,12 @@ private:
     bool        BB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
     ULong64_t   BB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
 
+    // BB7 MADC
+    int BB7_MADC_Hits;
+    int BB7_MADC_ADC_Data[BB7_MADC_MAX_HITS];
+    int BB7_MADC_Channel_ID[BB7_MADC_MAX_HITS];
+
+
 	//Germanium
         int         Ge_hits;
         int         Germanium_Det_Nums[Germanium_MAX_HITS];
@@ -481,20 +487,7 @@ public:
     
     void set_DATA_Germanium_Traces(int, int, int**, int**);
 
-
-
-// 	void set_DATA_PLASTIC(std::vector<int> &it,std::vector<std::vector<double> > &Edge_Coarse,
-//                           std::vector<std::vector<double> > &Edge_fine, std::vector<std::vector<UInt> > &ch_ed,
-//                           std::vector<double> &Coarse_Trigger,std::vector<double> &Fine_Trigger,int amount_hit_tamex);
-//
-// 	void set_DATA_PLASTIC_VME(int TDC_iterator,std::vector<double> &VME_QDC_Data,std::vector<double> &VME_QDC_Channels,
-// 						  std::vector<double> &VME_TDC_Data,std::vector<double> &VME_TDC_Channels);
-
-	//void set_DATA_Germanium(int,ULong64_t*,int*,int*,ULong64_t*,double*,int*);
-
-//	int get_Event_type();
-
-//	bool PLASTIC_CheckVME();
+    void set_DATA_BB7_MADC(int, int*, int*);
 
 
 	// ####################################################
@@ -783,6 +776,11 @@ public:
     //int         get_BB7_FEBEX_Trace_Length();
     //int         get_BB7_FEBEX_Trace_First(int,int);
     //int         get_BB7_FEBEX_Trace_Second(int,int);
+
+    // BB7 MADC Getters
+    int get_BB7_MADC_hits();
+    int get_BB7_MADC_adc(int);
+    int get_BB7_MADC_channel(int);
 
     // ------------------------------------------------------------///
 

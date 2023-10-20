@@ -26,12 +26,15 @@ class BB7_MADC_Detector_System : public Detector_System
         int max_hits;
         int num_modules;
 
-        int* Module_ID;
-        int* Side;
-        int* Strip;
-        int* AdcData;
-        int* Hit_Pattern; // does this need to be an array? [1,0,1,1,0,0,0,1]?
+        int Hits;
+        int Strip;
+        int* ADC_Data;
+        int* Channel_ID;
 
+        void load_board_channel_file();
+
+        // module_id, channel_id -> strip // ,side?
+        std::map<std::pair<int,int>, int> BB7_MADC_Map;
     
     public:
         BB7_MADC_Detector_System();

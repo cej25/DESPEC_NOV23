@@ -3594,16 +3594,52 @@ void EventUnpackProc::Make_BB7_FEBEX_Histos()
     for (int i = 0; i < BB7_FEBEX_MAX_CHANNELS; i++)
     {   
         // multi hit?
-        BB7_Raw_E[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_Energy_Spectra/BB7_Raw_E_Channel:%2d", i), Form("BB7 Layer Energy Raw - Channel %2d", i), 20000, 0, 200000);
+        BB7_FEBEX_Raw_E[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_Energy_Spectra/BB7_FEBEX_Raw_E_Channel:%2d", i), Form("BB7 Layer Energy Raw - Channel %2d", i), 20000, 0, 200000);
     }
 
     // should we be looking for decays and implants here?
+    // no decays, only implants
 
     // AIDA has
     // low energy, high energy, deadtime, scalers, timemachine
 
+    // we want:
+    // raw energy
+    // hit pattern
+    // anything else Anabel asks
+
+    // CEJ: hist needs initialising
+    BB7_FEBEX_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
 }
 
+
+
+
+
+void EventUnpackProc::Fill_Germanium_Histos(){
+
+    //double tmpGe[32];
+    int  Germanium_hits;
+    //GeID;
+
+     /**------------------Germanium Raw Energy -----------------------------------------**/
+      Germanium_hits = RAW->get_Germanium_am_Fired();
+      
+         for(int i=0; i<Germanium_hits; i++){
+            if(RAW->get_Germanium_Det_id(i)>-1){
+               hGe_Raw_E[RAW->get_Germanium_Det_id(i)][RAW->get_Germanium_Crystal_id(i)]->Fill(RAW->get_Germanium_Chan_E(i));
+         
+          if(Germanium_TRACES_ACTIVE){
+            for(int l_l=0; l_l<RAW->get_Germanium_Trace_Length()/2; l_l++){
+                     
+                      h_trace[RAW->get_Germanium_Det_id(i)][RAW->get_Germanium_Crystal_id(i)]->SetBinContent (l_l*2  ,RAW->get_Germanium_Trace_First(i,l_l));
+                      h_trace[RAW->get_Germanium_Det_id(i)][RAW->get_Germanium_Crystal_id(i)]->SetBinContent (l_l*2+1,RAW->get_Germanium_Trace_Second(i,l_l));
+                  }
+             }
+        }
+     }
+   }
 
 
 

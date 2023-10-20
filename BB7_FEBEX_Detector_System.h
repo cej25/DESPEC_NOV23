@@ -52,8 +52,9 @@ class BB7_FEBEX_Detector_System : public Detector_System
         int** l_dat_sec;
 
         int fired_FEBEX_traces;
-
-        std::map<std::pair<int,int>, std::pair<int,int>> BB7_Map;
+        
+        // module_id, channel_id -> strip
+        std::map<std::pair<int,int>, int> BB7_FEBEX_Map;
 
         int num_channels_fired;
 
