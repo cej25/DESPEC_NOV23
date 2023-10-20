@@ -63,9 +63,16 @@
 #define FatTAMEX_TimeMachineCh2 54
 
 // BB7 LAYER
-#define BB7_FEBEX_MAX_HITS 10 // must be similar to AIDA
-#define BB7_FEBEX_MODULES 1
-#define BB7_TAMEX_MODULES 1
+#define BB7_FEBEX_MODULES 4
+#define BB7_FEBEX_CHANNELS 16
+#define BB7_FEBEX_MAX_CHANNELS (BB7_FEBEX_MODULES * BB7_FEBEX_CHANNELS);
+#define BB7_FEBEX_MAX_HITS // some number
+#define BB7_TAMEX_MODULES 4
+#define BB7_TAMEX_CHANNELS 32 // CEJ: 16 fast/slow
+#define BB7_TAMEX_MAX_HITS 200 // CEJ: no idea
+#define BB7_MADC_MODULES 2
+#define BB7_MADC_CHANNELS 32
+#define BB7_MADC_MAX_HITS 64 // CEJ: no idea
 
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 
