@@ -516,6 +516,13 @@ using namespace std;
 			TH1 *hGe_Raw_E[Germanium_MAX_DETS][Germanium_CRYSTALS];
             TH1 *h_trace[Germanium_MAX_DETS][Germanium_CRYSTALS];
 
+
+            // BB7 Potential histograms
+            TH1* hBB7_FEBEX_Raw_E[BB7_FEBEX_MAX_CHANNELS];
+            TH1* hBB7_FEBEX_Hit_Pattern;
+            TH1* hBB7_MADC_Raw_E[BB7_MADC_MAX_HITS];
+            TH1* hBB7_MADC_Hit_Pattern;
+
 		private:
 
 
@@ -680,12 +687,21 @@ using namespace std;
 
 			void Make_Germanium_Histos();
 			void Fill_Germanium_Histos();
-
+        
             void Make_Finger_Histos();
             void Fill_Finger_Histos();
             
             void Make_BeamMonitor_Histos();
             void Fill_BeamMonitor_Histos();
+
+            void Make_BB7_FEBEX_Histos();
+            void Make_BB7_TWINPEAKS_Histos();
+            void Make_BB7_MADC_Histos();
+
+            void Fill_BB7_FEBEX_Histos();
+            void Fill_BB7_TWINPEAKS_Histos();
+            void Fill_BB7_MADC_Histos();
+
 
 			void FILL_HISTOGRAMS(int,int,int,EventUnpackStore* fOutput);
 
