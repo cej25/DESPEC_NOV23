@@ -16,7 +16,7 @@ BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
     fired_FEBEX_amount = 0;
 
     Sum_Time = new ULong64_t[max_am_dets];
-    Hit_Pattern = new int[max_am_dets];
+    Hit_Pattern = new int[max_am_dets]; // is this supposed to be BB7_Channels?
 
     // these names probably have to change
     det_ids = new int[max_am_dets];
@@ -41,7 +41,7 @@ BB7_FEBEX_Detector_System::~BB7_FEBEX_Detector_System()
     delete[] det_ids;
     delete[] crystal_ids;
     delete[] Sum_Time;
-    delete[] Hit_Pattern;
+    delete[] Hit_Pattern; // is this supposed to be BB7_Channels?
     delete[] Pileup;
     delete[] Overflow;
     delete[] Chan_Time;
@@ -58,7 +58,7 @@ void BB7_FEBEX_Detector_System::load_board_channel_file()
 
 void BB7_FEBEX_Detector_System::get_Event_Data(Raw_Event* RAW)
 {
-    RAW->set_DATA_BB7(fired_FEBEX_amount, Sum_Time, BB7_channels, Chan_Time, Chan_Energy, Chan_CF, det_ids, crystal_ids, Pileup, Overflow);
+    RAW->set_DATA_BB7_FEBEX(fired_FEBEX_amount, Sum_Time, BB7_channels, Chan_Time, Chan_Energy, Chan_CF, det_ids, crystal_ids, Pileup, Overflow);
 }
 
 void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
@@ -116,7 +116,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
                 }
                 if (tmp_Hit_Pattern & (1 << j))
                 {
-                    BB7_channels[j] = j;
+                    BB7_channels[j] = j; // why is it assigned j?
                     num_channels_fired++;
                 }
             }

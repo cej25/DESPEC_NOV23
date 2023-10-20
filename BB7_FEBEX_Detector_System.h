@@ -7,8 +7,8 @@
 #include <cmath>
 #include <map>
 
-#include "BB7_Energy_Calibration.h"
-#include "BB7_Time_Calibration.h"
+#include "BB7_FEBEX_Energy_Calibration.h"
+#include "BB7_FEBEX_Time_Calibration.h"
 
 #include "FEBEX.h"
 
@@ -57,16 +57,16 @@ class BB7_FEBEX_Detector_System : public Detector_System
 
         int num_channels_fired;
 
-        int pileup_flags[BB7_MAX_HITS];
-        int BB7_channels[BB7_MAX_HITS]; 
+        int pileup_flags[BB7_FEBEX_MAX_HITS];
+        int BB7_channels[BB7_FEBEX_MAX_HITS]; 
         int fired_FEBEX_amount;
         
         void load_board_channel_file();
         void reset_fired_channels();
         void Calibrate_FEBEX();
 
-        BB7_Energy_Calibration* BB7_E_CALIB;
-        BB7_Time_Calibration* BB7_T_CALIB;
+        BB7_FEBEX_Energy_Calibration* BB7_E_CALIB;
+        BB7_FEBEX_Time_Calibration* BB7_T_CALIB;
 
     
     public:

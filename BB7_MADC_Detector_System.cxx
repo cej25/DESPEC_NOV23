@@ -6,3 +6,100 @@
 #include "MADC32.h"
 #include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
+BB7_MADC_Detector_System::BB7_MADC_Detector_System()
+{
+    // what do we need to store/carry though
+    // adc value (energy), per channel
+    // do we get multi hit? I don't think so.
+    max_hits = BB7_MADC_MAX_HITS;
+    num_modules = BB7_MADC_MODULES;
+    Chan_Energy = new double[max_hits];
+    Hit_Pattern = new int[max_hits]; // only works with a map I guess
+
+    // do we care about channel time?
+}
+
+BB7_MADC_Detector_System::~BB7_MADC_Detector_System()
+{
+    // delete stuff
+    delete max_hits;
+    delete[] Chan_Energy;
+    delete[] Hit_Pattern;
+
+}
+
+void BB7_MADC_Detector_System::load_board_channel_file()
+{   
+    // CEJ:
+    // here we should load strip mapping
+    // we can make pair of module_id and channel_id
+    // and find which strip this maps to 
+    // horizontal or vertical? maybe its implicit 
+    // probably can't be assumed.
+    // Check AIDA mapping
+}
+
+void BB7_MADC_Detector_System::get_Event_Data(Raw_Event* RAW)
+{
+    RAW->set_DATA_BB7_MADC(double* Chan_Energy, int* Hit_Pattern);
+}
+
+void BB7_MADC_Detector_System::Process_MBS(int* pdata)
+{   
+    this->pdata = pdata;
+    // read data.
+    // header
+    // some amount of data, non-specifc channel order
+    // potential filler word
+    // end of event / trailer
+
+    // we should match channel to strip here
+    // must match how AIDA deals with this.
+
+    for (int i = 0; i < num_modules; i++)
+    {
+
+        ADC_Header* header = (ADC_Header*) pdata;
+        if (header->sig != 0b01)
+        {
+            std::cerr << "Can't match header word in MADC32! Word: " << std::hex << *pdata << std::endl;
+        }
+
+        adc_words = header->words;
+        module_id = header->module_id;
+        pdata++;
+
+        // loop over words
+        for (int word = 0; word < adc_words - 1; word++)
+        {   
+            // check for filler word
+            if (word == adc_words - 2)
+            {
+                ADC_Fill* fill = (ADC_Fill*) pdata;
+                if (fill->zero == 0)
+                {
+                    pdata++;
+                    continue;
+                }
+            }
+
+            // CEJ: should we check adc measurement vs ext_ts?
+
+            (ADC_Measurement*) data = (ADC_Measurement*) pdata;
+            Chan_Energy[data->channel] = data->measurement;
+            Hit_Pattern[data->channel] = 1;
+
+            pdata++;
+
+        } // word loop
+
+        ADC_End* eoe = (ADC_End*) pdata;
+        if (eoe->sig != 0b11)
+        {
+            std::cerr << "Can't match end of event word in MADC32! Word: " << std::hex << *pdata << std::dec << std::endl;
+        }
+
+    } // module loop
+}
+
+void BB7_MADC_Detector_System::get_pdata() { return pdata; }
