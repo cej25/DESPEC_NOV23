@@ -8,24 +8,36 @@
 
 BB7_MADC_Detector_System::BB7_MADC_Detector_System()
 {
-    // what do we need to store/carry though
-    // adc value (energy), per channel
-    // do we get multi hit? I don't think so.
     max_hits = BB7_MADC_MAX_HITS;
     num_modules = BB7_MADC_MODULES;
-    Chan_Energy = new double[max_hits];
-    Hit_Pattern = new int[max_hits]; // only works with a map I guess
+
+    Module_ID = new int[max_hits];
+    Side = new int[max_hits];
+    Strip = new int[max_hits];
+    AdcData = new int[max_hits];
+    Hit_Pattern = new int[max_hits];
+
+
+    for (int i = 0; i < max_hits; i++)
+    {
+        Module_ID[i] = 0;
+        Side[i] = 0;
+        Strip[i] = 0;
+        AdcData[i] = 0;
+        Hit_Pattern[i] = 0;
+    }
 
     // do we care about channel time?
 }
 
 BB7_MADC_Detector_System::~BB7_MADC_Detector_System()
 {
-    // delete stuff
-    delete max_hits;
-    delete[] Chan_Energy;
+    // BB7_MADC_Map.clear();
+    delete[] Module_ID;
+    delete[] Side;
+    delete[] Strip;
+    delete[] AdcData;
     delete[] Hit_Pattern;
-
 }
 
 void BB7_MADC_Detector_System::load_board_channel_file()
@@ -41,17 +53,12 @@ void BB7_MADC_Detector_System::load_board_channel_file()
 
 void BB7_MADC_Detector_System::get_Event_Data(Raw_Event* RAW)
 {
-    RAW->set_DATA_BB7_MADC(double* Chan_Energy, int* Hit_Pattern);
+    RAW->set_DATA_BB7_MADC(int* Module_ID, int* Side, int* Strip, int* AdcData, int* Hit_Pattern);
 }
 
 void BB7_MADC_Detector_System::Process_MBS(int* pdata)
 {   
     this->pdata = pdata;
-    // read data.
-    // header
-    // some amount of data, non-specifc channel order
-    // potential filler word
-    // end of event / trailer
 
     // we should match channel to strip here
     // must match how AIDA deals with this.
@@ -85,9 +92,14 @@ void BB7_MADC_Detector_System::Process_MBS(int* pdata)
 
             // CEJ: should we check adc measurement vs ext_ts?
 
-            (ADC_Measurement*) data = (ADC_Measurement*) pdata;
-            Chan_Energy[data->channel] = data->measurement;
+            ADC_Measurement* data = (ADC_Measurement*) pdata;
+            AdcData[data->channel] = data->measurement;
             Hit_Pattern[data->channel] = 1;
+
+            // match side and strip
+            // in AIDA...
+            // Side = conf->FEE(feeID).Side;
+            // Strip = {127 -} FeeToStrip[channelID];
 
             pdata++;
 

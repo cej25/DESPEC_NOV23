@@ -25,7 +25,11 @@ class BB7_MADC_Detector_System : public Detector_System
 
         int max_hits;
         int num_modules;
-        double* Chan_Energy;
+
+        int* Module_ID;
+        int* Side;
+        int* Strip;
+        int* AdcData;
         int* Hit_Pattern; // does this need to be an array? [1,0,1,1,0,0,0,1]?
 
     
