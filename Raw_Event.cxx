@@ -1492,7 +1492,7 @@ int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trai
 int Raw_Event::get_BB7_MADC_Hits() { return BB7_MADC_Hits; }
 int Raw_Event::get_BB7_MADC_Side(int i) { return BB7_MADC_Side[i]; }
 int Raw_Event::get_BB7_MADC_Strip(int i) { return BB7_MADC_Strip[i]; }
-int Raw_Event::get_BB7_MADC_ADC(int i) { return BB7_ADC_Data[i]; }
+int Raw_Event::get_BB7_MADC_ADC(int i) { return BB7_MADC_ADC_Data[i]; }
 
 
 //------------------------------------------ BB7 FEBEX ------------------------------------------//
