@@ -27,8 +27,8 @@ class BB7_MADC_Detector_System : public Detector_System
         int num_modules;
 
         int Hits;
-        int Strip;
-        int Side;
+        int* Strip;
+        int* Side;
         int* ADC_Data;
 
         void load_board_channel_file();
