@@ -389,9 +389,9 @@ private:
 
     // BB7 MADC
     int BB7_MADC_Hits;
+    int BB7_MADC_Side[BB7_MADC_MAX_HITS];
+    int BB7_MADC_Strip[BB7_MADC_MAX_HITS];
     int BB7_MADC_ADC_Data[BB7_MADC_MAX_HITS];
-    int BB7_MADC_Channel_ID[BB7_MADC_MAX_HITS];
-
 
 	//Germanium
         int         Ge_hits;

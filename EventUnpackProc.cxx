@@ -3078,24 +3078,6 @@ void EventUnpackProc::Fill_FATIMA_Histos(EventUnpackStore* fOutput){
 /**----------------------------------------   Germanium   -----------------------------------------**/
 /**----------------------------------------------------------------------------------------------**/
 
-// CEJ: actually this whole thing needs to be combined with AIDA spectra.
-// Making far too many bad assumptions right now.
-void EventUnpackProc::Make_BB7_FEBEX_Histos()
-{
-    Text_t chis[256];
-    Text_t chead[256];
-    // not sure these really hold up (DSSDS, FEEs or something?)
-    for (int i = 0; i < BB7_FEBEX_MAX_DETS; i++)
-    {
-        for (int j = 0; j < BB7_FEBEX_MAX_CRYSTALS; i++)
-        {
-            BB7_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_Energy_Spectra/BB7_Raw_E_Det: "))
-        }
-    }
-}
-
-
-
 void EventUnpackProc::Make_Germanium_Histos(){
     Text_t chis[256];
     Text_t chead[256];
@@ -3591,40 +3573,43 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 // I think this must be true.
 
 void EventUnpackProc::Make_BB7_FEBEX_Histos()
-{
-    for (int i = 0; i < BB7_FEBEX_MAX_CHANNELS; i++)
-    {   
-        // multi hit?
-        hBB7_FEBEX_Raw_E[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Channel:%2d", i), Form("BB7 Layer Energy Raw - Channel %2d", i), 20000, 0, 200000);
+{ 
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_FEBEX_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+        }
+        hBB7_FEBEX_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
     }
+    hBB7_FEBEX_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
 
-    // should we be looking for decays and implants here?
-    // no decays, only implants
-
-    // AIDA has
-    // low energy, high energy, deadtime, scalers, timemachine
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_FEBEX_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
 
     // we want:
     // raw energy
     // hit pattern
-    // anything else Anabel asks
-
-    // CEJ: hist needs initialising
-    hBB7_FEBEX_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
-
+    // anything else Anabel+Marta asks
 }
 
 void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 {
+    // CEJ: not so sure about any of this..!
     int Hits = RAW->get_BB7_FEBEX_Hits();
     for (int i = 0; i < Hits; i++)
-    {
-        // we just need to get channel, rather than det_id and channel_id
-        // maybe module if we care but.. probably not
-        // function doesn't exist yet
-        hBB7_FEBEX_Raw_E[RAW->get_BB7_FEBEX_Channel(i)]->Fill(RAW->get_BB7_FEBEX_Chan_Energy(i));
-        hBB7_FEBEX_Hit_Pattern->Fill(RAW->get_BB7_FEBEX_Channel(i));
+    { 
+        int Side = RAW->get_BB7_FEBEX_Side(i);
+        int Strip = RAW->get_BB7_FEBEX_Strip(i);
+        int Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+
+        hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
+        hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+        hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
+        // CEJ: currently 1-64, could be per side or febex module
+        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip)
     }
+
 }
 
 void EventUnpackProc::Make_BB7_TWINPEAKS_Histos()

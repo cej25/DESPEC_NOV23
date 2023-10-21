@@ -518,9 +518,14 @@ using namespace std;
 
 
             // BB7 Potential histograms
-            TH1* hBB7_FEBEX_Raw_E[BB7_FEBEX_MAX_CHANNELS];
+            TH1* hBB7_FEBEX_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Side[BB7_SIDES];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Total;
             TH1* hBB7_FEBEX_Hit_Pattern;
-            TH1* hBB7_MADC_Raw_E[BB7_MADC_MAX_HITS];
+            // tamex??
+            TH1* hBB7_MADC_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_MADC_Raw_E_SumSide[BB7_SIDES];
+            TH1* hBB7_MADC_Raw_E_SumTotal;
             TH1* hBB7_MADC_Hit_Pattern;
 
 		private:
