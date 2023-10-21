@@ -46,6 +46,9 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "PLASTIC_TAMEX_Detector_System.h"
 #include "Germanium_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 #include "DESPECAnalysis.h"
 #include "FRS_Detector_System.h"
 
