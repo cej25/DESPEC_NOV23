@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include "WR_Structure.h"
+#include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
 
 //define ULong64_t (used e.g. in Root or Go4)
