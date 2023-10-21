@@ -968,7 +968,7 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                     fine_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
 
                     phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]);
-                    leading_hits_BB7_TWINPEAKS[i][j]++;
+                    leading_hits_BB7_TWINPEAKS[i]++;
                     leading_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
                 }
                 if (ch_ID_BB7_TWINPEAKS[i][j] > 33 && j % 2 == 1 && ch_ID_BB7_TWINPEAKS[i][j] < 66)
