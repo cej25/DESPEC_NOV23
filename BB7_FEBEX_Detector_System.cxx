@@ -70,7 +70,6 @@ void BB7_FEBEX_Detector_System::load_board_channel_file()
 
 void BB7_FEBEX_Detector_System::get_Event_data(Raw_Event* RAW)
 {   
-    // Actually Hit_Pattern isn't really needed if we have Side, Strip
     RAW->set_DATA_BB7_FEBEX(Hits, Side, Strip, Sum_Time, Chan_Time, Chan_Energy, Chan_CF, Pileup, Overflow);
 }
 
@@ -107,7 +106,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
             FEBEX_Evt_Time* EventTime_Lo = (FEBEX_Evt_Time*) this->pdata;
             
-            tmp_Sum_Time = (EventTime_Lo->evt_time) | (EventTime_Hi->ext_time << 32);
+            tmp_Sum_Time = (EventTime_Lo->evt_time) | (ULong64_t*)(EventTime_Hi->ext_time << 32);
             this->pdata++;
 
             FEBEX_Flag_Hits* Flags = (FEBEX_Flag_Hits*) this->pdata;
@@ -133,13 +132,13 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
                 // CEJ: is this necessary here?
                 auto idx = std::make_pair(module_id, channel_id);
-                if (BB7_Map.find(idx) != BB7_Map.end())
+                if (BB7_FEBEX_Map.find(idx) != BB7_FEBEX_Map.end())
                 {
                     Sum_Time[Hits] = tmp_Sum_Time;
                     this->pdata++;
                     
                     FEBEX_TS* Channel_Time = (FEBEX_TS*) this->pdata;
-                    Chan_Time[Hits] = ((Channel_Time->chan_ts) | (Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
+                    Chan_Time[Hits] = ((Channel_Time->chan_ts) | (ULong64_t*)(Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
                     this->pdata++;
 
                     FEBEX_En* Channel_Energy = (FEBEX_En*) this->pdata;
@@ -189,7 +188,6 @@ void BB7_FEBEX_Detector_System::reset_fired_channels()
         Side[i] = 0;
         Strip[i] = 0;
         Sum_Time[i] = -1; // CEJ: why is this -1?
-        Hit_Pattern[i] = 0;
         Chan_Time[i] = 0;
         Chan_Energy[i] = 0;
         Chan_CF[i] = 0;
