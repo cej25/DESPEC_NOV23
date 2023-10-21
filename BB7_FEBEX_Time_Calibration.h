@@ -16,7 +16,8 @@ class BB7_FEBEX_Time_Calibration
     public:
         BB7_FEBEX_Time_Calibration();
         ~BB7_FEBEX_Time_Calibration();
-
+    
+        void load_Calibration_File();
         ULong Calibrate_FEBEX_Sum_T(ULong, int);
         ULong Calibrate_FEBEX_Chan_T(ULong, int);
 };
