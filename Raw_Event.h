@@ -487,7 +487,7 @@ public:
     void set_DATA_Germanium_Traces(int, int, int**, int**);
 
 
-    void set_DATA_BB7_FEBEX(int, int*, int*, ULong64_t*, ULong64_t*, double*, ULong64_t*, int*, int*);
+    void set_DATA_BB7_FEBEX(int, int*, int*, ULong64_t*, ULong64_t*, double*, ULong64_t*, bool*, bool*);
     void set_DATA_BB7_MADC(int, int*, int*, int*);
 
 
