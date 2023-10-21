@@ -26,7 +26,7 @@ class BB7_TAMEX_Calibrator
         bool** fired;
         bool** wired_tamex_ch;
 
-        double bins_x_arr;
+        double* bins_x_arr;
         double*** Cal_arr;
 
         TH1D*** Fine_Hist;

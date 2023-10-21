@@ -102,11 +102,12 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
             this->pdata++;
 
             FEBEX_Half_Time* EventTime_Hi = (FEBEX_Half_Time*) this->pdata;
+            tmp_EventTime_hi = EventTime_Hi->ext_time;
             this->pdata++;
 
             FEBEX_Evt_Time* EventTime_Lo = (FEBEX_Evt_Time*) this->pdata;
             
-            tmp_Sum_Time = (EventTime_Lo->evt_time) + (EventTime_Hi->ext_time << 32);
+            tmp_Sum_Time = (EventTime_Lo->evt_time) + (tmp_EventTime_hi << 32);
             this->pdata++;
 
             FEBEX_Flag_Hits* Flags = (FEBEX_Flag_Hits*) this->pdata;
@@ -129,6 +130,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
                 FEBEX_Chan_Header* Channel_Head = (FEBEX_Chan_Header*) this->pdata;
                 channel_id = Channel_Head->Ch_ID;
+                tmp_ChanTime_hi = Channel_Head->ext_chan_ts;
 
                 // CEJ: is this necessary here?
                 auto idx = std::make_pair(module_id, channel_id);
@@ -138,7 +140,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
                     this->pdata++;
                     
                     FEBEX_TS* Channel_Time = (FEBEX_TS*) this->pdata;
-                    Chan_Time[Hits] = ((Channel_Time->chan_ts) + (Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
+                    Chan_Time[Hits] = ((Channel_Time->chan_ts) + (tmp_ChanTime_hi << 32)) * 10; // convert to ns
                     this->pdata++;
 
                     FEBEX_En* Channel_Energy = (FEBEX_En*) this->pdata;

@@ -94,7 +94,8 @@ void BB7_TAMEX_Calibrator::load_Calibration_Files()
     // load files
 }
 
-double BB7_TAMEX_Calibrator::get_Calibration_val()
+// CEJ: fix in future...
+double BB7_TAMEX_Calibrator::get_Calibration_val(double one, int two, int three)
 {
     // get calibration val
 }

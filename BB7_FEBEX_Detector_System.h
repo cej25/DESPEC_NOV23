@@ -37,6 +37,8 @@ class BB7_FEBEX_Detector_System : public Detector_System
         bool* Pileup;
 
         ULong64_t tmp_Sum_Time;
+        ULong64_t tmp_EventTime_hi;
+        ULong64_t tmp_ChanTime_hi;
         int tmp_Pileup;
         int tmp_Hit_Pattern;
         
