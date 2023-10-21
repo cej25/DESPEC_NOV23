@@ -11,68 +11,74 @@
 BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
 {
     // set amount of detectors
-    max_am_dets = BB7_FEBEX_MAX_HITS;
+    max_hits = BB7_FEBEX_MAX_HITS;
+    num_modules = BB7_FEBEX_MODULES;
 
-    fired_FEBEX_amount = 0;
-
-    Sum_Time = new ULong64_t[max_am_dets];
-    Hit_Pattern = new int[max_am_dets]; // is this supposed to be BB7_Channels?
-
-    // these names probably have to change
-    det_ids = new int[max_am_dets];
-    crystal_ids = new int[max_am_dets];
-
-    Chan_Time = new ULong64_t[max_am_dets];
-    Chan_Energy = new double[max_am_dets];
-    Chan_CF = new ULong64_t[max_am_dets];
-    Pileup = new bool[max_am_dets];
-    Overflow = new bool[max_am_dets];
-
-    BB7_E_CALIB = new BB7_Energy_Calibration();
-    BB7_T_CALIB = new BB7_Time_Calibration();
+    Side = new int[max_hits];
+    Strip = new int[max_hits];
+    Sum_Time = new ULong64_t[max_hits];
+    Hit_Pattern = new int[max_hits];
+    Chan_Time = new ULong64_t[max_hits];
+    Chan_Energy = new double[max_hits];
+    Chan_CF = new ULong64_t[max_hits];
+    Pileup = new int[max_hits];
+    Overflow = new int[max_hits];
 
     load_board_channel_file();
-
 }
 
 BB7_FEBEX_Detector_System::~BB7_FEBEX_Detector_System()
 {
-    BB7_Map.clear(); // not necessary?
-    delete[] det_ids;
-    delete[] crystal_ids;
+    BB7_FEBEX_Map.clear(); // note from AKM that this is maybe not necessary
+    delete[] Side;
+    delete[] Strip;
     delete[] Sum_Time;
-    delete[] Hit_Pattern; // is this supposed to be BB7_Channels?
     delete[] Pileup;
     delete[] Overflow;
     delete[] Chan_Time;
     delete[] Chan_Energy;
     delete[] Chan_CF;
-    delete[] BB7_E_CALIB;
-    delete[] BB7_T_CALIB;
 }
 
 void BB7_FEBEX_Detector_System::load_board_channel_file()
 {
-    // do loading
+    std::ifstream file("Configuration_Files/BB7/BB7_FEBEX_Detector_Map.txt");
+    std::cout << "Loading BB7 FEBEX Detector Map" << std::endl;
+    if (file.fail())
+    {
+        std::cerr << "Could not find BB7 FEBEX Mapping" << std::endl;
+        exit(0);
+    }
+
+    constexpr auto ignore = std::numeric_limits<streamsize>::max();
+
+    while (file.good())
+    {
+        if (file.peek() == '#')
+        {
+            file.ignore(ignore, '\n');
+            continue;
+        }
+
+        // #module_id, channel_id, side, strip_number
+        int mod, chan, side, strip;
+        file >> mod >> chan >> side >> strip;
+        file.ignore(ignore, '\n');
+
+        BB7_FEBEX_Map[std::make_pair(mod, chan)] = std::make_pair(side, strip);
+    }
 }
 
 void BB7_FEBEX_Detector_System::get_Event_Data(Raw_Event* RAW)
-{
-    RAW->set_DATA_BB7_FEBEX(fired_FEBEX_amount, Sum_Time, BB7_channels, Chan_Time, Chan_Energy, Chan_CF, det_ids, crystal_ids, Pileup, Overflow);
+{   
+    // Actually Hit_Pattern isn't really needed if we have Side, Strip
+    RAW->set_DATA_BB7_FEBEX(Hits, Side, Strip, Sum_Time, Chan_Time, Chan_Energy, Chan_CF, Pileup, Overflow);
 }
 
 void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
-{
+{   
+    this->pdata = pdata; // CEJ: i hate this
     reset_fired_channels();
-
-    std::pair<int, int> current_det;
-
-    this->pdata = pdata; // god i hate this
-    bool FEBEX_data_loop = true;
-
-    int num_modules = BB7_FEBEX_MODULES; 
-    
-    fired_FEBEX_amount = 0; // how would this not already be zero.. 
 
     // loop through padding
     FEBEX_Add* FEBEX_add = (FEBEX_Add*) this->pdata;
@@ -84,11 +90,12 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
     FEBEX_Header* SumChannel_Head = (FEBEX_Header*) this->pdata;
 
+    bool FEBEX_data_loop = true;
     while (FEBEX_data_loop)
     {
         if (SumChannel_Head->ff == 0xFF)
         {
-            board_id = SumChannel_Head->chan_head;
+            module_id = SumChannel_Head->chan_head;
             this->pdata++;
 
             FEBEX_Chan_Size* Channel_Size = (FEBEX_Chan_Size*) this->pdata;
@@ -108,18 +115,9 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
             tmp_Pileup = Flags->pile_flags;
             tmp_Hit_Pattern = Flags->hit_pattern;
 
-            for (int j = 15; j >= 0; j--)
-            {
-                if (tmp_Pileup & (1 << j))
-                {
-                    pileup_flags[j] = 1;
-                }
-                if (tmp_Hit_Pattern & (1 << j))
-                {
-                    BB7_channels[j] = j; // why is it assigned j?
-                    num_channels_fired++;
-                }
-            }
+            // none of this seemed correct for modules>1
+            // we can rework if we need a hit pattern by module
+
             this->pdata++;
 
         } // FF header
@@ -131,37 +129,37 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
             {
                 this->pdata++;
 
-                FEBEX_Chan_Header* Channel_Head = (FEBEX_Chan_Head*) this->pdata;
-                int tmp_Ch_ID = Channel_Head->Ch_ID;
+                FEBEX_Chan_Header* Channel_Head = (FEBEX_Chan_Header*) this->pdata;
+                channel_id = Channel_Head->Ch_ID;
 
                 // CEJ: is this necessary here?
-                auto idx = std::make_pair(board_id, tmp_Ch_ID);
+                auto idx = std::make_pair(module_id, channel_id);
                 if (BB7_Map.find(idx) != BB7_Map.end())
                 {
-                    Sum_Time[fired_FEBEX_amount] = tmp_Sum_Time;
+                    Sum_Time[Hits] = tmp_Sum_Time;
                     this->pdata++;
                     
                     FEBEX_TS* Channel_Time = (FEBEX_TS*) this->pdata;
-                    Chan_Time[fired_FEBEX_amount] = ((Channel_Time->chan_ts) | (Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
+                    Chan_Time[Hits] = ((Channel_Time->chan_ts) | (Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
                     this->pdata++;
 
                     FEBEX_En* Channel_Energy = (FEBEX_En*) this->pdata;
-                    Chan_Energy[fired_FEBEX_amount] = Channel_Energy->chan_en;
-                    Chan_CF[fired_FEBEX_amount] = 10.0 * ((Channel_Time->chan_ts) + (Channel_Energy->cf) / 64.0);
+                    Chan_Energy[Hits] = Channel_Energy->chan_en;
+                    Chan_CF[Hits] = 10.0 * ((Channel_Time->chan_ts) + (Channel_Energy->cf) / 64.0);
 
                     if (Channel_Energy->chan_en & 0x00800000)
                     {
                         int energy = 0xFF000000 | Channel_Energy->chan_en;
-                        Chan_Energy[fired_FEBEX_amount] = energy;
+                        Chan_Energy[Hits] = energy;
                     }
 
-                    Pileup[fired_FEBEX_amount] = Channel_Energy->pileup != 0; // CEJ: why does this need to be a condition...
-                    Overflow[fired_FEBEX_amount] = Channel_Energy->overflow != 0;
-                    det_ids[fired_FEBEX_amount] = BB7_Map[idx].first;
-                    crystal_ids[fired_FEBEX_amount] = BB7_Map[idx].second;
+                    Pileup[Hits] = Channel_Energy->pileup != 0; // CEJ: why does this need to be a condition...
+                    Overflow[Hits] = Channel_Energy->overflow != 0;
+                    Side[Hits] = BB7_FEBEX_Map[idx].first;
+                    Strip[Hits] = BB7_FEBEX_Map[idx].second;
                     this->pdata++;
 
-                    fired_FEBEX_amount++;
+                    Hits++;
                     
                 } // mapping loop
                 else
@@ -184,21 +182,22 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 }
 
 void BB7_FEBEX_Detector_System::reset_fired_channels()
-{
-    fired_FEBEX_amount = 0;
-    num_channels_fired = 0;
+{   
 
-    for (int i = 0; i < max_am_dets; i++)
+    Hits = 0;
+    for (int i = 0; i < max_hits; i++)
     {
-        Sum_Time[i] = -1;
-        pileup_flags[i] = -1;
-        BB7_channels[i] = 0;
-        Pileup[i] = -1;
+        Side[i] = 0;
+        Strip[i] = 0;
+        Sum_Time[i] = -1; // CEJ: why is this -1?
         Hit_Pattern[i] = 0;
         Chan_Time[i] = 0;
         Chan_Energy[i] = 0;
         Chan_CF[i] = 0;
+        Pileup[i] = -1;
+        Overflow[i] = -1;
     }
+
 }
 
 int* BB7_FEBEX_Detector_System::get_pdata() { return pdata; }

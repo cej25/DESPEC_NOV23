@@ -377,16 +377,15 @@ private:
     bool    fired_tamex_BB7_TWINPEAKS[BB7_TAMEX_MODULES];
 
     // BB7 FEBEX
-    int         BB7_FEBEX_hits;
-    int         BB7_FEBEX_Det_Nums[BB7_FEBEX_MAX_HITS];
-    int         BB7_FEBEX_Crystal_Nums[BB7_FEBEX_MAX_HITS];
+    int         BB7_FEBEX_Hits;
+    int         BB7_FEBEX_Side[BB7_FEBEX_MAX_HITS];
+    int         BB7_FEBEX_Strip[BB7_FEBEX_MAX_HITS];
     ULong64_t   BB7_FEBEX_Sum_Time[BB7_FEBEX_MAX_HITS];
-    int         BB7_FEBEX_Hit_Pattern[BB7_FEBEX_MAX_HITS];
     ULong64_t   BB7_FEBEX_Chan_Time[BB7_FEBEX_MAX_HITS];
     double      BB7_FEBEX_Chan_Energy[BB7_FEBEX_MAX_HITS];
+    ULong64_t   BB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
     bool        BB7_FEBEX_Pileup[BB7_FEBEX_MAX_HITS];
     bool        BB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
-    ULong64_t   BB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
 
     // BB7 MADC
     int BB7_MADC_Hits;
@@ -487,7 +486,9 @@ public:
     
     void set_DATA_Germanium_Traces(int, int, int**, int**);
 
-    void set_DATA_BB7_MADC(int, int*, int*);
+
+    void set_DATA_BB7_FEBEX(int, int*, int*, ULong64_t*, ULong64_t*, double*, ULong64_t*, int*, int*);
+    void set_DATA_BB7_MADC(int, int*, int*, int*);
 
 
 	// ####################################################
@@ -763,24 +764,21 @@ public:
     double  get_BB7_TWINPEAKS_Lead_Lead(int,int);
 
     // BB7 FEBEX Getters
-    int         get_BB7_FEBEX_am_Fired();
-    ULong64_t   get_BB7_FEBEX_Event_T(int);
-    int         get_BB7_FEBEX_Hit_Pattern(int);
-    ULong64_t   get_BB7_FEBEX_Chan_T(int);
-    double      get_BB7_FEBEX_Chan_E(int);
-    int         get_BB7_FEBEX_Det_id(int);
-    int         get_BB7_FEBEX_Crystal_id(int);
+    int         get_BB7_FEBEX_Hits();
+    int         get_BB7_FEBEX_Side(int);
+    int         get_BB7_FEBEX_Strip(int);
+    ULong64_t   get_BB7_FEBEX_Sum_Time(int);
+    ULong64_t   get_BB7_FEBEX_Chan_Time(int);
+    double      get_BB7_FEBEX_Chan_Energy(int);
+    ULong64_t   get_BB7_FEBEX_Chan_CF(int);
     bool        get_BB7_FEBEX_Pileup(int);
     bool        get_BB7_FEBEX_Overflow(int);
-    ULong64_t   get_BB7_FEBEX_Channel_cf(int);
-    //int         get_BB7_FEBEX_Trace_Length();
-    //int         get_BB7_FEBEX_Trace_First(int,int);
-    //int         get_BB7_FEBEX_Trace_Second(int,int);
 
     // BB7 MADC Getters
-    int get_BB7_MADC_hits();
-    int get_BB7_MADC_adc(int);
-    int get_BB7_MADC_channel(int);
+    int get_BB7_MADC_Hits();
+    int get_BB7_MADC_ADC(int);
+    int get_BB7_MADC_Side(int);
+    int get_BB7_MADC_Strip(int);
 
     // ------------------------------------------------------------///
 

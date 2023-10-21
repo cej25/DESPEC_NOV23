@@ -901,20 +901,19 @@ void Raw_Event::set_DATA_Germanium_Traces(int ge_trace_fired, int ge_trace_lengt
 //-------------------------------------- BB7 FEBEX  ------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Raw_Event::set_DATA_BB7_FEBEX(int BB7_FEBEX_hits,ULong64_t* sum_time,int* hit_pattern,ULong64_t* chan_time,double* chan_en, ULong64_t* chan_cf, int* det_ids, int* crystal_ids, bool* pileup, bool* overflow)
-{
-    this->BB7_FEBEX_hits = BB7_FEBEX_hits;
-    for (int i = 0; i < BB7_FEBEX_hits; i++)
-    {
-        BB7_FEBEX_Det_Nums[i] = det_ids[i];
-        BB7_FEBEX_Crystal_Nums[i] = crystal_ids[i];
-        BB7_FEBEX_Sum_Time[i] = sum_time[i];
-        BB7_FEBEX_Hit_Pattern[i] = hit_pattern[i];
-        BB7_FEBEX_Chan_Time[i] = chan_time[i];
-        BB7_FEBEX_Chan_Energy[i] = chan_energy[i];
-        BB7_FEBEX_Chan_CF[i] = chan_cf[i];
-        BB7_FEBEX_Pileup[i] = pileup[i];
-        BB7_FEBEX_Overflow[i] = overflow[i];
+void Raw_Event::set_DATA_BB7_FEBEX(int Hits, int* Side, int* Strip, ULong64_t* Sum_Time, ULong64_t* Chan_Time, double* Chan_Energy, ULong64_t* Chan_CF, bool* Pileup, bool* Overflow)
+{   
+    BB7_FEBEX_Hits = Hits;
+    for (int i = 0; i < BB7_FEBEX_Hits; i++)
+    {   
+        BB7_FEBEX_Side[i] = Side[i];
+        BB7_FEBEX_Strip[i] = Strip[i];
+        BB7_FEBEX_Sum_Time[i] = Sum_Time[i];
+        BB7_FEBEX_Chan_Time[i] = Chan_Time[i];
+        BB7_FEBEX_Chan_Energy[i] = Chan_Energy[i];
+        BB7_FEBEX_Chan_CF[i] = Chan_CF[i];
+        BB7_FEBEX_Pileup[i] = Pileup[i];
+        BB7_FEBEX_Overflow[i] = Overflow[i];
     }
     
 }
@@ -923,13 +922,14 @@ void Raw_Event::set_DATA_BB7_FEBEX(int BB7_FEBEX_hits,ULong64_t* sum_time,int* h
 //-------------------------------------- BB7 MADC  ------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Raw_Event::set_DATA_BB7_MADC(int hits, int* adcs, int* chans)
+void Raw_Event::set_DATA_BB7_MADC(int Hits, int* Side, int* Strip, int* ADC_Data)
 {   
-    BB7_MADC_Hits = hits;
+    BB7_MADC_Hits = Hits;
     for (int i = 0; i < BB7_MADC_Hits; i++)
-    {
-        BB7_MADC_ADC_Data[i] = adcs[i];
-        BB7_MADC_Channel_ID[i] = chans[i];
+    {   
+        BB7_MADC_Side[i] = Side[i];
+        BB7_MADC_Strip[i] = Strip[i];
+        BB7_MADC_ADC_Data[i] = ADC_Data[i];
     }
 }
 
@@ -1489,23 +1489,24 @@ int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trai
     int Raw_Event::get_bPLAST_TWINPEAKS_physical_trail_hits(int i,int j){return trailing_hits_ch_bPlastTwinPeaks[i][j];}
 
 
-int Raw_Event::get_BB7_MADC_hits() { return BB7_MADC_Hits; }
-int Raw_Event::get_BB7_MADC_value(int i) { return BB7_ADC_Data[i]; }
-int Raw_Event::get_BB7_MADC_channel(int i) { return BB7_Channel_ID[i]; }
+int Raw_Event::get_BB7_MADC_Hits() { return BB7_MADC_Hits; }
+int Raw_Event::get_BB7_MADC_Side(int i) { return BB7_MADC_Side[i]; }
+int Raw_Event::get_BB7_MADC_Strip(int i) { return BB7_MADC_Strip[i]; }
+int Raw_Event::get_BB7_MADC_ADC(int i) { return BB7_ADC_Data[i]; }
 
 
 //------------------------------------------ BB7 FEBEX ------------------------------------------//
 
-int Raw_Event::get_BB7_FEBEX_am_Fired() { return BB7_FEBEX_hits; }
-ULong64_t Raw_Event::get_BB7_FEBEX_Event_T(int i) { return BB7_FEBEX_Sum_Time[i]; }
+int Raw_Event::get_BB7_FEBEX_Hits() { return BB7_FEBEX_Hits; }
+int Raw_Event::get_BB7_FEBEX_Side(int i) { return BB7_FEBEX_Side[i]; }
+int Raw_Event::get_BB7_FEBEX_Strip(int i) { return BB7_FEBEX_Strip[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Sum_Time(int i) { return BB7_FEBEX_Sum_Time[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Chan_Time(int i) { return BB7_FEBEX_Chan_Time[i]; }
+double Raw_Event::get_BB7_FEBEX_Chan_Energy(int i) { return BB7_FEBEX_Chan_Energy[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Chan_CF(int i) { return BB7_FEBEX_Chan_CF[i]; } 
 bool Raw_Event::get_BB7_FEBEX_Pileup(int i) { return BB7_FEBEX_Pileup[i]; }
 bool Raw_Event::get_BB7_FEBEX_Overflow(int i) { return BB7_FEBEX_Overflow[i]; }
-int Raw_Event::get_BB7_FEBEX_Hit_Pattern(int i) { return BB7_FEBEX_Hit_Pattern[i]; }
-ULong64_t Raw_Event::get_BB7_FEBEX_Chan_T(int i) { return BB7_FEBEX_Chan_Time[i]; }
-double Raw_Event::get_BB7_FEBEX_Chan_E(int i) { return BB7_FEBEX_Chan_Energy[i]; }
-int Raw_Event::get_BB7_FEBEX_Det_id(int i){ return BB7_FEBEX_Det_Nums[i]; }
-int Raw_Event::get_BB7_FEBEX_Crystal_id(int i) { return BB7_FEBEX_Crystal_Nums[i]; }
-ULong64_t Raw_Event::get_BB7_FEBEX_Channel_cf(int i) { return BB7_FEBEX_Chan_CF[i]; }
+
 
 // CEJ: will traces be required?
 //int Raw_Event::get_BB7_FEBEX_Trace_Length(){return BB7_FEBEX_Tr_Length;}

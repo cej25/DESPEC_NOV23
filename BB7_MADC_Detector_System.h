@@ -17,8 +17,8 @@ class BB7_MADC_Detector_System : public Detector_System
 {
     private:
         // stuff
-        int module_id;  // 1_2 // hopefully..maybe
-        int channel_id; // 1_32 
+        int module_id;
+        int channel_id;
 
         int* pdata;
         int adc_words;
@@ -28,13 +28,14 @@ class BB7_MADC_Detector_System : public Detector_System
 
         int Hits;
         int Strip;
+        int Side;
         int* ADC_Data;
         int* Channel_ID;
 
         void load_board_channel_file();
 
-        // module_id, channel_id -> strip // ,side?
-        std::map<std::pair<int,int>, int> BB7_MADC_Map;
+        // module_id, channel_id -> side, strip
+        std::map<std::pair<int,int>, std::pair<int,int>> BB7_MADC_Map;
     
     public:
         BB7_MADC_Detector_System();

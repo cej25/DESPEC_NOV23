@@ -11,14 +11,16 @@ BB7_MADC_Detector_System::BB7_MADC_Detector_System()
     max_hits = BB7_MADC_MAX_HITS;
     num_modules = BB7_MADC_MODULES;
 
+    Side = new int[max_hits];
+    Strip = new int[max_hits];
     ADC_Data = new int[max_hits];
-    Channel_ID = new int[max_hits];
 
     Hits = 0;
     for (int i = 0; i < max_hits; i++)
-    {
+    {   
+        Side[i] = 0;
+        Strip[i] = 0;
         ADC_Data[i] = 0;
-        Channel_ID[i] = 0;
     }
 
     load_board_channel_file();
@@ -29,8 +31,9 @@ BB7_MADC_Detector_System::BB7_MADC_Detector_System()
 BB7_MADC_Detector_System::~BB7_MADC_Detector_System()
 {
     BB7_MADC_Map.clear();
+    delete[] Side;
+    delete[] Strip;
     delete[] ADC_Data;
-    delete[] Channel_ID;
 }
 
 void BB7_MADC_Detector_System::load_board_channel_file()
@@ -39,7 +42,7 @@ void BB7_MADC_Detector_System::load_board_channel_file()
     std::cout << "Loading BB7 MADC Detector Map" << std::endl;
     if (file.fail())
     {
-        std::cerr << "Could not find MADC Mapping!" << std::endl;
+        std::cerr << "Could not find BB7 MADC Mapping!" << std::endl;
         exit(0);
     }
 
@@ -53,18 +56,18 @@ void BB7_MADC_Detector_System::load_board_channel_file()
             continue;
         }
 
-        // #module_id, channel_id, strip_number // side?
-        int mod, chan, strip;
-        file >> mod >> chan >> strip; // >> side;
+        // #module_id, channel_id, side, strip_number
+        int mod, chan, side, strip;
+        file >> mod >> chan >> side >> strip;
         file.ignore(ignore, '\n');
 
-        BB7_MADC_Map[std::make_pair(mod, chan)] = strip;
+        BB7_MADC_Map[std::make_pair(mod, chan)] = std::make_pair(side, strip);
     }
 }
 
 void BB7_MADC_Detector_System::get_Event_Data(Raw_Event* RAW)
 {
-    RAW->set_DATA_BB7_MADC(Hits, ADC_Data, Channel_ID);
+    RAW->set_DATA_BB7_MADC(Hits, Side, Strip, ADC_Data);
 }
 
 void BB7_MADC_Detector_System::Process_MBS(int* pdata)
@@ -101,13 +104,12 @@ void BB7_MADC_Detector_System::Process_MBS(int* pdata)
             // CEJ: should we check adc measurement vs ext_ts?
 
             ADC_Measurement* data = (ADC_Measurement*) pdata;
+            channel_id = data->channel;
 
-            // auto idx = std::make_pair(module_id, data->channel);
-            // Strip = BB7_MADC_Map.find(idx);
-            // if Strip isn't weird, we allow the hit?
-
+            auto idx = std::make_pair(module_id, channel_id);
+            Side[Hits] = BB7_MADC_Map[idx].first;
+            Strip[Hits] = BB7_MADC_Map[idx].second;
             ADC_Data[Hits] = data->measurement;
-            Channel_ID[Hits] = data->channel;
 
             Hits++;
             pdata++;

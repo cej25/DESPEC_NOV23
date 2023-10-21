@@ -3616,14 +3616,14 @@ void EventUnpackProc::Make_BB7_FEBEX_Histos()
 
 void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 {
-    int hits = RAW->get_BB7_FEBEX_am_Fired();
-    for (int i = 0; i < hits; i++)
+    int Hits = RAW->get_BB7_FEBEX_Hits();
+    for (int i = 0; i < Hits; i++)
     {
         // we just need to get channel, rather than det_id and channel_id
         // maybe module if we care but.. probably not
         // function doesn't exist yet
-        hBB7_FEBEX_Raw_E[RAW->get_BB7_FEBEX_channel(i)]->Fill(RAW->get_BB7_FEBEX_Chan_E(i));
-        hBB7_FEBEX_Hit_Pattern->Fill(RAW->get_BB7_FEBEX_channel(i));
+        hBB7_FEBEX_Raw_E[RAW->get_BB7_FEBEX_Channel(i)]->Fill(RAW->get_BB7_FEBEX_Chan_Energy(i));
+        hBB7_FEBEX_Hit_Pattern->Fill(RAW->get_BB7_FEBEX_Channel(i));
     }
 }
 
