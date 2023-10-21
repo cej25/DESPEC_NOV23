@@ -1350,7 +1350,7 @@ double Raw_Event::get_BB7_TWINPEAKS_Lead_Lead(int i, int j)
     double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j+2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j+2]);
     return T_lead_BB7_TWINPEAKS1 - T_lead_BB7_TWINPEAKS2;
 }
-double Raw_Event::get_bPLAST_TWINPEAKS_TOT(int i,int j)
+double Raw_Event::get_BB7_TWINPEAKS_TOT(int i,int j)
 {
     double T_lead_BB7_TWINPEAKS = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]);
     double T_trail_BB7_TWINPEAKS = (coarse_T_edge_trail_BB7_TWINPEAKS[i][j+1] - fine_T_edge_trail_BB7_TWINPEAKS[i][j+1]);
