@@ -330,3 +330,4 @@ void BB7_TWINPEAKS_Detector_System::get_calib_type()
     // read a file, do something else
 }
 
+int* BB7_TWINPEAKS_Detector_System::get_pdata() { return pdata; }
