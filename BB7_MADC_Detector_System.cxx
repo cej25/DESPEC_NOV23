@@ -125,4 +125,4 @@ void BB7_MADC_Detector_System::Process_MBS(int* pdata)
     } // module loop
 }
 
-void BB7_MADC_Detector_System::get_pdata() { return pdata; }
+int* BB7_MADC_Detector_System::get_pdata() { return pdata; }
