@@ -4,7 +4,7 @@
 
 BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
 {
-    get_Calib_type();
+    get_calib_type();
     cal_count = 0;
 
     Calibration_Done = false;
@@ -325,7 +325,7 @@ void BB7_TWINPEAKS_Detector_System::calibrate_OFFLINE()
     // calibrate
 }
 
-void BB7_TWINPEAKS_Detector_System::get_Calib_Type()
+void BB7_TWINPEAKS_Detector_System::get_calib_type()
 {
     // read a file, do something else
 }

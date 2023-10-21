@@ -67,7 +67,7 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         void Process_TAMEX();
         void calibrate_ONLINE();
         void calibrate_OFFLINE();
-        void get_Calib_Type();
+        void get_calib_type();
         void reset_edges();
 
         bool no_error_reached();
