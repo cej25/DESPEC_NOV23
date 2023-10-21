@@ -20,8 +20,8 @@ BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
     Chan_Time = new ULong64_t[max_hits];
     Chan_Energy = new double[max_hits];
     Chan_CF = new ULong64_t[max_hits];
-    Pileup = new int[max_hits];
-    Overflow = new int[max_hits];
+    Pileup = new bool[max_hits];
+    Overflow = new bool[max_hits];
 
     load_board_channel_file();
 }

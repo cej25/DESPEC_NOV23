@@ -544,8 +544,8 @@ using namespace std;
             int AIDA_Strip[AIDA_MAX_HITS] = {0};
             int AIDA_evtID[AIDA_MAX_HITS] = {0};
 
-			Int_t PrcID_Array[10][9];
-			bool Used_Systems[10];
+			Int_t PrcID_Array[NUM_SUBSYS][NUM_SUBSYS]; // was 10 9???
+			bool Used_Systems[NUM_SUBSYS];
 
             Int_t Type;
             Int_t SubType;
