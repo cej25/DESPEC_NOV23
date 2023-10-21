@@ -106,7 +106,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
             FEBEX_Evt_Time* EventTime_Lo = (FEBEX_Evt_Time*) this->pdata;
             
-            tmp_Sum_Time = (EventTime_Lo->evt_time) | (ULong64_t*)(EventTime_Hi->ext_time << 32);
+            tmp_Sum_Time = (EventTime_Lo->evt_time) + (EventTime_Hi->ext_time << 32);
             this->pdata++;
 
             FEBEX_Flag_Hits* Flags = (FEBEX_Flag_Hits*) this->pdata;
@@ -138,7 +138,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
                     this->pdata++;
                     
                     FEBEX_TS* Channel_Time = (FEBEX_TS*) this->pdata;
-                    Chan_Time[Hits] = ((Channel_Time->chan_ts) | (ULong64_t*)(Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
+                    Chan_Time[Hits] = ((Channel_Time->chan_ts) + (Channel_Head->ext_chan_ts << 32)) * 10; // convert to ns
                     this->pdata++;
 
                     FEBEX_En* Channel_Energy = (FEBEX_En*) this->pdata;
