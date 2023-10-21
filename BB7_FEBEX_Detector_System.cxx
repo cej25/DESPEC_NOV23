@@ -64,6 +64,9 @@ void BB7_FEBEX_Detector_System::load_board_channel_file()
         file >> mod >> chan >> side >> strip;
         file.ignore(ignore, '\n');
 
+        std::cout << "mod, chan, side, strip" << std::endl;
+        std::cout << mod << " : " << chan << " : " << side << " : " <<  strip << std::endl;
+
         BB7_FEBEX_Map[std::make_pair(mod, chan)] = std::make_pair(side, strip);
     }
 }

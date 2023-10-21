@@ -402,7 +402,6 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
            if(WR_d==6) fOutput->fFinger_WR = WR_tmp; //FINGER
            if(WR_d==7) fOutput->fBM_WR = WR_tmp; // BeamMonitor 
            if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX option
-           std::cout << "we did this successfully?: " << std::hex << *pdata << std::dec << std::endl;
            if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS option
            if(WR_d==10) fOutput->fBB7_MADC_WR = WR_tmp; // BB7 MADC option
             WR_main = WR_tmp;
@@ -454,7 +453,7 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
        if(PrcID_Conv!=7){
            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
             Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now
+            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now for BB7_FEBEX
 
         ///get mbs stream data from unpacker (pointer copy solution)
             pdata = Detector_Systems[PrcID_Conv]->get_pdata();
