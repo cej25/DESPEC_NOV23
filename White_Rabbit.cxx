@@ -1,4 +1,5 @@
 #include "White_Rabbit.h"
+#include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
 using namespace std;
 
@@ -6,7 +7,7 @@ using namespace std;
 
 White_Rabbit::White_Rabbit(){
 
-    for(int i = 0;i < 8;++i) ID[i] = -1;
+    for(int i = 0;i < NUM_SUBSYS;++i) ID[i] = -1;
     load_config_file();
     pdata = nullptr;
     increase = 5;
@@ -44,7 +45,7 @@ void White_Rabbit::load_config_file(){
         getline(config_file,line,'\n');
         if(line[0] == '#') continue;
         sscanf(line.c_str(),format,s,&id);
-        for(int i = 0;i < 8;++i){
+        for(int i = 0;i < NUM_SUBSYS;++i){
             if(string(s) == names[i]){
                 ID[i] = id;
 
@@ -65,7 +66,7 @@ void White_Rabbit::load_config_file(){
 void White_Rabbit::set_triggered_detector(int WR_d){
 
     //check for id of detector
-    for(int i = 0;i < 8;i++){
+    for(int i = 0;i < NUM_SUBSYS;i++){
       // printf("ID0x%02x, WR0x%02x\n", (unsigned int) ID[i], WR_d);
         if(WR_d == ID[i]){
             detector_id = i;

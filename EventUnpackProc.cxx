@@ -51,6 +51,9 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "Germanium_Detector_System.h"
 #include "FRS_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 
 #include "TAidaConfiguration.h"
 
@@ -102,13 +105,14 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
    DESPECAnalysis* an = dynamic_cast<DESPECAnalysis*> (TGo4Analysis::Instance());
    
  //create Detector Systems
-  Detector_Systems = new Detector_System*[8];
+  Detector_Systems = new Detector_System*[NUM_SUBSYS];
 
   // all non used systems intialized as NULL
   //-> calling uninitialized system will cause an error !
 
   Detector_Systems[0] = !Used_Systems[0] ? nullptr : new FRS_Detector_System();
   Detector_Systems[1] = !Used_Systems[1] ? nullptr : new AIDA_Detector_System();
+  // CEJ: do we need this switch for BB7?
   if(bPLASTIC_TWINPEAKS==0) Detector_Systems[2] = !Used_Systems[2] ? nullptr : new PLASTIC_TAMEX_Detector_System();
   if(bPLASTIC_TWINPEAKS==1) Detector_Systems[2] = !Used_Systems[2] ? nullptr : new PLASTIC_TWINPEAKS_Detector_System();
   Detector_Systems[3] = !Used_Systems[3] ? nullptr : new FATIMA_Detector_System();
@@ -116,6 +120,9 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   Detector_Systems[5] = !Used_Systems[5] ? nullptr : new Germanium_Detector_System();
   Detector_Systems[6] = !Used_Systems[6] ? nullptr : new FINGER_Detector_System();
   Detector_Systems[7] = !Used_Systems[7] ? nullptr : new Beam_Monitor_Detector_System();
+  Detector_Systems[8] = !Used_Systems[8] ? nullptr : new BB7_FEBEX_Detector_System();
+  Detector_Systems[9] = !Used_Systems[9] ? nullptr : new BB7_TWINPEAKS_Detector_System();
+  Detector_Systems[10] = !Used_Systems[10] ? nullptr : new BB7_MADC_Detector_System();
   
    frs_id = dynamic_cast<TIDParameter*> (an->GetParameter("IDPar"));
 
@@ -131,6 +138,12 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   if(Used_Systems[5]) Make_Germanium_Histos();
   
   if(Used_Systems[7]) Make_BeamMonitor_Histos();
+
+  if (Used_Systems[8]) Make_BB7_FEBEX_Histos();
+
+  if (Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+
+  if (Used_Systems[10]) Make_BB7_MADC_Histos();
 
   RAW = new Raw_Event();
 
@@ -387,7 +400,10 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
            if(WR_d==4) fOutput->fFat_Tamex_WR = WR_tmp; //Fatima (TAMEX)
            if(WR_d==5) fOutput->fGe_WR = WR_tmp; //Geileo
            if(WR_d==6) fOutput->fFinger_WR = WR_tmp; //FINGER
-
+           if(WR_d==7) fOutput->fBM_WR = WR_tmp; // BeamMonitor 
+           if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX option
+           if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS option
+           if(WR_d==10) fOutput->fBB7_MADC_WR = WR_tmp; // BB7 MADC option
             WR_main = WR_tmp;
 
         }
@@ -1659,8 +1675,10 @@ void EventUnpackProc::load_FingerID_File(){
 //-----------------------------------------------------------------------------------------------------------------------------//
 Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 
-  for(int i = 0;i < 8;++i){
-    for(int j = 0;j < 8;++j){
+  // CEJ: changing this to use variable for number of subsystems
+
+  for(int i = 0;i < NUM_SUBSYS;++i){
+    for(int j = 0;j < NUM_SUBSYS;++j){
         ///Fix for FRS
           if (PrcID==100) return -1;
       if(PrcID == PrcID_Array[i][j]) return i;
@@ -1671,7 +1689,8 @@ Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 }
 
 void EventUnpackProc::get_used_systems(){
-    for(int i = 0;i < 8;i++) Used_Systems[i] = false;
+    // CEJ: changing here to use num subsys variable
+    for(int i = 0;i < NUM_SUBSYS;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -1688,13 +1707,14 @@ void EventUnpackProc::get_used_systems(){
     sscanf(line.c_str(),"%s %d",s_tmp,&id);
     Used_Systems[i] = (id == 1);
     i++;
-  }
-  string DET_NAME[8] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor"};
+  } 
+  // CEJ: this is defined in multiple places...surely can be done better
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
     cout << "-----------------------------------------------------" << endl;
-    for(int j = 0;j < 8;++j){
+    for(int j = 0;j < 10;++j){
         if(Used_Systems[j]) cout <<"\t"<< DET_NAME[j] << endl;
     }
     cout << "=====================================================" << endl;
@@ -1799,10 +1819,6 @@ void EventUnpackProc::get_used_systems(){
         case 5: index = 10; break;
         case 6: index = 8; break;
     }
-//       sprintf(fname,"FRS/SCI/SCI%s/SCI%s",fext1[index],fext2[index]);
-//       sprintf(name, "SCI%s_L", count_title1[index]);
-//       sprintf(title, "Sc%s L dE [ch]", count_title1[index]);
-//       hSCI_L[index] = MakeH1I(fname,name,4096,0,4096,title,2,3);
 
       hSCI_L[index] = MakeTH1('D', Form("FRS/SCI/SCI%s/SCI%s/SCI%s_L",fext1[index],fext2    [index],count_title1[index]), Form("SCI%s_L", count_title1[index]),4096,0,4096,"Sc%s L dE [ch]", count_title1[index]);
 
@@ -1855,37 +1871,6 @@ void EventUnpackProc::get_used_systems(){
 
         hSCI_Tof5_calib = MakeTH1('D', "FRS/SCI/TOF/TOF(5)/SCI_22_41_Tof5_calib","SCI_22_41_Tof3_calib",40000,0,400000,"TAC SC41-SC22 [pos.corr.]");
 
-
-//         hSCIdE41_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41_TPC42X", 1024,0,4096, 400,-100.,100, "SC41 dE", "TPC42 X[mm]", 2);
-//         hSCIdE41L_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41L_TPC42X", 1024,0,4096, 400,-100.,100, "SC41L dE", "TPC42 X[mm]", 2);
-//         hSCIdE41L_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE41L_TPC41X", 1024,0,4096, 400,-100.,100, "SC41L dE", "TPC41 X[mm]", 2);
-//         hSCIdE41R_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41R_TPC42X", 1024,0,4096, 400,-100.,100, "SC41R dE", "TPC42 X[mm]", 2);
-//         hSCIdE41R_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE41R_TPC41X", 1024,0,4096, 400,-100.,100, "SC41R dE", "TPC41 X[mm]", 2);
-//
-//         hSCIdE21_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21_TPC42X", 1024,0,4096, 400,-100.,100, "SC41 dE", "TPC42 X[mm]", 2);
-//         hSCIdE21L_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21L_TPC42X", 1024,0,4096, 400,-100.,100, "SC21L dE", "TPC42 X[mm]", 2);
-//         hSCIdE21L_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE21L_TPC41X", 1024,0,4096, 400,-100.,100, "SC21L dE", "TPC41 X[mm]", 2);
-//         hSCIdE21R_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21R_TPC42X", 1024,0,4096, 400,-100.,100, "SC21R dE", "TPC42 X[mm]", 2);
-//         hSCIdE21R_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE21R_TPC41X", 1024,0,4096, 400,-100.,100, "SC21R dE", "TPC41 X[mm]", 2);
-
-//         // ToF SC21-SC42 changed on 03.07.2018 SB
-//         sprintf(fname,"FRS/SCI/TOF/TOF(%d)",3);
-//         sprintf(name,"SCI_21_42_TofLL");
-//         hSCI_TofLL3 = MakeH1I(fname,name,1500,0,62000,"TAC SC42L-SC21L [ps]",2,3);
-//
-//         sprintf(name,"SCI_21_42_TofRR");
-//         hSCI_TofRR3 = MakeH1I(fname,name,1500,0,62000,"TAC SC42R-SC21R [ps]",2,3);
-//
-//         sprintf(name,"SCI_21_42_Tof3");
-//         hSCI_Tof3 = MakeH1I(fname,name,1000,0,62000,"TAC SC42-SC21 [ps] (pos.corr.)",2,3);
-
-
-    /*hSCI_dT_21l_41l = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21l_41l","hSCI_dT_21l_41l",5001,0,5000); //from Multihit TDCS
-    hSCI_dT_21r_41r = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21r_41r","hSCI_dT_21r_41r",5001,0,5000);
-
-    hSCI_dT_21l_42l = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21l_42l","hSCI_dT_21l_42l",5001,0,5000);
-    hSCI_dT_21r_42r = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21r_42r","hSCI_dT_21r_42r",5001,0,5000);*/
-
     //ID
 //     cout<<"frs_id->min_aoq_plot " <<frs_id->min_aoq_plot << endl;
     hID_AoQ = MakeTH1('D',"FRS/ID/ID_AoQ","ID_AoQ",1000,2,3,"A/Q S2-S4");
@@ -1895,13 +1880,6 @@ void EventUnpackProc::get_used_systems(){
 
     hID_AoQ_mhtdc = MakeTH1('D',"FRS/MHTDC/ID/ID_AoQ_mhtdc","ID_AoQ",1000,2,3,"A/Q S2-S4");
     hID_AoQ_corr_mhtdc = MakeTH1('D',"FRS/MHTDC/ID/ID_AoQ_corr_mhtdc","ID_AoQ_corr",1000,2,3,"A/Q S2-S4");
-
-
-//     hID_Z_AoQ_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z1_AoQ_mhtdc", "Z1 vs A/Q",1500,frs_id->min_aoq_plot,frs_id->max_aoq_plot, 1500,frs_id->min_z_plot,frs_id->max_z_plot,"A/Q s2-s4", "Z1 s2-s4");
-// 
-//     hID_Z_AoQ_corr_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z_AoQ_corr_mhtdc", "Z1 vs A/Q",1500,frs_id->min_aoq_plot,frs_id->max_aoq_plot, 1000,frs_id->min_z_plot,frs_id->max_z_plot,"A/Q s2-s4", "Z1 s2-s4");
-
-  //  hID_Z_Z2_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z1_Z2_mhtdc","Z1 vs. Z2", 1000,frs_id->min_z_plot,frs_id->max_z_plot, 1000,frs_id->min_z_plot,frs_id->max_z_plot,"Z1", "Z2");
 
   //   hID_Z = MakeH1I("ID",Form("ID_Z, gain=%f",music->e1_gain[0]),1000,10,93,"Z s2-s4",2,6);
     hID_Z = MakeTH1('D',"FRS/ID/ID_Z1","ID_Z1",1000,70,90,"Z1 s2-s4");
@@ -1962,16 +1940,6 @@ for(int i=0;i<7;i++)
 
        hTPC_LTRT[i] = MakeTH2('D',Form("FRS/TPC/%s/%s_LTRT",tpc_folder_ext1[i],tpc_folder_ext1[i]), Form("%s_LTRT" ,tpc_folder_ext1[i]), 2048,0,4095, 2048,0,4095,"LT [ch]","RT[ch] ");
 
-//          hID_dEdeg_Z1_Z1AoQgate[i] = MakeTH2('D',"FRS/ID_Gated/ID_dEdeg_Z1/dEdeg_Z1_Z1AoQgated",  name,  1000,frs_id->min_z_plot,frs_id->max_z_plot, 1000, 10.,50., "Z1 from MUSIC41", "dE(S2deg) [a.u.]");
-
-//
-//       sprintf(name,"%s%s",tpc_name_ext1[i],"LTRT");
-//       hTPC_LTRT[i]=MakeTH2('D',fname,name, 2048,0,4095, 2048,0,4095,"LT [ch]","RT[ch] ");
-
-      //hTPC_DELTAX[i]=MakeTH1(fname,"x0-x1",i,100,-10.,10.,
-              //   "x0-x1[mm]",2,3);
-
-       // hTPC_DELTAX[i]=MakeTH1('D',fname,"x0-x1",i,100,-10.,10.,"x0-x1[mm]");
 
     }
     //TPCs at S2 focus (23 24)
@@ -2141,10 +2109,6 @@ for(int i=0;i<7;i++)
    
    // end KW
 
-    
-//     htimestamp = MakeTH1('D',"FRS/timestamp","timestamp",30,0.,300.);
-//     hts = MakeTH1('D',"FRS/ts","ts",30,0.,300.);
-//     hts2 = MakeTH1('D',"FRS/ts2","ts2",30,0.,300.);
 
 
   }
@@ -2540,24 +2504,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
   if(sci_x[5]!=0 && TPC_X_sc41!=-999) hSCI_X_XTPC[5]->Fill(sci_x[5],TPC_X_sc41);
   if(sci_x[6]!=0 && TPC_X_sc42!=-999) hSCI_X_XTPC[6]->Fill(sci_x[6],TPC_X_sc42);
 
-  //      if(sci_e[5]!=0 && TPC_X[5]!=0) hSCIdE41_TPC42X->Fill(sci_e[5],TPC_X[5]); //dE_SCI_41 vs TPC_42X
-  //      if(sci_l[5]!=0 &&TPC_X[5]!=0) hSCIdE41L_TPC42X->Fill(sci_l[5],TPC_X[5]); //dE_SCI_41L vs TPC_42X
-  //      if(sci_l[5]!=0 &&TPC_X[4]!=0) hSCIdE41L_TPC41X->Fill(sci_l[5],TPC_X[4]); //dE_SCI_41L vs TPC_41X
-  //      if(sci_r[5]!=0 &&TPC_X[5]!=0) hSCIdE41R_TPC42X->Fill(sci_r[5],TPC_X[5]); //dE_SCI_41R vs TPC_42X
-  //      if(sci_r[5]!=0 &&TPC_X[4]!=0) hSCIdE41R_TPC41X->Fill(sci_r[5],TPC_X[4]); //dE_SCI_41R vs TPC_41X
-  //       //cout<<"sci_e[0] " << sci_e[0] <<endl;
-  //      if(sci_e[0]!=0 &&TPC_X[5]!=0) hSCIdE21_TPC42X->Fill(sci_e[0],TPC_X[5]); //dE_SCI_21 vs TPC_42X
-  //      if(sci_l[0]!=0 &&TPC_X[5]!=0) hSCIdE21L_TPC42X->Fill(sci_l[0],TPC_X[5]); //dE_SCI_21L vs TPC_42X
-  //      if(sci_l[0]!=0 &&TPC_X[4]!=0) hSCIdE21L_TPC41X->Fill(sci_l[0],TPC_X[4]); //dE_SCI_21L vs TPC_41X
-  //      if(sci_l[0]!=0 &&TPC_X[4]!=0) hSCIdE21R_TPC42X->Fill(sci_l[0],TPC_X[4]); //dE_SCI_21R vs TPC_42X
-  //      if(sci_r[0]!=0 &&TPC_X[4]!=0) hSCIdE21R_TPC41X->Fill(sci_r[0],TPC_X[4]); //dE_SCI_21R vs TPC_41X
-
-  //  TPC_X_s2_foc_23_24 = RAW->get_FRS_tpc_x_s2_foc_23_24();
-  // TPC_Y_s2_foc_23_24 = RAW->get_FRS_tpc_y_s2_foc_23_24();
-  // TPC_X_angle_s2_foc_23_24 = RAW->get_FRS_tpc_x_angle_s2_foc_23_24();
-  // TPC_Y_angle_s2_foc_23_24 = RAW->get_FRS_tpc_y_angle_s2_foc_23_24();
-
-
 
   if(TPC_X_s2_foc_23_24!=-999)hTPC_X_S2_TPC_23_24->Fill(TPC_X_s2_foc_23_24);
   if(TPC_Y_s2_foc_23_24!=-999)hTPC_Y_S2_TPC_23_24->Fill(TPC_Y_s2_foc_23_24);
@@ -2637,30 +2583,10 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     }
   }
 
-  //     htpc_X2->Fill(TPC_X[2]);
-  //     htpc_Y2->Fill(TPC_Y[2]);
-  //     htpc_X4->Fill(TPC_X[4]);
-  //     htpc_Y4->Fill(TPC_Y[4]);
   for(int i=0;i<2;i++){
     if(ID_brho[i]!=0)hID_BRho[i]->Fill(ID_brho[i]);
   }
 
-  //SCI tx
-  //if(sci_dt_21l_21r) hSCI_dT_21l_21r->Fill(sci_dt_21l_21r);
-  //     if(sci_dt_41l_41r) hSCI_dT_41l_41r->Fill(sci_dt_41l_41r);
-  //     if(sci_dt_42l_42r) hSCI_dT_42l_42r->Fill(sci_dt_42l_42r);
-
-  //    if(sci_dt_21l_41l!=0) hSCI_dT_21l_41l->Fill(sci_dt_21l_41l);
-  //     if(sci_dt_21r_41r!=0) hSCI_dT_21r_41r->Fill(sci_dt_21r_41r);
-  //
-  //     if(sci_dt_21l_42l!=0) hSCI_dT_21l_42l->Fill(sci_dt_21l_42l);
-  //     if(sci_dt_21r_42r!=0) hSCI_dT_21r_42r->Fill(sci_dt_21r_42r);
-
-  ///For TAC
-  // if(beta!=0)cout<<"beta " << beta*1000<<endl;
-  //     if(beta!=0) hID_beta->Fill(beta*1000);
-  // if(beta3) hbeta3->Fill(beta3);
-  //}
 
 
   if(PrcID==20){
@@ -2674,31 +2600,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     /****  S4  (MUSIC 2)   */
     if(ID_z2!=0) hID_Z2->Fill(ID_z2);
     /****  S4  (MUSIC OLD)   */
-    //hID_Z3->Fill(ID_z3);
-
-    //      hID_Z_Z2->Fill(ID_z,ID_z2);
-    //      if(ID_z!=0 && Music_dE[1]!=0)hID_Z_dE2->Fill(ID_z,Music_dE[1]);
-    // hID_Z_Z3->Fill(ID_z,ID_z3);
-    //if(ID_z!=0 && sci_l[2]!=0 && sci_r[2]!=0)hID_Z_Sc21E->Fill(ID_z, sqrt(sci_l[2]*sci_r[2]));
-
-    //      if(ID_x2!=0&&ID_x4!=0 ) hID_x2x4->Fill(ID_x2, ID_x4);
-    //      if(AoQ!=0 && sci_e[5]!=0) hID_SC41dE_AoQ->Fill(AoQ, sci_e[5]);
-    // 
-    //      if(sci_tof2!=0 && Music_dE[0]!=0) hID_dEToF->Fill(sci_tof2, Music_dE[0]);
-    // 
-    //      if(ID_z!=0 && ID_x2!=0) hID_x2z->Fill(ID_z, ID_x2);// MUSIC1
-    //      if(ID_z!=0 && ID_x4!=0) hID_x4z->Fill(ID_z, ID_x4);// MUSIC1
-    // 
-    //      if(ID_x4!=0 && Music_dE[0]!=0) hID_E_Xs4->Fill(ID_x4,Music_dE[0]);
-    //      if(ID_x4!=0 && Music_dE[0]!=0)hID_E_Xs2->Fill(ID_x2,Music_dE[0]);
-    // 
-    //      if(ID_x2!=0 && ID_a2!=0)hID_x2a2->Fill(ID_x2,ID_a2);
-    //      if(ID_y2!=0 && ID_b2!=0)hID_y2b2->Fill(ID_y2,ID_b2);
-    //      if(ID_x4!=0 && ID_a4!=0)hID_x4a4->Fill(ID_x4,ID_a4);
-    //      if(ID_x4!=0 && ID_b4!=0) hID_y4b4->Fill(ID_y4,ID_b4);
-    //      
-    //      if(AoQ_corr!=0 && ID_a2!=0)hID_AoQa2->Fill(AoQ_corr,ID_a2);
-    //      if(AoQ_corr!=0 && ID_a4!=0)hID_AoQa4->Fill(AoQ_corr,ID_a4);
 
 
     ///MHTDC
@@ -2712,12 +2613,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
 	if(ID_tof4121_mhtdc[i]!=0) hMultiHitTDC_TOF_41_21->Fill(ID_tof4121_mhtdc[i]);
 	if(ID_tof4122_mhtdc[i]!=0) hMultiHitTDC_TOF_41_22->Fill(ID_tof4122_mhtdc[i]);
 
-	//if(ID_tof4121_mhtdc[i]!=0 && i==0) hMultiHitTDC_TOF_41_21_first_hit->Fill(ID_tof4121_mhtdc[i]);
-
-	//  if(ID_tof4121_mhtdc[i]!=0 && i>0) hMultiHitTDC_TOF_41_21_excl_first_hit->Fill(ID_tof4121_mhtdc[i]);
-
-
-	//  if(ID_tof4121_mhtdc>147.3 && ID_tof4121_mhtdc<147.73)
 
       }
 
@@ -2869,48 +2764,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
       // h1_VFTX_TOF_42_21->Fill(ToF_vftx_2142_calib[i]);
       
       
-      
-      // cout<<" TRaw_vftx_41l "<<TRaw_vftx_41l << " TRaw_vftx_41r "<<TRaw_vftx_41r <<" TRaw_vftx_21l "<<TRaw_vftx_21l <<" TRaw_vftx_21r " <<TRaw_vftx_21r  << "TOF " <<(0.5*((TRaw_vftx_41l+TRaw_vftx_41r)-(TRaw_vftx_21l+TRaw_vftx_21r)))<< endl;
-      //    ///SCI41 -SCI21 ToF
-      //   if(TRaw_vftx_41l[i]!=0.&&TRaw_vftx_41r[i]!=0.&&TRaw_vftx_21l[i]!=0.&&TRaw_vftx_21r[i]!=0.){
-      //    hvftx_ToFraw_2141->Fill((0.5*((TRaw_vftx_41l[i]+TRaw_vftx_41r)-(TRaw_vftx_21l+TRaw_vftx_21r))));//ps
-      // 
-      //     }
-      //     ///SCI41 -SCI21 LL
-      //   if(TRaw_vftx_41l!=0.&&TRaw_vftx_21l!=0.){
-      //    hvftx_ToFraw_2141LL->Fill((TRaw_vftx_41l-TRaw_vftx_21l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI22 LL
-      //   if(TRaw_vftx_41l!=0.&&TRaw_vftx_21l!=0.){
-      //    hvftx_ToFraw_2241LL->Fill((TRaw_vftx_41l-TRaw_vftx_22l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI21 RR
-      //   if(TRaw_vftx_41r!=0.&& TRaw_vftx_21r!=0.){
-      //    hvftx_ToFraw_2241RR->Fill((TRaw_vftx_41r-TRaw_vftx_22r));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI22 RR
-      //   if(TRaw_vftx_41r!=0.&& TRaw_vftx_21r!=0.){
-      //    hvftx_ToFraw_2141RR->Fill((TRaw_vftx_41r-TRaw_vftx_21r));//ps
-      // 
-      //     }
-      //     
-      //      ///SCI42 -SCI21 LL
-      //   if(TRaw_vftx_42l!= 0 &&TRaw_vftx_21l!= 0){
-      //    hvftx_ToFraw_2142LL->Fill((TRaw_vftx_42l-TRaw_vftx_21l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI42 -SCI21 RR
-      //   if(TRaw_vftx_42r!=0 && TRaw_vftx_21r!=0){
-      //    hvftx_ToFraw_2141RR->Fill((TRaw_vftx_42r-TRaw_vftx_21r));//ps
-      // 
-      //         }
       // KW add all hits
       if(TRaw_vftx_21l[i]!=0.&&TRaw_vftx_21r[i]!=0.)
 	h1_VFTX_deltaT_S21->Fill(TRaw_vftx_21l[i]-TRaw_vftx_21r[i]);
@@ -3163,82 +3016,8 @@ void EventUnpackProc::Fill_AIDA_Histos() {
   }
 }
 
-/**----------------------------------------------------------------------------------------------**/
-/**-----------------------------------------  FATIMA TAMEX  ------------------------------------------**/
-/**----------------------------------------------------------------------------------------------**/
-///This can be enabled for testing purposes, otherwise not needed
-//  void EventUnpackProc::Make_FATIMA_TAMEX_Histos(){
-//
-//
-// //         for(int i=0; i<FATIMA_TAMEX_CHANNELS; i++){
-// //              hFATlead_Coarse[i]= MakeTH1('D', Form("FATIMA_TAMEX/Lead_Coarse/Lead-CoarseCh.%02d", i), Form("Lead Coarse %2d", i), 5000, -5000., 5000.);
-// //              hFATlead_Fine[i]= MakeTH1('D', Form("FATIMA_TAMEX/Lead_Fine/Lead-FineCh.%02d", i), Form("Lead Fine %2d", i), 600, -1., 2.);
-// // //              hFATtrail_Coarse[i]= MakeTH1('D', Form("FATIMA_TAMEX/Trail_Coarse/Trail-CoarseCh.%02d", i), Form("Trail Coarse %2d", i), 5000, -5000., 5000.);
-// // //              hFATtrail_Fine[i]= MakeTH1('D', Form("FATIMA_TAMEX/Trail_Fine/Trail-FineCh.%02d", i), Form("Trail Fine %2d", i), 600, -1., 2.);
-// //
-// //
-// //             }
-//         }
-  //-----------------------------------------------------------------------------------------------------------------------------//
 
-//   void EventUnpackProc::Fill_FATIMA_TAMEX_Histos(){
-//
-//       ///TAMEX
-// //     //get amount of fired Tamex modules
-// //     int TamexHits_Fatima = RAW->get_FATIMA_tamex_hits();
-// //
-// //     int Lead_Fatima_Coarse[4][32];
-// //     double Lead_Fatima_Fine[4][32];
-// //     int Trail_Fatima_Coarse[4][32];
-// //     double Trail_Fatima_Fine[4][32];
-// //     int Phys_Channel_Fatima[32];
-// //     int leadHits_Fatima = 0,leadHitsCh_Fatima = 0;
-// //     int trailHits_Fatima = 0,trailHitsCh_Fatima = 0;
-// //
-// //
-// //     for(int i=0; i<32; i++){
-// //      Phys_Channel_Fatima[i] = 0;
-// //     }
-// //
-// //     for(int i =0; i<4; i++){
-// //         for(int j=0; j<32;j++){
-// //      Lead_Fatima_Coarse[i][j] = 0;
-// //      Lead_Fatima_Fine[i][j] = 0;
-// //      Trail_Fatima_Coarse[i][j] = 0;
-// //      Trail_Fatima_Fine[i][j] = 0;
-// //         }
-// //
-// //     for(int i = 0;i < TamexHits_Fatima;++i){
-// //
-// //       leadHits_Fatima = RAW->get_FATIMA_lead_hits(i);
-// //       trailHits_Fatima = RAW->get_FATIMA_trail_hits(i);
-// //
-// //
-// //         //Box diagrams for leading and trailing
-// //       for(int j = 0;j < RAW->get_FATIMA_am_Fired(i);j++){
-// //          if(RAW->get_FATIMA_CH_ID(i,j) % 2 == 1){
-// //             Phys_Channel_Fatima[j] =TAMEX_Fat_ID[i][RAW->get_FATIMA_physical_channel(i, j)];
-// //           //  Lead_Fatima[i][j] = RAW->get_FATIMA_lead_T(i,j);
-// //             Lead_Fatima_Coarse[i][j] = RAW->get_FATIMA_coarse_lead(i,j);
-// //             Lead_Fatima_Fine[i][j] = RAW->get_FATIMA_fine_lead(i,j);
-// //
-// // //             hFATlead_Coarse[Phys_Channel_Fatima[j]]->Fill(Lead_Fatima_Coarse[i][j]);
-// // //             hFATlead_Fine[Phys_Channel_Fatima[j]]->Fill(Lead_Fatima_Fine[i][j]);
-// //
-// //         }
-// //          if(RAW->get_FATIMA_CH_ID(i,j) % 2 == 0){
-// //             Phys_Channel_Fatima[j] = RAW->get_FATIMA_physical_channel(i,j);
-// //           //  Trail_Fatima[Phys_Channel_Fatima[j]] = RAW->get_FATIMA_trail_T(i,j);
-// //             Trail_Fatima_Coarse[i][j] = RAW->get_FATIMA_coarse_trail(i,j);
-// //             Trail_Fatima_Fine[i][j] = RAW->get_FATIMA_fine_trail(i,j);
-// // //          hFATtrail_Coarse[Phys_Channel_Fatima[j]]->Fill(Trail_Fatima_Coarse[i][j]);
-// //       //    hFATtrail_Fine[Phys_Channel_Fatima[j]]->Fill(Trail_Fatima_Fine[i][j]);
-// //                 }
-// //             }
-// //         }
-// //     }
-//
-//   }
+
   /**----------------------------------------------------------------------------------------------**/
 /**-----------------------------------------  FATIMA VME  ------------------------------------------**/
 /**----------------------------------------------------------------------------------------------**/
@@ -3305,7 +3084,6 @@ void EventUnpackProc::Fill_FATIMA_Histos(EventUnpackStore* fOutput){
 /**----------------------------------------   Germanium   -----------------------------------------**/
 /**----------------------------------------------------------------------------------------------**/
 
-
 void EventUnpackProc::Make_Germanium_Histos(){
     Text_t chis[256];
     Text_t chead[256];
@@ -3320,11 +3098,7 @@ void EventUnpackProc::Make_Germanium_Histos(){
                     
         }
     }
-//   for (int j; j<Germanium_MAX_HITS; j++){
-//       
-//
-//                     }
-//     hFebTime  = MakeTH1('D',"SysTime/FebexClock","Febex clock",200000,0,200000);
+
                 }
 /**----------------------------------------------------------------------------------------------**/                
 void EventUnpackProc::Fill_Germanium_Histos(){
@@ -3350,6 +3124,8 @@ void EventUnpackProc::Fill_Germanium_Histos(){
         }
      }
    }
+
+
 //-----------------------------------------------------------------------------------------------------------------------------//
 /**----------------------------------------------------------------------------------------------**/
 /**----------------------------------------   Beam Monitor   -----------------------------------------**/
@@ -3548,6 +3324,8 @@ void EventUnpackProc::Make_BeamMonitor_Histos(){
    	gBM_s2gr_dctime->GetXaxis()->SetNdivisions(-4);
 	gBM_s2gr_dctime->Draw("APC");
    }
+
+
    //-----------------------------------------------------------------------------------------------------------------------------//
 void EventUnpackProc::Fill_BeamMonitor_Histos(){
 	Int_t BM_Hits;
@@ -3749,49 +3527,6 @@ void EventUnpackProc::Fill_BeamMonitor_Histos(){
    }
 //-----------------------------------------------------------------------------------------------------------------------------//
 
-// void EventUnpackProc::checkTAMEXorVME(){
-//
-//   std::ifstream PL_FILE("Configuration_Files/DESPEC_General_Setup/TAMEX_or_VME.txt");
-//
-//   std::string line;
-//
-//   if(PL_FILE.fail()){
-//     std::cerr << "Could not find Configuration_Files/DESPEC_General_Setup/TAMEX_or_VME.txt file" << std::endl;
-//     exit(1);
-//   }
-//   bool T_or_V_bPlas = false;
-//   bool T_or_V_Fatima = false;
-//   bool T_and_V_Fatima = false;
-//   while(std::getline(PL_FILE,line)){
-//     if(line[0] == '#') continue;
-//
-//     if(line == "VME_bPlas") T_or_V_bPlas = true;
-//     if(line == "TAMEX_bPlas") T_or_V_bPlas = false;
-//
-//     if(line == "VME_Fatima") T_or_V_Fatima = true;
-//     if(line == "TAMEX_Fatima") T_or_V_Fatima = false;
-//
-//     if(line == "VME_AND_TAMEX_Fatima") T_or_V_Fatima = false;
-//     if(line == "VME_AND_TAMEX_Fatima") T_and_V_Fatima = true;
-//
-//     if(line == "VME_Fatima") T_and_V_Fatima = false;
-//     if(line == "TAMEX_Fatima") T_and_V_Fatima = false;
-//
-//
-// //     if(line != "VME_bPlas" && line != "TAMEX_bPlas"){
-// //       std::cerr << line << " module of PLASTIC not known!" <<std::endl;
-// //       exit(1);
-// //     }
-//   }
-//
-//   VME_TAMEX_bPlas = T_or_V_bPlas;
-//   VME_TAMEX_Fatima = T_or_V_Fatima;
-//   VME_AND_TAMEX_Fatima = T_and_V_Fatima;
-//
-//
-// }
-
-
 
 //-----------------------------------------------------------------------------------------------------------------------------//
 
@@ -3826,34 +3561,6 @@ TH1I* EventUnpackProc::MakeH1I(const char* fname,
 }
 //-----------------------------------------------------------------------------------------------------------------------------//
 
-// TH2I* EventUnpackProc::MakeH2I(const char* fname,
-//                              const char* hname,
-//                              Int_t nbinsx, Float_t xmin, Float_t xmax,
-//                              Int_t nbinsy, Float_t ymin, Float_t ymax,
-//                              const char* xtitle, const char* ytitle,
-//                              Color_t markercolor) {
-// //    TNamed* res = TestObject((getfunc)&TGo4EventProcessor::GetHistogram, fname, hname);
-// //    if (res!=0) return dynamic_cast<TH2I*>(res);
-// 
-//    TH2I* histo = new TH2I(hname, hname, nbinsx, xmin, xmax, nbinsy, ymin, ymax);
-//    histo->SetMarkerColor(markercolor);
-//    histo->SetXTitle(xtitle);
-//    histo->SetYTitle(ytitle);
-//    AddHistogram(histo, fname);
-//    return histo;
-// }
-// TH1I* EventUnpackProc::MakeTH1(const char* foldername, const char* name, int nameindex,
-//                   Int_t nbinsx, Float_t xmin, Float_t xmax,
-//                   const char* xtitle, Color_t linecolor, Color_t fillcolor)
-// {
-//   char fullname[100];
-//   if(nameindex>=0)
-//     sprintf(fullname,"%s%s",tpc_name_ext1[nameindex],name);
-//   else
-//     strcpy(fullname, name);
-//   return MakeH1I(foldername, fullname, nbinsx, xmin, xmax, xtitle,
-//          linecolor, fillcolor);
-// }
 const  char* EventUnpackProc::tpc_name_ext1[7]={"TPC21_","TPC22_","TPC23_","TPC24_","TPC41_","TPC42_", "TPC31_"};
 const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24","TPC41","TPC42","TPC31"};
 
@@ -3861,3 +3568,91 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
+
+
+void EventUnpackProc::Make_BB7_FEBEX_Histos()
+{ 
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_FEBEX_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+        }
+        hBB7_FEBEX_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
+    }
+    hBB7_FEBEX_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_FEBEX_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+    // we want:
+    // raw energy
+    // hit pattern
+    // anything else Anabel+Marta asks
+}
+
+void EventUnpackProc::Fill_BB7_FEBEX_Histos()
+{
+    int Hits = RAW->get_BB7_FEBEX_Hits();
+    for (int i = 0; i < Hits; i++)
+    { 
+        int Side = RAW->get_BB7_FEBEX_Side(i);
+        int Strip = RAW->get_BB7_FEBEX_Strip(i);
+        int Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+
+        hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
+        hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+        hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
+        // CEJ: currently 1-64, could be per side or febex module
+        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+    }
+
+}
+
+void EventUnpackProc::Make_BB7_MADC_Histos()
+{
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+        }
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
+    }
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_MADC_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+}
+
+void EventUnpackProc::Fill_BB7_MADC_Histos()
+{
+    int Hits = RAW->get_BB7_MADC_Hits();
+    for (int i = 0; i < Hits; i++)
+    { 
+        int Side = RAW->get_BB7_MADC_Side(i);
+        int Strip = RAW->get_BB7_MADC_Strip(i);
+        int Energy = RAW->get_BB7_MADC_ADC(i);
+
+        hBB7_MADC_Raw_E[Side][Strip]->Fill(Energy);
+        hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+        hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
+        // CEJ: currently 1-64, could be per side or febex module
+        hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+    }
+    
+}
+
+
+
+void EventUnpackProc::Make_BB7_TWINPEAKS_Histos()
+{
+    // stuff
+}
+
+void EventUnpackProc::Fill_BB7_TWINPEAKS_Histos()
+{
+    // stuff
+
+}

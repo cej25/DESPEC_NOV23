@@ -211,6 +211,12 @@ void  EventUnpackStore::Clear(Option_t *t)
         ZERO_ARRAY(fGe_Overflow);
     }
     fGe_WR = 0;
+
+    fBM_WR = 0;
+    fBB7_FEBEX_WR = 0;
+    fBB7_TWINPEAKS_WR = 0;
+    fBB7_MADC_WR = 0;
+
     ///Finger
     if (fFinger_WR != 0) {
         fFinger_WR = 0;

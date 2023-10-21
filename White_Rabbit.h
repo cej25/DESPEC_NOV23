@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include "WR_Structure.h"
+#include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
 
 //define ULong64_t (used e.g. in Root or Go4)
@@ -15,11 +16,11 @@ typedef unsigned long long ULong64_t;
 class White_Rabbit{
 
 private:
-
-    const std::string names[8] = {"FRS","AIDA","PLASTIC","FATIMA","FATIMA_TAMEX","GERMANIUM","FINGER","BEAM_MONITOR"};
+    // CEJ: this shouldn't defined this twice!!!!
+    const std::string names[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA","FATIMA_TAMEX","GERMANIUM","FINGER","BEAM_MONITOR", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
     int increase;
-    int DETECTORS[8];
-    int ID[8];
+    int DETECTORS[NUM_SUBSYS];
+    int ID[NUM_SUBSYS];
 
     int* pdata;
 

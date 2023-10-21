@@ -5,6 +5,7 @@
 ///Note that channels start from 0
 
 #define WHITE_RABBIT_ENABLED 1
+#define NUM_SUBSYS 11 // CEJ: number of subsystems for wr/procid
 
 ///Use FRS MHTDC for Analysis (1) or NIM TAC (0)
 #define MHTDC_OR_TAC 0
@@ -60,6 +61,21 @@
 #define FATIMA_TAMEX_SC41R_Digi  52
 #define FatTAMEX_TimeMachineCh1 53
 #define FatTAMEX_TimeMachineCh2 54
+
+// BB7 LAYER
+#define BB7_SIDES 2
+#define BB7_STRIPS_PER_SIDE 32
+
+#define BB7_FEBEX_MODULES 4
+#define BB7_FEBEX_CHAN_PER_MOD 16
+#define BB7_FEBEX_MAX_CHANNELS (BB7_FEBEX_MODULES * BB7_FEBEX_CHAN_PER_MOD)
+#define BB7_FEBEX_MAX_HITS BB7_FEBEX_MAX_CHANNELS
+#define BB7_TAMEX_MODULES 4
+#define BB7_TAMEX_CHANNELS 32 // CEJ: 16 fast/slow
+#define BB7_TAMEX_MAX_HITS 200 // CEJ: no idea
+#define BB7_MADC_MODULES 2
+#define BB7_MADC_CHANNELS 32
+#define BB7_MADC_MAX_HITS (BB7_MADC_MODULES * BB7_MADC_CHANNELS)
 
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 

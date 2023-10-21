@@ -46,6 +46,9 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "PLASTIC_TAMEX_Detector_System.h"
 #include "Germanium_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 #include "DESPECAnalysis.h"
 #include "FRS_Detector_System.h"
 
@@ -516,6 +519,18 @@ using namespace std;
 			TH1 *hGe_Raw_E[Germanium_MAX_DETS][Germanium_CRYSTALS];
             TH1 *h_trace[Germanium_MAX_DETS][Germanium_CRYSTALS];
 
+
+            // BB7 Potential histograms
+            TH1* hBB7_FEBEX_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Side[BB7_SIDES];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Total;
+            TH1* hBB7_FEBEX_Hit_Pattern;
+            // tamex??
+            TH1* hBB7_MADC_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_MADC_Raw_E_Sum_Side[BB7_SIDES];
+            TH1* hBB7_MADC_Raw_E_Sum_Total;
+            TH1* hBB7_MADC_Hit_Pattern;
+
 		private:
 
 
@@ -529,8 +544,8 @@ using namespace std;
             int AIDA_Strip[AIDA_MAX_HITS] = {0};
             int AIDA_evtID[AIDA_MAX_HITS] = {0};
 
-			Int_t PrcID_Array[10][9];
-			bool Used_Systems[10];
+			Int_t PrcID_Array[NUM_SUBSYS][NUM_SUBSYS]; // was 10 9???
+			bool Used_Systems[NUM_SUBSYS];
 
             Int_t Type;
             Int_t SubType;
@@ -680,12 +695,21 @@ using namespace std;
 
 			void Make_Germanium_Histos();
 			void Fill_Germanium_Histos();
-
+        
             void Make_Finger_Histos();
             void Fill_Finger_Histos();
             
             void Make_BeamMonitor_Histos();
             void Fill_BeamMonitor_Histos();
+
+            void Make_BB7_FEBEX_Histos();
+            void Make_BB7_TWINPEAKS_Histos();
+            void Make_BB7_MADC_Histos();
+
+            void Fill_BB7_FEBEX_Histos();
+            void Fill_BB7_TWINPEAKS_Histos();
+            void Fill_BB7_MADC_Histos();
+
 
 			void FILL_HISTOGRAMS(int,int,int,EventUnpackStore* fOutput);
 
