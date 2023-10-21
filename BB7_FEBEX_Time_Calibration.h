@@ -10,8 +10,8 @@ typedef unsigned long ULong;
 class BB7_FEBEX_Time_Calibration
 {
     private:
-        double calib_coeffs_sum[];
-        double calib_coeffs_channels[];
+        double calib_coeffs_sum[36];
+        double calib_coeffs_channels[36];
     
     public:
         BB7_FEBEX_Time_Calibration();

@@ -77,7 +77,7 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         BB7_TWINPEAKS_Detector_System();
         ~BB7_TWINPEAKS_Detector_System();
 
-        void Process_MBS(TGo4SubEvent* psubevt) {};
+        void Process_MBS(TGo4MbsSubEvent* psubevt) {};
         void Process_MBS(int*);
 
         void get_Event_data(Raw_Event*);
@@ -95,3 +95,5 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         unsigned long next_ts_for_update() { return 1; } 
 
 };
+
+#endif

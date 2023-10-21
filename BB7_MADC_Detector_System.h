@@ -30,7 +30,6 @@ class BB7_MADC_Detector_System : public Detector_System
         int Strip;
         int Side;
         int* ADC_Data;
-        int* Channel_ID;
 
         void load_board_channel_file();
 
@@ -41,7 +40,7 @@ class BB7_MADC_Detector_System : public Detector_System
         BB7_MADC_Detector_System();
         ~BB7_MADC_Detector_System();
 
-        void Process_MBS(TGo4SubEvent* psubevt) {};
+        void Process_MBS(TGo4MbsSubEvent* psubevt) {};
         void Process_MBS(int*);
         void get_Event_Data(Raw_Event*);
         int* get_pdata();
@@ -53,7 +52,7 @@ class BB7_MADC_Detector_System : public Detector_System
         bool do_gain_matching(int ts_ns) { return 1; }
         unsigned long next_ts_for_update() { return 1; }
 
-}
+};
 
 
 
