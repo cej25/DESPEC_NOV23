@@ -1673,8 +1673,10 @@ void EventUnpackProc::load_FingerID_File(){
 //-----------------------------------------------------------------------------------------------------------------------------//
 Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 
-  for(int i = 0;i < 10;++i){
-    for(int j = 0;j < 10;++j){
+  // CEJ: changing this to use variable for number of subsystems
+
+  for(int i = 0;i < NUM_SUBSYS;++i){
+    for(int j = 0;j < NUM_SUBSYS;++j){
         ///Fix for FRS
           if (PrcID==100) return -1;
       if(PrcID == PrcID_Array[i][j]) return i;
@@ -1685,7 +1687,8 @@ Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 }
 
 void EventUnpackProc::get_used_systems(){
-    for(int i = 0;i < 10;i++) Used_Systems[i] = false;
+    // CEJ: changing here to use num subsys variable
+    for(int i = 0;i < NUM_SUBSYS;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -1702,8 +1705,9 @@ void EventUnpackProc::get_used_systems(){
     sscanf(line.c_str(),"%s %d",s_tmp,&id);
     Used_Systems[i] = (id == 1);
     i++;
-  }
-  string DET_NAME[10] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS"};
+  } 
+  // CEJ: this is defined in multiple places...surely can be done better
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
@@ -3564,14 +3568,6 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 //-----------------------------------------------------------------------------------------------------------------------------//
 
 
-
-
-
-
-// Somehow need a combo of the following two for BB7_FEBEX
-// OK so we have 64 total channels, either using 4 FEBEX modules or 2 Mesytec VME ADCs, or 2 TAMEX modules
-// I think this must be true.
-
 void EventUnpackProc::Make_BB7_FEBEX_Histos()
 { 
     for (int i = 0; i < BB7_SIDES; i++)
@@ -3595,7 +3591,6 @@ void EventUnpackProc::Make_BB7_FEBEX_Histos()
 
 void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 {
-    // CEJ: not so sure about any of this..!
     int Hits = RAW->get_BB7_FEBEX_Hits();
     for (int i = 0; i < Hits; i++)
     { 
@@ -3612,6 +3607,43 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 
 }
 
+void EventUnpackProc::Make_BB7_MADC_Histos()
+{
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+        }
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
+    }
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_MADC_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+}
+
+void EventUnpackProc::Fill_BB7_MADC_Histos()
+{
+    int Hits = RAW->get_BB7_MADC_Hits();
+    for (int i = 0; i < Hits; i++)
+    { 
+        int Side = RAW->get_BB7_MADC_Side(i);
+        int Strip = RAW->get_BB7_MADC_Strip(i);
+        int Energy = RAW->get_BB7_MADC_ADC(i);
+
+        hBB7_MADC_Raw_E[Side][Strip]->Fill(Energy);
+        hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+        hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
+        // CEJ: currently 1-64, could be per side or febex module
+        hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip)
+    }
+    
+}
+
+
+
 void EventUnpackProc::Make_BB7_TWINPEAKS_Histos()
 {
     // stuff
@@ -3623,29 +3655,6 @@ void EventUnpackProc::Fill_BB7_TWINPEAKS_Histos()
 
 }
 
-void EventUnpackProc::Make_BB7_MADC_Histos()
-{
-    //stuff
-    for (int i = 0; i < BB7_MADC_MAX_HITS; i++)
-    {
-        hBB7_MADC_Raw_E[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Channel:%2d", i), Form("BB7 Layer Energy Raw - Channel %2d", i), 20000, 0, 200000);
-    }
-
-    hBB7_MADC_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
-
-}
-
-void EventUnpackProc::Fill_BB7_MADC_Histos()
-{
-    //stuff
-    int hits = RAW->get_BB7_MADC_hits();
-    for (int i = 0; i < hits; i++)
-    {
-        hBB7_MADC_Raw_E[RAW->get_BB7_MADC_channel(i)]->Fill(RAW->get_BB7_MADC_adc(i));
-        hBB7_MADC_Hit_Pattern->Fill(RAW->get_BB7_MADC_channel(i));
-    }
-    
-}
 
 
 

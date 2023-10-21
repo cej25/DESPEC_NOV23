@@ -15,11 +15,11 @@ typedef unsigned long long ULong64_t;
 class White_Rabbit{
 
 private:
-
-    const std::string names[10] = {"FRS","AIDA","PLASTIC","FATIMA","FATIMA_TAMEX","GERMANIUM","FINGER","BEAM_MONITOR", "BB7_FEBEX", "BB7_TWINPEAKS"};
+    // CEJ: this shouldn't defined this twice!!!!
+    const std::string names[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA","FATIMA_TAMEX","GERMANIUM","FINGER","BEAM_MONITOR", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
     int increase;
-    int DETECTORS[10];
-    int ID[10];
+    int DETECTORS[NUM_SUBSYS];
+    int ID[NUM_SUBSYS];
 
     int* pdata;
 

@@ -5,7 +5,7 @@
 ///Note that channels start from 0
 
 #define WHITE_RABBIT_ENABLED 1
-#define NUM_SUBSYS 10 // CEJ: number of subsystems for wr/procid
+#define NUM_SUBSYS 11 // CEJ: number of subsystems for wr/procid
 
 ///Use FRS MHTDC for Analysis (1) or NIM TAC (0)
 #define MHTDC_OR_TAC 0
