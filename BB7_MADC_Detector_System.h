@@ -42,7 +42,7 @@ class BB7_MADC_Detector_System : public Detector_System
 
         void Process_MBS(TGo4MbsSubEvent* psubevt) {};
         void Process_MBS(int*);
-        void get_Event_Data(Raw_Event*);
+        void get_Event_data(Raw_Event*);
         int* get_pdata();
 
         // neede for Detector_System

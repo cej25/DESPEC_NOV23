@@ -65,7 +65,7 @@ void BB7_MADC_Detector_System::load_board_channel_file()
     }
 }
 
-void BB7_MADC_Detector_System::get_Event_Data(Raw_Event* RAW)
+void BB7_MADC_Detector_System::get_Event_data(Raw_Event* RAW)
 {
     RAW->set_DATA_BB7_MADC(Hits, Side, Strip, ADC_Data);
 }

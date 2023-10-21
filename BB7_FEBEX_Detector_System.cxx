@@ -68,7 +68,7 @@ void BB7_FEBEX_Detector_System::load_board_channel_file()
     }
 }
 
-void BB7_FEBEX_Detector_System::get_Event_Data(Raw_Event* RAW)
+void BB7_FEBEX_Detector_System::get_Event_data(Raw_Event* RAW)
 {   
     // Actually Hit_Pattern isn't really needed if we have Side, Strip
     RAW->set_DATA_BB7_FEBEX(Hits, Side, Strip, Sum_Time, Chan_Time, Chan_Energy, Chan_CF, Pileup, Overflow);

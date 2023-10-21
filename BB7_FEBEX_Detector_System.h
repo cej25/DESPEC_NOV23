@@ -53,7 +53,7 @@ class BB7_FEBEX_Detector_System : public Detector_System
 
         void Process_MBS(TGo4MbsSubEvent* psubevt) {};
         void Process_MBS(int*);
-        void get_Event_Data(Raw_Event*);
+        void get_Event_data(Raw_Event*);
         int* get_pdata();
 
         // needed for Detector System
