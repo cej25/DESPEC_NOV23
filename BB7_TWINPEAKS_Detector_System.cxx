@@ -9,7 +9,7 @@ BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
 
     Calibration_Done = false;
 
-    BB7_TAMEX_Calibration = new BB7_TAMEX_Calibration(CALIBRATE);
+    BB7_TAMEX_Calibration = new BB7_TAMEX_Calibrator(CALIBRATE);
 
     iterator = new int[200];
     for (int i = 0; i < 200; i++)
@@ -34,7 +34,7 @@ BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
     {
         edge_coarse[i] = new double[200];
         edge_fine[i] = new double[200];
-        ch_ID_edge[i] = new double[200];
+        ch_ID_edge[i] = new unsigned int[200];
 
         lead_arr[i] = new int[200];
         leading_hits[i] = new int[200];
@@ -63,7 +63,7 @@ BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
     delete[] fine_T;
     delete[] ch_ID;
 
-    delete BB7_TAMEX_Calibration
+    delete BB7_TAMEX_Calibration;
 }
 
 void BB7_TWINPEAKS_Detector_System::get_Event_data(Raw_Event* RAW)
@@ -123,7 +123,7 @@ void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
 
     TAMEX_CHANNEL_HEADER* Channel_Header = (TAMEX_CHANNEL_HEADER*) pdata;
 
-    bool ongoing = (Channel_Header->identify == 0x34) && (Channel_Header->identify_2 == 0) && (Channel_Head->sfp_id == 1 || Channel_Head->sfp_id == 0);
+    bool ongoing = (Channel_Header->identify == 0x34) && (Channel_Header->identify_2 == 0) && (Channel_Header->sfp_id == 1 || Channel_Header->sfp_id == 0);
 
     if (!ongoing)
     {
@@ -132,7 +132,7 @@ void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
     }
     if (tamex_iter > 0)
     {
-        if (Channel_Head->Tamex_id <= tamex_id[tamex_iter - 1])
+        if (Channel_Header->Tamex_id <= tamex_id[tamex_iter - 1])
         {
             tamex_end = true;
             return;
@@ -254,7 +254,7 @@ void BB7_TWINPEAKS_Detector_System::get_edges()
 
         if (TDC_Data->leading_E == 1)
         {
-            leading_hit = TDC->leading_E;
+            leading_hit = TDC_Data->leading_E;
             edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
             edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
             ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID;
@@ -296,7 +296,7 @@ void BB7_TWINPEAKS_Detector_System::check_error()
         std::cerr << "wrong error heading in BB7 TAMEX word: " << std::hex << *pdata << std::dec << std::endl;
         exit(0);
     }
-    if (erorr->err_code != 0)
+    if (error->err_code != 0)
     {
         std::cerr << "Error (not known) in BB7 TAMEX occurred: " << std::hex << *pdata << std::dec << std::endl;
     }
