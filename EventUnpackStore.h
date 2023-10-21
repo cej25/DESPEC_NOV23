@@ -160,6 +160,12 @@ public:
          bool     fGe_Overflow[Germanium_MAX_HITS];
          Long64_t fGe_WR;
 
+         // BB7
+         Long64_t fBM_WR;
+         Long64_t fBB7_FEBEX_WR;
+         Long64_t fBB7_TWINPEAKS_WR;
+         Long64_t fBB7_MADC_WR;
+
 
         Long64_t fFinger_WR;
        Int_t fFing_Strip_N[52];

@@ -53,6 +53,7 @@
 #include "FRS_Detector_System.h"
 #include "BB7_FEBEX_Detector_System.h"
 #include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 
 #include "TAidaConfiguration.h"
 
@@ -121,6 +122,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   Detector_Systems[7] = !Used_Systems[7] ? nullptr : new Beam_Monitor_Detector_System();
   Detector_Systems[8] = !Used_Systems[8] ? nullptr : new BB7_FEBEX_Detector_System();
   Detector_Systems[9] = !Used_Systems[9] ? nullptr : new BB7_TWINPEAKS_Detector_System();
+  Detector_Systems[10] = !Used_Systems[10] ? nullptr : new BB7_MADC_Detector_System();
   
    frs_id = dynamic_cast<TIDParameter*> (an->GetParameter("IDPar"));
 
@@ -399,9 +401,9 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
            if(WR_d==5) fOutput->fGe_WR = WR_tmp; //Geileo
            if(WR_d==6) fOutput->fFinger_WR = WR_tmp; //FINGER
            if(WR_d==7) fOutput->fBM_WR = WR_tmp; // BeamMonitor 
-           if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX
-           if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS
-
+           if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX option
+           if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS option
+           if(WR_d==10) fOutput->fBB7_MADC_WR = WR_tmp; // BB7 MADC option
             WR_main = WR_tmp;
 
         }
@@ -3602,7 +3604,7 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
         hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
         hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
         // CEJ: currently 1-64, could be per side or febex module
-        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip)
+        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
     }
 
 }
@@ -3637,7 +3639,7 @@ void EventUnpackProc::Fill_BB7_MADC_Histos()
         hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
         hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
         // CEJ: currently 1-64, could be per side or febex module
-        hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip)
+        hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
     }
     
 }
@@ -3653,78 +3655,4 @@ void EventUnpackProc::Fill_BB7_TWINPEAKS_Histos()
 {
     // stuff
 
-}
-
-
-
-
-  void EventUnpackProc::Make_AIDA_Histos(){
-
-    TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
-    hAIDA_ADC.resize(conf->FEEs());
-
-    for (int i = 0; i < conf->FEEs(); i++)
-    {
-      for (int j = 0; j < 64; j++)
-      {
-        hAIDA_ADC[i][j][0] = MakeTH1('I',
-          Form("AIDA/Unpacker/FEE%d/Fee%d_L_Channel%02d", i+1, i+1, j+1),
-          Form("FEE %d Channel %2d (Low Energy)", i+1, j+1),
-          2000, -32768, 32767
-        );
-      }
-
-    }
-
-    hAIDA_DeadTime.resize(conf->FEEs());
-    aida_deadtime_queue.resize(conf->FEEs());
-    aida_deadtime_pos.resize(conf->FEEs());
-    last_pauses.resize(conf->FEEs());
-    hAIDA_DeadTime_Spill = MakeTH1('I',
-        Form("AIDA/DeadTime/DeadTime_Spill"),
-        Form("Spill flag for AIDA dead time"),
-        6000, 0, 600, "Time before now (seconds)",
-        "On spill?"
-    );
-    hAIDA_DeadTime_Spill->SetLineColor(kRed);
-    aida_deadtime_spill_queue.resize(6000);
-    aida_deadtime_spill_pos = 0;
-    AIDA_DeadTime_OnSpill = false;
-    for (int i = 0; i < conf->FEEs(); i++)
-    {
-      aida_deadtime_queue[i].resize(6000);
-      aida_deadtime_pos[i] = 0;
-      last_pauses[i] = 0;
-      hAIDA_DeadTime[i] = MakeTH1('I',
-          Form("AIDA/DeadTime/DeadTime_Fee%d", i+1),
-          Form("FEE %d Dead Time", i+1),
-          6000, 0, 600, "Time before now (seconds)",
-          "Dead Time (%)"
-        );
-    }
-
-    for (int i = 0; i < conf->FEEs(); i++)
-    {
-      for (int j = 0; j < 64; j++)
-      {
-        hAIDA_ADC[i][j][1] = MakeTH1('I',
-          Form("AIDA/Unpacker/FEE%d/Fee%d_H_Channel%02d", i+1, i+1, j+1),
-          Form("FEE %d Channel %2d (High Energy)", i+1, j+1),
-          2000, -32768, 32767
-        );
-      }
-    }
-
-    for (auto scaler : conf->ScalerMap())
-    {
-      hAIDA_Scaler[scaler.first] = MakeTH1('I',
-        Form("AIDA/Scaler/%s", scaler.second.c_str()),
-        Form("AIDA Scaler %d (%s)", scaler.first, scaler.second.c_str()),
-        3600, 0, 3600,
-        "Time before now (seconds)",
-        "Frequency (Hz)"
-      );
-    }
-
-    hAIDA_TimeMachine = MakeTH1('I', "AIDA/Scaler/TimeMachine", "AIDA Time Machine dT", 200, 0, 2000, "dT (ns)");
 }

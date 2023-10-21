@@ -17,7 +17,6 @@ BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
     Side = new int[max_hits];
     Strip = new int[max_hits];
     Sum_Time = new ULong64_t[max_hits];
-    Hit_Pattern = new int[max_hits];
     Chan_Time = new ULong64_t[max_hits];
     Chan_Energy = new double[max_hits];
     Chan_CF = new ULong64_t[max_hits];
