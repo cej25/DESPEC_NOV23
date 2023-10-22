@@ -1571,8 +1571,8 @@ void EventUnpackProc::load_PrcID_File(){
     cerr << "Could not find PrcID config file!" << endl;
     exit(0);
   }
-  // num_frs_ID
-  int id[8] = {0,0,0,0,0,0,0,0,0};
+  // num_frs_ID ? 
+  int id[8] = {0,0,0,0,0,0,0,0};
   int i = 0;
   string line;
   char s_tmp[100];
@@ -1580,6 +1580,7 @@ void EventUnpackProc::load_PrcID_File(){
     getline(data,line,'\n');
     if(line[0] == '#') continue;
     sscanf(line.c_str(),"%s %d %d %d %d %d %d %d %d %d",s_tmp,&id[0],&id[1],&id[2],&id[3],&id[4],&id[5],&id[6],&id[7],&id[8]);
+    // num frs_ID?
     for(int j = 0; j < 8; ++j){ PrcID_Array[i][j] = id[j];
 
     }
