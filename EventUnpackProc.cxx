@@ -3639,14 +3639,14 @@ void EventUnpackProc::Make_BB7_MADC_Histos()
     {
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
         {
-            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 200000.);
         }
-        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 200000.);
     }
-    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 200000.);
 
     // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
-    hBB7_MADC_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+    hBB7_MADC_Hit_Pattern = MakeTH1('I', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
 
 }
 
