@@ -1494,9 +1494,9 @@ for (int i=0; i<10; i++){
               {
                   fOutput->fBB7_FEBEX_Side[i] =  RAW->get_BB7_FEBEX_Side(i);
                   fOutput->fBB7_FEBEX_Strip[i] =  RAW->get_BB7_FEBEX_Strip(i);
-                  fOutput->fBB7_FEBEX_Chan_Event[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                  fOutput->fBB7_FEBEX_Chan_Energy[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
                   fOutput->fBB7_FEBEX_Chan_Time[i] = RAW->get_BB7_FEBEX_Chan_Time(i);
-                  fOutput->fBB7_FEBEX_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
+                  fOutput->fBB7_FEBEX_Chan_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
                   fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
                   fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
                   fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
