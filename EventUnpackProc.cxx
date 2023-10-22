@@ -1470,7 +1470,8 @@ for (int i=0; i<10; i++){
           }
         }
          ///--------------------------------------------------------------------------------------------///
-         if (Used_Systems[7] && PrcID_Conv==7){
+         if (Used_Systems[7] && PrcID_Conv==7)
+         {
              
              BM_Hits_S2 = RAW->get_BM_Hits_S2();
              BM_Hits_S4 = RAW->get_BM_Hits_S4();
@@ -1483,12 +1484,27 @@ for (int i=0; i<10; i++){
                 BM_L_diff_S4[i] = RAW->get_BM_LDiff_S4(i);  
           //       cout<<"BM_L_diff_S4[i] " <<BM_L_diff_S4[i] << " BM_Hits_S4 " <<BM_Hits_S4  <<" i " << i << endl;
              }
+
              
- 
-             
-            
-             
-         }
+         } // BM output
+
+          if (Used_Systems[8] && PrcID_Conv == 8)
+          {
+              for (int i = fOutput->fBB7_FEBEX_Hits; i<RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
+              {
+                  fOutput->fBB7_FEBEX_Side[i] =  RAW->get_BB7_FEBEX_Side(i);
+                  fOutput->fBB7_FEBEX_Strip[i] =  RAW->get_BB7_FEBEX_Strip(i);
+                  fOutput->fBB7_FEBEX_Chan_Event[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                  fOutput->fBB7_FEBEX_Chan_Time[i] = RAW->get_BB7_FEBEX_Chan_Time(i);
+                  fOutput->fBB7_FEBEX_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
+                  fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
+                  fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
+                  fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
+                  fOutput->fBB7_FEBEX_Hits++;
+              }
+          } // output BB7 FEBEX
+        
+
         ///--------------------------------------------------------------------------------------------///
 
       } //End of subevent loop
