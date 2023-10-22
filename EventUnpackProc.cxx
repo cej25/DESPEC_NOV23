@@ -463,8 +463,6 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                 }
             }
 
-            std::cout << "HEY CALUM LOOK HERE - PROCIDCONV = " << PrcID_Conv << std::endl;
-
         //=================================================================
         //HISTOGRAM FILLING (only singles)
         FILL_HISTOGRAMS(PrcID_Conv,PrcID,SubType,fOutput);
@@ -3173,7 +3171,9 @@ void EventUnpackProc::Make_BB7_FEBEX_Histos()
 }
 
 void EventUnpackProc::Fill_BB7_FEBEX_Histos()
-{
+{ 
+
+    std::cout << "Are we here? " << std::endl;
     int Hits = RAW->get_BB7_FEBEX_Hits();
     for (int i = 0; i < Hits; i++)
     { 
