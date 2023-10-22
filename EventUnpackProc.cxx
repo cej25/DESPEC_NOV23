@@ -3173,7 +3173,7 @@ void EventUnpackProc::Make_BB7_FEBEX_Histos()
 void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 { 
 
-    std::cout << "Are we here? " << std::endl;
+    
     int Hits = RAW->get_BB7_FEBEX_Hits();
     for (int i = 0; i < Hits; i++)
     { 
