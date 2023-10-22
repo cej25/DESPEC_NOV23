@@ -128,7 +128,8 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
             this->pdata--; // move back to DEADBEEF for this loop to work
 
             for (int i = 0; i < num_channels; i++)
-            {
+            {   
+                std::cout << "pdata: " << std::hex << *this->pdata << std::dec << std::endl;
                 this->pdata++;
 
                 FEBEX_Chan_Header* Channel_Head = (FEBEX_Chan_Header*) this->pdata;
