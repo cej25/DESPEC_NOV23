@@ -3183,6 +3183,7 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
         int Strip = RAW->get_BB7_FEBEX_Strip(i);
         double Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
         std::cout << "Are we here? " << std::endl;
+        std::cout << "Side: " << Side << " - Strip: " << Strip << " - Energy: " << Energy << std::endl;
         hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
         hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
         hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
