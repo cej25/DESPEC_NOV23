@@ -3178,17 +3178,20 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 
     
     for (int i = 0; i < Hits; i++)
-    { 
+    {   
         int Side = RAW->get_BB7_FEBEX_Side(i);
         int Strip = RAW->get_BB7_FEBEX_Strip(i);
-        double Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
-        std::cout << "Are we here? " << std::endl;
-        std::cout << "Side: " << Side << " - Strip: " << Strip << " - Energy: " << Energy << std::endl;
-        hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
-        hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
-        hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
-        // CEJ: currently 1-64, could be per side or febex module
-        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        if (Side > -1 && Strip > -1)
+        {
+            double Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+            hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
+            hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+            hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
+            // CEJ: currently 1-64, could be per side or febex module
+            hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        }
+
+        
     }
 
 }
