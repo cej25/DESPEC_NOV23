@@ -1522,6 +1522,12 @@ void EventUnpackProc::FILL_HISTOGRAMS(int PrcID_Conv, int PrcID, int SubType,Eve
   
     ///Beam_Monitor is PrcID_Conv 7 && Used_Systems 7
   if(PrcID_Conv==7 && Used_Systems[7]) Fill_BeamMonitor_Histos();
+
+  if (PrcID_Conv==8 && Used_Systems[8]) Fill_BB7_FEBEX_Histos();
+
+  // bb7 tamex
+
+  if (PrcID_Conv==10 && Used_Systems[10]) Fill_BB7_MADC_Histos();
 }
 
 
@@ -1565,7 +1571,8 @@ void EventUnpackProc::load_PrcID_File(){
     cerr << "Could not find PrcID config file!" << endl;
     exit(0);
   }
-  int id[9] = {0,0,0,0,0,0,0,0,0};
+  // num_frs_ID
+  int id[8] = {0,0,0,0,0,0,0,0,0};
   int i = 0;
   string line;
   char s_tmp[100];
@@ -1714,8 +1721,8 @@ void EventUnpackProc::get_used_systems(){
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
     cout << "-----------------------------------------------------" << endl;
-    for(int j = 0;j < 10;++j){
-        if(Used_Systems[j]) cout <<"\t"<< DET_NAME[j] << endl;
+    for(int j = 0;j < NUM_SUBSYS;++j){
+        if(Used_Systems[j]) std::cout <<"\t"<< DET_NAME[j] << std::endl;
     }
     cout << "=====================================================" << endl;
 
