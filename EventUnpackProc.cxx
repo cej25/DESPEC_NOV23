@@ -463,6 +463,8 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                 }
             }
 
+            std::cout << "HEY CALUM LOOK HERE - PROCIDCONV = " << PrcID_Conv << std::endl;
+
         //=================================================================
         //HISTOGRAM FILLING (only singles)
         FILL_HISTOGRAMS(PrcID_Conv,PrcID,SubType,fOutput);
