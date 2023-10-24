@@ -179,7 +179,10 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
     if(Used_Systems[3]) Make_Fatima_Histos();
     if(Used_Systems[4]) Make_Fatima_Tamex_Histos();
     if(Used_Systems[5]) Make_Germanium_Histos();
-    //if (Used_Systems[6]) Make_Finger_Histos();
+    // FINGER[6], BEAM MONITOR[7]
+    //if(Used_Systems[8]) Make_BB7_FEBEX_Histos();
+    //if(Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+    //if(Used_Systems[10]) Make_BB7_MADC_Histos();
 
         }
 
@@ -629,6 +632,10 @@ if(Fatmult > 0){
 
  }  //End of BuildEvent
 
+
+// --------------------------------------- BB7 Input (FEBEX) --------------------------------------------///
+
+   // BB7_FEBEX_Hits = -1;
 
 
 
