@@ -7,7 +7,8 @@ using namespace std;
 
 White_Rabbit::White_Rabbit(){
 
-    for(int i = 0;i < NUM_SUBSYS;++i) ID[i] = -1;
+    // i guess this is number of ids per too.. 
+    for(int i = 0;i < 8;++i) ID[i] = -1;
     load_config_file();
     pdata = nullptr;
     increase = 5;
@@ -30,7 +31,7 @@ void White_Rabbit::load_config_file(){
 
     const char* format = "%s %x";
 
-    ifstream config_file("Configuration_Files/DESPEC_General_Setup/White_Rabbit_Map.txt");
+    std::ifstream config_file("Configuration_Files/DESPEC_General_Setup/White_Rabbit_Map.txt");
     if(config_file.fail()){
         cerr << "Could not find White_rabbit map!" << endl;
         exit(0);
@@ -45,10 +46,10 @@ void White_Rabbit::load_config_file(){
         getline(config_file,line,'\n');
         if(line[0] == '#') continue;
         sscanf(line.c_str(),format,s,&id);
-        for(int i = 0;i < NUM_SUBSYS;++i){
+        for(int i = 0;i < NUM_SUBSYS;i++){ // is this messing it up?
             if(string(s) == names[i]){
+                std::cout << "true for " << names[i] << std::endl; 
                 ID[i] = id;
-
                 break;
             }
         }
@@ -68,7 +69,8 @@ void White_Rabbit::set_triggered_detector(int WR_d){
     //check for id of detector
     for(int i = 0;i < NUM_SUBSYS;i++){
       // printf("ID0x%02x, WR0x%02x\n", (unsigned int) ID[i], WR_d);
-        if(WR_d == ID[i]){
+        if(WR_d == ID[i])
+        {
             detector_id = i;
             
             return;
@@ -112,7 +114,7 @@ void White_Rabbit::process_White_Rabbit(int* pdata){
 
     // If a valid WR timestamp is found
     if (found)
-    {
+    {   
       // match the WR detector ID to the internal detector number
       set_triggered_detector(WR_d);
 

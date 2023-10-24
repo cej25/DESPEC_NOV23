@@ -178,6 +178,7 @@ void Germanium_Detector_System::Process_MBS(int* pdata){
                 }
             }
             this->pdata++; // Moves to DEADBEEF //
+
         }
     else if (FEBEXhead->ff == 0xF0){ // FEBEX channel indicator //
             this->pdata--; // Moves back to DEADBEEF so channel loop functions properly //
@@ -224,7 +225,9 @@ void Germanium_Detector_System::Process_MBS(int* pdata){
             Chan_Energy[fired_FEBEX_amount] = fbx_Ch_En->chan_en;
            // cout<<"Chan_Energy[fired_FEBEX_amount] " <<Chan_Energy[fired_FEBEX_amount] << endl;
              Chan_CF[fired_FEBEX_amount] = 10.0*((fbx_Ch_TS->chan_ts)+(fbx_Ch_En->cf)/64.0);
-            
+
+
+
             //if(Chan_CF[fired_FEBEX_amount]!=0)cout<<"Chan_CF[fired_FEBEX_amount] " <<Chan_CF[fired_FEBEX_amount]<< endl;
                        // Sign extend the 24-bit energy so negative energies work properly
             if (fbx_Ch_En->chan_en & 0x00800000)
@@ -232,6 +235,10 @@ void Germanium_Detector_System::Process_MBS(int* pdata){
               int energy = 0xFF000000 | fbx_Ch_En->chan_en;
               Chan_Energy[fired_FEBEX_amount] = energy;
             }
+
+            std::cout << "Chan Energy: " << Chan_Energy[fired_FEBEX_amount] << std::endl;
+
+
             Pileup[fired_FEBEX_amount] = fbx_Ch_En->pileup != 0;
             Overflow[fired_FEBEX_amount] = fbx_Ch_En->overflow != 0;
             det_ids[fired_FEBEX_amount] = Germanium_map[idx].first;

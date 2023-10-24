@@ -12,7 +12,7 @@ BB7_FEBEX_Detector_System::BB7_FEBEX_Detector_System()
 {
     // set amount of detectors
     max_hits = BB7_FEBEX_MAX_HITS;
-    num_modules = BB7_FEBEX_MODULES;
+    //num_modules = BB7_FEBEX_MODULES;
 
     Side = new int[max_hits];
     Strip = new int[max_hits];
@@ -49,7 +49,7 @@ void BB7_FEBEX_Detector_System::load_board_channel_file()
         exit(0);
     }
 
-    constexpr auto ignore = std::numeric_limits<streamsize>::max();
+    constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
 
     while (file.good())
     {
@@ -78,15 +78,18 @@ void BB7_FEBEX_Detector_System::get_Event_data(Raw_Event* RAW)
 
 void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 {   
+    num_modules = BB7_FEBEX_MODULES;
+    Hits = 0;
+
     this->pdata = pdata; // CEJ: i hate this
     reset_fired_channels();
 
     // loop through padding
-    FEBEX_Add* FEBEX_add = (FEBEX_Add*) this->pdata;
-    while (FEBEX_add->add == 0xADD)
-    {
+    FEBEX_Add* Padding = (FEBEX_Add*) this->pdata;
+    while (Padding->add == 0xADD)
+    {   
         this->pdata++;
-        FEBEX_add = (FEBEX_Add*) this->pdata;
+        Padding = (FEBEX_Add*) this->pdata;
     }
 
     FEBEX_Header* SumChannel_Head = (FEBEX_Header*) this->pdata;
@@ -97,6 +100,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
         if (SumChannel_Head->ff == 0xFF)
         {
             module_id = SumChannel_Head->chan_head;
+            
             this->pdata++;
 
             FEBEX_Chan_Size* Channel_Size = (FEBEX_Chan_Size*) this->pdata;
@@ -129,14 +133,12 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 
             for (int i = 0; i < num_channels; i++)
             {   
-                std::cout << "pdata: " << std::hex << *this->pdata << std::dec << std::endl;
                 this->pdata++;
 
                 FEBEX_Chan_Header* Channel_Head = (FEBEX_Chan_Header*) this->pdata;
                 channel_id = Channel_Head->Ch_ID;
                 tmp_ChanTime_hi = Channel_Head->ext_chan_ts;
 
-                // CEJ: is this necessary here?
                 auto idx = std::make_pair(module_id, channel_id);
                 if (BB7_FEBEX_Map.find(idx) != BB7_FEBEX_Map.end())
                 {
@@ -156,6 +158,9 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
                         int energy = 0xFF000000 | Channel_Energy->chan_en;
                         Chan_Energy[Hits] = energy;
                     }
+
+                    std::cout << "Chan_Energy: " << Chan_Energy[Hits] << std::endl;
+
 
                     Pileup[Hits] = Channel_Energy->pileup != 0; // CEJ: why does this need to be a condition...
                     Overflow[Hits] = Channel_Energy->overflow != 0;
@@ -188,7 +193,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
 void BB7_FEBEX_Detector_System::reset_fired_channels()
 {   
 
-    Hits = 0;
+    //Hits = 0;
     for (int i = 0; i < max_hits; i++)
     {
         Side[i] = 0;

@@ -19,7 +19,7 @@ private:
     // CEJ: this shouldn't defined this twice!!!!
     const std::string names[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA","FATIMA_TAMEX","GERMANIUM","FINGER","BEAM_MONITOR", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
     int increase;
-    int DETECTORS[NUM_SUBSYS];
+    int DETECTORS[NUM_SUBSYS]; // what is this used for?
     int ID[NUM_SUBSYS];
 
     int* pdata;
