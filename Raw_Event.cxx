@@ -961,7 +961,7 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
 
                 // CEJ: I think here there were issues with lead/trail when you get lead-lead or trail-trail
-                // hmm maybe not. Not sure 
+                // hmm maybe not. Not sure.
                 if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && j % 2 == 0)
                 {
                     coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
@@ -975,7 +975,8 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 {
                     coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
                     fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
-
+                    
+                    // CEJ: this is because trails get adjusted by max_cha_input in TWINPEAKS_Detector_System
                     phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]) - 33;
                     trailing_hits_BB7_TWINPEAKS[i]++;
                     if (phys_channel_BB7_TWINPEAKS[i][j] < 100)

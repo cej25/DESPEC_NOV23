@@ -533,6 +533,13 @@ using namespace std;
 
 		private:
 
+            std::map<std::pair<int,int>, std::pair<int,int>> BB7_TWINPEAKS_Map;
+            int bb7_twinpeaks_mod;
+            int bb7_twinpeaks_chan;
+            int bb7_twinpeaks_side;
+            int bb7_twinpeaks_strip;
+
+
 
             int AIDA_Hits=0;
             double AIDA_Energy[AIDA_MAX_HITS] = {0};
@@ -673,6 +680,7 @@ using namespace std;
             void load_FingerID_File();
             void load_FatTamex_Allocationfile();
             void load_bPlasticTamex_Allocationfile();
+            void load_BB7_TWINPEAKS_AllocationFile();
 			void load_PrcID_File();
 
 			void Make_FRS_Histos();

@@ -155,6 +155,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   load_FingerID_File();
   load_FatTamex_Allocationfile();
   load_bPlasticTamex_Allocationfile();
+  load_BB7_TWINPEAKS_AllocationFile();
   PrintDespecParameters();
 
     WR_count = 0;
@@ -960,67 +961,11 @@ for (int i=0; i<10; i++){
                 } ///end tamex hits loop
             } ///End proc ID 2
        // }
-        ///--------------------------------------------------------------------------------------------///
-                                                /**Output bPLASTIC TAMEX  **/
-        ///--------------------------------------------------------------------------------------------///
-//            if(bPLASTIC_TWINPEAKS==0){
-//             int bPlasfired[3];
-//             int Phys_Channel_Lead_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int Phys_Channel_Trail_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int N1 =0;
-//             int bPlasdetnum=-1;
-// 
-//         if (Used_Systems[2]&& PrcID_Conv==2){
-//       // cout<<"Event " << event_number<<endl;
-//        for (int i=0; i<RAW->get_PLASTIC_tamex_hits(); i++){///Loop over tamex ID's
-// 
-//             int chan=-1;
-// 
-//            //fOutput->fbPlas_TAMEX_ID = i;
-//             bPlasfired[i] = RAW->get_PLASTIC_am_Fired(i); ///Iterator
-// 
-// 
-//             //TAMEX_bPlast_Det[bPlastTamID][bPlastTamCh]
-// 
-// 
-//             for(int j = 0;j < bPlasfired[i];j++){
-// 
-//               if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 1){ //Lead odd j
-//                   //Phys_Channel_Lead_bPlas[TAMID][Hit]
-//                 Phys_Channel_Lead_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Lead_bPlas[i][j]);
-//                 if(chan>-1){
-//                 /// PMT allocation succeeded
-//                 bPlasdetnum=TAMEX_bPlast_Det[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 fOutput->fbPlasDetNum = bPlasdetnum;
-//                 fOutput->fbPlasChan[bPlasdetnum]=  chan;
-//                 N1 = fOutput->fbPlas_PMT_Lead_N[bPlasdetnum][chan]++;
-// 
-// 
-//             if(N1>-1 && N1<bPLASTIC_TAMEX_HITS){
-// 
-//                fOutput->fbPlas_Lead_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_lead_T(i,j);
-//                   }
-//                 }
-//               }
-//                if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 0){ //Trail even j
-// 
-//                 Phys_Channel_Trail_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Trail_bPlas[i][j]);
-// 
-//                if(chan>-1){
-// 
-//                 /// PMT allocation succeeded
-//                  N1 = fOutput->fbPlas_PMT_Trail_N[bPlasdetnum][chan]++;
-//                 if(N1>-1&& N1<bPLASTIC_TAMEX_HITS){
-//              fOutput->fbPlas_Trail_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_trail_T(i,j);
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
+        
+
+
+
+
 
          ///--------------------------------------------------------------------------------------------///
                                                 /**Output FATIMA VME **/
@@ -1515,6 +1460,164 @@ for (int i=0; i<10; i++){
                   fOutput->fBB7_FEBEX_Hits++;
               }
           } // output BB7 FEBEX
+
+
+        // --- CEJ:  BB7 twinpeaks output ---  //
+        // bPlast currently just a series of detectors, mapped in Raw_Event
+        // we need to map to a Side and Strip and fOutput this
+        // so discrimination is fast/slow - lead/trail - side - strip
+        // important: mapping uses a map not a 2D array.
+
+        if (Used_Systems[9] && PrcID_Conv == 9)
+        {   
+            // loop over TAMEX modules
+            for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)
+            { 
+                // loop over hits per board
+                BB7_TWINPEAKS_Fired[i] = RAW->get_BB7_TWINPEAKS_am_Fired(i);
+                for (int j = 0; j < BB7_TWINPEAKS_Fired[i]; j++)
+                {
+                    
+                    BB7_TWINPEAKS_Channel_ID = RAW->get_BB7_TWINPEAKS_CH_ID(i, j);
+                    // we need to change this to read side and strip i believe.
+                    //BB7_TWINPEAKS_Side = 
+                    //BB7_TWINPEAKS_Strip = 
+                    // CEJ: below can be side - scanner: find TAMEX_bPlast_Det[i]
+
+                    auto & idx = std::make_pair(i, BB7_TWINPEAKS_Channel_ID);
+
+                    // adding 1, dividing by 2, minusing 1: maps physical channel to fast with 0 based index?
+                    BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
+
+                    if (BB7_TWINPEAKS_detnum > 0) // check det num
+                    {
+                        // NOW define Fast and Slow
+                        // do these numbers make sense for us?
+                        if (channel_id > 0 && channel_id << 66)
+                        {
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 1 && RAW->get_BB7_TWINPEAKS_lead_T(i, j) > 0)
+                            {
+                                // these are lead hits
+
+                                if ((channel_id < 33 && channel_id % 2 == 1) || (channel_id > 33 && (channel_id - 33) % 2 == 1))
+                                {
+                                    // these are fast leads
+                                    // CEJ: below can be strip - scanner: find TAMEX_bPlast_Chan[i]
+                                    int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
+                                    fOutput->fBB7_TWINPEAKS_FastChan[BB7_TWINPEAKS_Side] = chan_BB7_TWINPEAKS_fast_lead; // Helena says: no clue what this is supposed to be?
+                                    if (chan_BB7_TWINPEAKS_fast_lead > -1 && chan_BB7_TWINPEAKS_fast_lead < BB7_TWINPEAKS_CHAN_PER_DET) // strips_per_side
+                                    {
+                                        N1_fast = fOutput->
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+  for (int i=0; i<RAW->get_bPLAST_TWINPEAKS_tamex_hits(); i++){///Loop over tamex ID's
+        
+                bPlasfired[i] = RAW->get_bPLAST_TWINPEAKS_am_Fired(i);
+
+        for(int j = 0;j < bPlasfired[i];j++){///Loop over hits per board
+                
+               
+          ///NOW DEFINE FAST (ODD CHANNELS) AND SLOW  (EVEN)     
+           if(j % 2 == 0 ){ ///Lead even hits
+            
+                  ///Fast lead channels odd
+             if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==1){
+                     if(RAW->get_bPLAST_TWINPEAKS_lead_T(i,j)>0){
+                            Phys_Channel_Lead_Fast_bPlast[i][j] =TAMEX_bPlast_Chan[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1]; 
+             
+                        bPlasdetnum_fast=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
+                        fOutput->fbPlasDetNum_Fast = bPlasdetnum_fast;
+		     
+                        int chan_bPlast_fast_lead = Phys_Channel_Lead_Fast_bPlast[i][j];
+
+                        fOutput->fbPlas_FastChan[bPlasdetnum_fast] = chan_bPlast_fast_lead;
+   
+                    if(chan_bPlast_fast_lead>-1 && chan_bPlast_fast_lead<bPLASTIC_CHAN_PER_DET) {
+  
+                        int N1_fast = fOutput->fbPlast_Fast_Lead_N[bPlasdetnum_fast][chan_bPlast_fast_lead]++;
+          
+                        fOutput->fbPlast_Fast_Lead[bPlasdetnum_fast][chan_bPlast_fast_lead][N1_fast] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
+                           }
+                        }
+                      }
+                    ///Slow lead channels, even 
+        if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==0){
+                        
+                Phys_Channel_Lead_Slow_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)-1]; 
+                        
+                int chan_bPlast_slow_lead = Phys_Channel_Lead_Slow_bPlast[i][j];
+   
+                 bPlasdetnum_slow=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
+                  fOutput->fbPlasDetNum_Slow = bPlasdetnum_slow;
+    
+     
+                if(chan_bPlast_slow_lead>-1  && chan_bPlast_slow_lead<bPLASTIC_CHAN_PER_DET) {
+                    fOutput->fbPlas_SlowChan[bPlasdetnum_slow] = chan_bPlast_slow_lead;
+         
+                    int N1_slow = fOutput->fbPlast_Slow_Lead_N[bPlasdetnum_fast][chan_bPlast_slow_lead]++;
+          
+                    fOutput->fbPlast_Slow_Lead[bPlasdetnum_fast][chan_bPlast_slow_lead][N1_slow] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
+                    
+                            }
+                    }
+              }///End of lead hits
+              
+               if(j % 2 == 1){ ///TRAIL 
+                              ///Fast trail channels even
+        if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==0 && (RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2<256){
+                        
+                Phys_Channel_Trail_Fast_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)]; 
+                  
+                int chan_bPlast_fast_trail = Phys_Channel_Trail_Fast_bPlast[i][j];
+
+                bPlasdetnum_fast=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
+
+                if(chan_bPlast_fast_trail>-1&& chan_bPlast_fast_trail<bPLASTIC_CHAN_PER_DET) {
+            
+                 int N1_fast = fOutput->fbPlast_Fast_Trail_N[bPlasdetnum_fast][chan_bPlast_fast_trail]++;
+          
+                 fOutput->fbPlast_Fast_Trail[bPlasdetnum_fast][chan_bPlast_fast_trail][N1_fast] = RAW->get_bPLAST_TWINPEAKS_trail_T(i,j);
+            
+                }
+            }
+          ///Slow trail channels even
+          if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==1 && RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)<256){
+                        
+                Phys_Channel_Trail_Slow_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)-1]; 
+                
+                bPlasdetnum_slow=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
+                 
+                int chan_bPlast_slow_trail = Phys_Channel_Trail_Slow_bPlast[i][j];
+                         
+                if(chan_bPlast_slow_trail>-1&& chan_bPlast_slow_trail<bPLASTIC_CHAN_PER_DET) {
+          
+                    int N1_slow = fOutput->fbPlast_Slow_Trail_N[bPlasdetnum_slow][chan_bPlast_slow_trail]++;
+          
+                    fOutput->fbPlast_Slow_Trail[bPlasdetnum_slow][chan_bPlast_slow_trail][N1_slow] = RAW->get_bPLAST_TWINPEAKS_trail_T(i,j);
+                    
+            
+                                        } /// end if max channel condition 
+                                } /// End slow trail 
+                           }  /// End trail
+                    }/// End bPlast hits loop
+                } ///end tamex hits loop
+            } ///End proc ID 2
+       
+        
+
+
+
+
+
+
         
 
         ///--------------------------------------------------------------------------------------------///
@@ -1683,6 +1786,43 @@ void EventUnpackProc::load_bPlasticTamex_Allocationfile(){
    // cout<<"TAMEX_bPlast_Det " <<TAMEX_bPlast_Det[bPlastTamID] <<" TAMEX_bPlast_Chan "<<TAMEX_bPlast_Chan[bPlastTamID][bPlastTamCh]<<" bPlast_det " <<bPlast_det << " bPlastTamID " << bPlastTamID <<" bPlastTamCh " << bPlastTamCh<<" bPlast_ch" <<bPlast_ch << endl;
   }
 }
+
+// ------------ CEJ: LOAD TAMEX ALLOCATION FOR BB7 --------  //
+
+void EventUnpackProc::load_BB7_TWINPEAKS_AllocationFile()
+{
+    std::ifstream file("Configuration_Files/BB7/BB7_TWINPEAKS_allocation.txt");
+    std::cout << "Loading BB7 TWINPEAKS Detector Map" << std::endl;
+    if (file.fail())
+    {
+        std::cerr << "Could not find BB7 TWINPEAKS allocation file!" << std::endl;
+        exit(0);
+    }
+
+    // CEJ: make a map like Germanium? This is less confusing to me
+    constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
+
+    while (file.good())
+    {
+        if (file.peek() == '#')
+        {
+            file.ignore(ignore, '\n');
+            continue;
+        }
+
+        // #TAMEXID | TAMEXCH | SIDE | STRIP      
+        file >> bb7_twinpeaks_mod >> bb7_twinpeaks_chan >> bb7_twinpeaks_side >> bb7_twinpeaks_strip;
+
+        file.ignore(ignore, '\n');
+
+        BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)] = std::make_pair(bb7_twinpeaks_side, bb7_twinpeaks_strip);
+    }
+}
+
+
+
+
+
 //---------------------------------------------------------------------------------------------------
 void EventUnpackProc::load_FingerID_File(){
 

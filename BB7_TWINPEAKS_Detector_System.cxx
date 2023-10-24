@@ -258,7 +258,7 @@ void BB7_TWINPEAKS_Detector_System::get_edges()
             edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
             edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
             ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID;
-            lead_arr[tamex_iter][iterator[tamex_iter]] = (TDC_Data->ch_ID % 2); // is this fast and slow?
+            lead_arr[tamex_iter][iterator[tamex_iter]] = (TDC_Data->ch_ID % 2); // this should be giving fast and slow?
         }
 
         if (TDC_Data->leading_E == 0)
