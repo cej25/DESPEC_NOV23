@@ -95,6 +95,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   ///get_WR_Config();
 
 
+
    /// checkTAMEXorVME();
   //create White Rabbit obj
   WR = new White_Rabbit();
@@ -248,7 +249,14 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
     TGo4Log::Info("AIDA: Loaded DSSD Strip Thresholds");
   }
 
+
+  for (int i = 0; i < NUM_SUBSYS; i++)
+  {
+      std::cout << "USED...: " << Used_Systems[i] << std::endl; 
+  }
+
 }
+
 
 void EventUnpackProc::UserPostLoop()
 {
@@ -388,7 +396,7 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
             //Pulls it straight from White_Rabbit class
             WR_tmp = WR->get_White_Rabbit(pdata);
             WR_d = WR->get_Detector_id();
-            pdata = WR->get_pdata();
+            pdata = WR->get_pdata(); // CEJ: perhaps the issue stems from here after reading whiterabbit?
 
             ///Temp WR Skip fix
            if(PrcID ==10|| PrcID == 30 || PrcID==20 || PrcID == 25 || PrcID==41)WR_d=0;
@@ -450,10 +458,10 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                         }
                     
         
-       if(PrcID_Conv!=7){
+       if(PrcID_Conv!=7){ // CEJ add trigger here if in doubt
            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
             Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
+            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now for BB7_FEBEX
 
         ///get mbs stream data from unpacker (pointer copy solution)
             pdata = Detector_Systems[PrcID_Conv]->get_pdata();
@@ -1355,7 +1363,9 @@ for (int i=0; i<10; i++){
         ///--------------------------------------------------------------------------------------------///
                                             /**Output Germanium **/
         ///--------------------------------------------------------------------------------------------///
+        
         if (Used_Systems[5]&& PrcID_Conv==5){
+
          for (int i=fOutput->fGe_fired; i<RAW->get_Germanium_am_Fired() && i < Germanium_MAX_HITS; i++){
                 fOutput->fGe_Detector[i] =  RAW->get_Germanium_Det_id(i);
                 fOutput->fGe_Crystal[i] =  RAW->get_Germanium_Crystal_id(i);
@@ -1470,7 +1480,8 @@ for (int i=0; i<10; i++){
           }
         }
          ///--------------------------------------------------------------------------------------------///
-         if (Used_Systems[7] && PrcID_Conv==7){
+         if (Used_Systems[7] && PrcID_Conv==7)
+         {
              
              BM_Hits_S2 = RAW->get_BM_Hits_S2();
              BM_Hits_S4 = RAW->get_BM_Hits_S4();
@@ -1483,12 +1494,27 @@ for (int i=0; i<10; i++){
                 BM_L_diff_S4[i] = RAW->get_BM_LDiff_S4(i);  
           //       cout<<"BM_L_diff_S4[i] " <<BM_L_diff_S4[i] << " BM_Hits_S4 " <<BM_Hits_S4  <<" i " << i << endl;
              }
+
              
- 
-             
-            
-             
-         }
+         } // BM output
+
+          if (Used_Systems[8] && PrcID_Conv == 8)
+          {
+              for (int i = fOutput->fBB7_FEBEX_Hits; i<RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
+              {
+                  fOutput->fBB7_FEBEX_Side[i] =  RAW->get_BB7_FEBEX_Side(i);
+                  fOutput->fBB7_FEBEX_Strip[i] =  RAW->get_BB7_FEBEX_Strip(i);
+                  fOutput->fBB7_FEBEX_Chan_Energy[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                  fOutput->fBB7_FEBEX_Chan_Time[i] = RAW->get_BB7_FEBEX_Chan_Time(i);
+                  fOutput->fBB7_FEBEX_Chan_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
+                  fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
+                  fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
+                  fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
+                  fOutput->fBB7_FEBEX_Hits++;
+              }
+          } // output BB7 FEBEX
+        
+
         ///--------------------------------------------------------------------------------------------///
 
       } //End of subevent loop
@@ -1522,6 +1548,12 @@ void EventUnpackProc::FILL_HISTOGRAMS(int PrcID_Conv, int PrcID, int SubType,Eve
   
     ///Beam_Monitor is PrcID_Conv 7 && Used_Systems 7
   if(PrcID_Conv==7 && Used_Systems[7]) Fill_BeamMonitor_Histos();
+
+  if (PrcID_Conv==8 && Used_Systems[8]) Fill_BB7_FEBEX_Histos();
+
+  // bb7 tamex
+
+  if (PrcID_Conv==10 && Used_Systems[10]) Fill_BB7_MADC_Histos();
 }
 
 
@@ -1560,12 +1592,13 @@ void EventUnpackProc::CorrectTimeForMultiplexer(AidaEvent &evt)
 
 
 void EventUnpackProc::load_PrcID_File(){
-  ifstream data("Configuration_Files/DESPEC_General_Setup/PrcID_to_Det_Sys.txt");
+  std::ifstream data("Configuration_Files/DESPEC_General_Setup/PrcID_to_Det_Sys.txt");
   if(data.fail()){
     cerr << "Could not find PrcID config file!" << endl;
     exit(0);
   }
-  int id[9] = {0,0,0,0,0,0,0,0,0};
+  // num_frs_ID ? 
+  int id[8] = {0,0,0,0,0,0,0,0};
   int i = 0;
   string line;
   char s_tmp[100];
@@ -1573,6 +1606,7 @@ void EventUnpackProc::load_PrcID_File(){
     getline(data,line,'\n');
     if(line[0] == '#') continue;
     sscanf(line.c_str(),"%s %d %d %d %d %d %d %d %d %d",s_tmp,&id[0],&id[1],&id[2],&id[3],&id[4],&id[5],&id[6],&id[7],&id[8]);
+    // num frs_ID?
     for(int j = 0; j < 8; ++j){ PrcID_Array[i][j] = id[j];
 
     }
@@ -1584,7 +1618,7 @@ void EventUnpackProc::load_PrcID_File(){
 void EventUnpackProc::load_FatTamex_Allocationfile(){
 
   const char* format = "%d %d %d";
-  ifstream data("Configuration_Files/FATIMA/Fatima_TAMEX_allocation.txt");
+  std::ifstream data("Configuration_Files/FATIMA/Fatima_TAMEX_allocation.txt");
   if(data.fail()){
     cerr << "Could not find Fatima_TAMEX_allocation config file!" << endl;
     exit(0);
@@ -1675,10 +1709,8 @@ void EventUnpackProc::load_FingerID_File(){
 //-----------------------------------------------------------------------------------------------------------------------------//
 Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 
-  // CEJ: changing this to use variable for number of subsystems
-
   for(int i = 0;i < NUM_SUBSYS;++i){
-    for(int j = 0;j < NUM_SUBSYS;++j){
+    for(int j = 0;j < 8;++j){
         ///Fix for FRS
           if (PrcID==100) return -1;
       if(PrcID == PrcID_Array[i][j]) return i;
@@ -1709,13 +1741,13 @@ void EventUnpackProc::get_used_systems(){
     i++;
   } 
   // CEJ: this is defined in multiple places...surely can be done better
-  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","GERMANIUM","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
     cout << "-----------------------------------------------------" << endl;
-    for(int j = 0;j < 10;++j){
-        if(Used_Systems[j]) cout <<"\t"<< DET_NAME[j] << endl;
+    for(int j = 0;j < NUM_SUBSYS;++j){
+        if(Used_Systems[j]) std::cout <<"\t"<< DET_NAME[j] << std::endl;
     }
     cout << "=====================================================" << endl;
 
@@ -3106,7 +3138,6 @@ void EventUnpackProc::Fill_Germanium_Histos(){
     //double tmpGe[32];
     int  Germanium_hits;
     //GeID;
-
      /**------------------Germanium Raw Energy -----------------------------------------**/
       Germanium_hits = RAW->get_Germanium_am_Fired();
       
@@ -3124,6 +3155,52 @@ void EventUnpackProc::Fill_Germanium_Histos(){
         }
      }
    }
+
+void EventUnpackProc::Make_BB7_FEBEX_Histos()
+{ 
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_FEBEX_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 2000000.);
+        }
+        hBB7_FEBEX_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 2000000.);
+    }
+    hBB7_FEBEX_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 2000000.);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_FEBEX_Hit_Pattern = MakeTH1('I', "BB7_Layer/FEBEX/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+    // we want:
+    // raw energy
+    // hit pattern
+    // anything else Anabel+Marta asks
+}
+
+void EventUnpackProc::Fill_BB7_FEBEX_Histos()
+{ 
+    
+    int Hits = RAW->get_BB7_FEBEX_Hits();
+
+    
+    for (int i = 0; i < Hits; i++)
+    {   
+        int Side = RAW->get_BB7_FEBEX_Side(i);
+        int Strip = RAW->get_BB7_FEBEX_Strip(i);
+        if (Side > -1 && Strip > -1)
+        { 
+            double Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+            hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
+            hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+            hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
+            // CEJ: currently 1-64, could be per side or febex module
+            hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        }
+
+        
+    }
+
+}
 
 
 //-----------------------------------------------------------------------------------------------------------------------------//
@@ -3570,59 +3647,20 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 //-----------------------------------------------------------------------------------------------------------------------------//
 
 
-void EventUnpackProc::Make_BB7_FEBEX_Histos()
-{ 
-    for (int i = 0; i < BB7_SIDES; i++)
-    {
-        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
-        {
-            hBB7_FEBEX_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
-        }
-        hBB7_FEBEX_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
-    }
-    hBB7_FEBEX_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
-
-    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
-    hBB7_FEBEX_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
-
-    // we want:
-    // raw energy
-    // hit pattern
-    // anything else Anabel+Marta asks
-}
-
-void EventUnpackProc::Fill_BB7_FEBEX_Histos()
-{
-    int Hits = RAW->get_BB7_FEBEX_Hits();
-    for (int i = 0; i < Hits; i++)
-    { 
-        int Side = RAW->get_BB7_FEBEX_Side(i);
-        int Strip = RAW->get_BB7_FEBEX_Strip(i);
-        int Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
-
-        hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
-        hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
-        hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
-        // CEJ: currently 1-64, could be per side or febex module
-        hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
-    }
-
-}
-
 void EventUnpackProc::Make_BB7_MADC_Histos()
 {
     for (int i = 0; i < BB7_SIDES; i++)
     {
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
         {
-            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0, 200000);
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 200000.);
         }
-        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0, 200000);
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 200000.);
     }
-    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0, 200000);
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 200000.);
 
     // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
-    hBB7_MADC_Hit_Pattern = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+    hBB7_MADC_Hit_Pattern = MakeTH1('I', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
 
 }
 

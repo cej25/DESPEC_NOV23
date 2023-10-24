@@ -163,6 +163,17 @@ public:
          // BB7
          Long64_t fBM_WR;
          Long64_t fBB7_FEBEX_WR;
+
+        int fBB7_FEBEX_Hits;
+        int fBB7_FEBEX_Side[BB7_FEBEX_MAX_HITS];
+        int fBB7_FEBEX_Strip[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Event_Time[BB7_FEBEX_MAX_HITS];
+        double fBB7_FEBEX_Chan_Energy[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Chan_Time[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
+        bool fBB7_FEBEX_Pileup[BB7_FEBEX_MAX_HITS];
+        bool fBB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
+
          Long64_t fBB7_TWINPEAKS_WR;
          Long64_t fBB7_MADC_WR;
 
