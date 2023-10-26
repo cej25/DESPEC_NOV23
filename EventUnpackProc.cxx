@@ -64,6 +64,7 @@
 
 #include <string>
 
+#define DEBUG 0
 
 using namespace std;
 
@@ -1468,158 +1469,121 @@ for (int i=0; i<10; i++){
         // so discrimination is fast/slow - lead/trail - side - strip
         // important: mapping uses a map not a 2D array.
 
+        // CEJ: can go in header
+        int BB7_TWINPEAKS_Fired[BB7_TAMEX_MODULES];
+        int BB7_TWINPEAKS_Side = -1;
+        int BB7_TWINPEAKS_Strip = -1;
+        int BB7_TWINPEAKS_Channel_ID = -1;
+        int BB7_TWINPEAKS_Physical_Channel = -1;
+        int N1_fast = 0;
+        int N1_slow = 0;
+
         if (Used_Systems[9] && PrcID_Conv == 9)
         {   
             // loop over TAMEX modules
             for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)
             { 
                 // loop over hits per board
+                // Helena has a condition to check hits < 640 in scanner code....do we need a similar check?
                 BB7_TWINPEAKS_Fired[i] = RAW->get_BB7_TWINPEAKS_am_Fired(i);
                 for (int j = 0; j < BB7_TWINPEAKS_Fired[i]; j++)
                 {
                     
                     BB7_TWINPEAKS_Channel_ID = RAW->get_BB7_TWINPEAKS_CH_ID(i, j);
-                    // we need to change this to read side and strip i believe.
-                    //BB7_TWINPEAKS_Side = 
-                    //BB7_TWINPEAKS_Strip = 
-                    // CEJ: below can be side - scanner: find TAMEX_bPlast_Det[i]
+                    // now use _Channel_ID to get _physical_strip or something
+   
 
-                    auto & idx = std::make_pair(i, BB7_TWINPEAKS_Channel_ID);
+                    // map should look with "physical channel"
+                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1;
+                    auto idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                    BB7_TWINPEAKS_Side = BB7_TWINPEAKS_Map[idx].first;
+                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
 
                     // adding 1, dividing by 2, minusing 1: maps physical channel to fast with 0 based index?
-                    BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
+                    //BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
 
-                    if (BB7_TWINPEAKS_detnum > 0) // check det num
+                    // CEJ: i have taken corrections from Helena
+                    // Now i'm making changes based on BB7 layer
+                    // (in case it breaks)
+                    if (BB7_TWINPEAKS_Side > -1 && BB7_TWINPEAKS_Strip > -1) // check det num
                     {
                         // NOW define Fast and Slow
-                        // do these numbers make sense for us?
-                        if (channel_id > 0 && channel_id << 66)
+                        if (BB7_TWINPEAKS_Channel_ID > 0 && BB7_TWINPEAKS_Channel_ID < 66)
                         {
                             if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 1 && RAW->get_BB7_TWINPEAKS_lead_T(i, j) > 0)
                             {
-                                // these are lead hits
+                                // LEADS
 
-                                if ((channel_id < 33 && channel_id % 2 == 1) || (channel_id > 33 && (channel_id - 33) % 2 == 1))
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
                                 {
                                     // these are fast leads
                                     // CEJ: below can be strip - scanner: find TAMEX_bPlast_Chan[i]
-                                    int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
-                                    fOutput->fBB7_TWINPEAKS_FastChan[BB7_TWINPEAKS_Side] = chan_BB7_TWINPEAKS_fast_lead; // Helena says: no clue what this is supposed to be?
-                                    if (chan_BB7_TWINPEAKS_fast_lead > -1 && chan_BB7_TWINPEAKS_fast_lead < BB7_TWINPEAKS_CHAN_PER_DET) // strips_per_side
+                                    //int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
+                                    fOutput->fBB7_TWINPEAKS_FastChan[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // Helena says: no clue what this is supposed to be?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // can this ever be false?
                                     {
-                                        N1_fast = fOutput->
+                                        N1_fast = fOutput->fBB7_TWINPEAKS_Fast_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // fast leads
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // these are slow leads
+                                    //int chan_BB7_TWINPEAKS_slow_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, 2) / 2) -1];
+                                    fOutput->fBB7_TWINPEAKS_SlowChan[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // HMA - again what is this for?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        N1_slow = fOutput->fBB7_TWINPEAKS_Slow_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // slow leads
+                            } // lead hits
+
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 0 && RAW->get_BB7_TWINPEAKS_trail_T(i, j) > 0)
+                            {
+                                // TRAILS
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID  > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
+                                {
+                                    // fast trails
+                                    //int chan_BB7_TWINPEAKS_fast_trail = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2)];
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        if (fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a fast trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }
+                                        N1_fast = fOutput->fBB7_TWINPEAKS_Fast_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                    }
+                                } // fast trails
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // slow trails
+                                    //int chan_BB7_TWINPEAKS_slow_trail = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2)];
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        if (fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a slow trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }
+                                        N1_slow = fOutput->fBB7_TWINPEAKS_Slow_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
                                     }
 
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                } // slow trails
+                            } // trails
+                        } // chans between 0 and 66
+                    } // check Side and Strip
+                } // loop over hits
+            } // loop over tamex modules
 
-
-  for (int i=0; i<RAW->get_bPLAST_TWINPEAKS_tamex_hits(); i++){///Loop over tamex ID's
-        
-                bPlasfired[i] = RAW->get_bPLAST_TWINPEAKS_am_Fired(i);
-
-        for(int j = 0;j < bPlasfired[i];j++){///Loop over hits per board
-                
-               
-          ///NOW DEFINE FAST (ODD CHANNELS) AND SLOW  (EVEN)     
-           if(j % 2 == 0 ){ ///Lead even hits
-            
-                  ///Fast lead channels odd
-             if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==1){
-                     if(RAW->get_bPLAST_TWINPEAKS_lead_T(i,j)>0){
-                            Phys_Channel_Lead_Fast_bPlast[i][j] =TAMEX_bPlast_Chan[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1]; 
-             
-                        bPlasdetnum_fast=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
-                        fOutput->fbPlasDetNum_Fast = bPlasdetnum_fast;
-		     
-                        int chan_bPlast_fast_lead = Phys_Channel_Lead_Fast_bPlast[i][j];
-
-                        fOutput->fbPlas_FastChan[bPlasdetnum_fast] = chan_bPlast_fast_lead;
-   
-                    if(chan_bPlast_fast_lead>-1 && chan_bPlast_fast_lead<bPLASTIC_CHAN_PER_DET) {
-  
-                        int N1_fast = fOutput->fbPlast_Fast_Lead_N[bPlasdetnum_fast][chan_bPlast_fast_lead]++;
-          
-                        fOutput->fbPlast_Fast_Lead[bPlasdetnum_fast][chan_bPlast_fast_lead][N1_fast] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
-                           }
-                        }
-                      }
-                    ///Slow lead channels, even 
-        if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==0){
-                        
-                Phys_Channel_Lead_Slow_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)-1]; 
-                        
-                int chan_bPlast_slow_lead = Phys_Channel_Lead_Slow_bPlast[i][j];
-   
-                 bPlasdetnum_slow=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
-                  fOutput->fbPlasDetNum_Slow = bPlasdetnum_slow;
-    
-     
-                if(chan_bPlast_slow_lead>-1  && chan_bPlast_slow_lead<bPLASTIC_CHAN_PER_DET) {
-                    fOutput->fbPlas_SlowChan[bPlasdetnum_slow] = chan_bPlast_slow_lead;
-         
-                    int N1_slow = fOutput->fbPlast_Slow_Lead_N[bPlasdetnum_fast][chan_bPlast_slow_lead]++;
-          
-                    fOutput->fbPlast_Slow_Lead[bPlasdetnum_fast][chan_bPlast_slow_lead][N1_slow] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
-                    
-                            }
-                    }
-              }///End of lead hits
-              
-               if(j % 2 == 1){ ///TRAIL 
-                              ///Fast trail channels even
-        if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==0 && (RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2<256){
-                        
-                Phys_Channel_Trail_Fast_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)]; 
-                  
-                int chan_bPlast_fast_trail = Phys_Channel_Trail_Fast_bPlast[i][j];
-
-                bPlasdetnum_fast=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
-
-                if(chan_bPlast_fast_trail>-1&& chan_bPlast_fast_trail<bPLASTIC_CHAN_PER_DET) {
-            
-                 int N1_fast = fOutput->fbPlast_Fast_Trail_N[bPlasdetnum_fast][chan_bPlast_fast_trail]++;
-          
-                 fOutput->fbPlast_Fast_Trail[bPlasdetnum_fast][chan_bPlast_fast_trail][N1_fast] = RAW->get_bPLAST_TWINPEAKS_trail_T(i,j);
-            
-                }
-            }
-          ///Slow trail channels even
-          if(RAW->get_bPLAST_TWINPEAKS_CH_ID(i,j) % 2==1 && RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)<256){
-                        
-                Phys_Channel_Trail_Slow_bPlast[i][j] =TAMEX_bPlast_Chan[i][(RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)/2)-1]; 
-                
-                bPlasdetnum_slow=TAMEX_bPlast_Det[i][((RAW->get_bPLAST_TWINPEAKS_physical_channel(i, j)+1)/2)-1];
-                 
-                int chan_bPlast_slow_trail = Phys_Channel_Trail_Slow_bPlast[i][j];
-                         
-                if(chan_bPlast_slow_trail>-1&& chan_bPlast_slow_trail<bPLASTIC_CHAN_PER_DET) {
-          
-                    int N1_slow = fOutput->fbPlast_Slow_Trail_N[bPlasdetnum_slow][chan_bPlast_slow_trail]++;
-          
-                    fOutput->fbPlast_Slow_Trail[bPlasdetnum_slow][chan_bPlast_slow_trail][N1_slow] = RAW->get_bPLAST_TWINPEAKS_trail_T(i,j);
-                    
-            
-                                        } /// end if max channel condition 
-                                } /// End slow trail 
-                           }  /// End trail
-                    }/// End bPlast hits loop
-                } ///end tamex hits loop
-            } ///End proc ID 2
        
-        
-
-
-
-
-
-
-        
-
+            
+        } ///End proc ID 2
+       
+      
         ///--------------------------------------------------------------------------------------------///
 
       } //End of subevent loop

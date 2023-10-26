@@ -1362,6 +1362,7 @@ int Raw_Event::get_BB7_TWINPEAKS_lead_hits(int i) { return leading_hits_bPlastTw
 int Raw_Event::get_BB7_TWINPEAKS_physical_channel(int i, int j) { return phys_channel_BB7_TWINPEAKS[i][j]; }
 int Raw_Event::get_BB7_TWINPEAKS_physical_lead_hits(int i, int j) { return leading_hits_ch_BB7_TWINPEAKS[i][j]; }
 int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trailing_hits_ch_BB7_TWINPEAKS[i][j]; }
+int Raw_Event::get_BB7_TWINPEAKS_leading_arr(int i, int j) { return leading_array_BB7_TWINPEAKS[i][j]; }
 
 
 

@@ -227,6 +227,20 @@ void  EventUnpackStore::Clear(Option_t *t)
     }
     fBB7_FEBEX_WR = 0;
 
+    if (fBB7_TWINPEAKS_WR != 0)
+    {
+        ZERO_ARRAY(fBB7_TWINPEAKS_FastChan);
+        ZERO_ARRAY(fBB7_TWINPEAKS_SlowChan);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Lead_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Lead);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Trail_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Trail);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Trail_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Trail);
+    }
+
     fBB7_TWINPEAKS_WR = 0;
     fBB7_MADC_WR = 0;
 

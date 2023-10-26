@@ -1,5 +1,7 @@
 #include "BB7_TWINPEAKS_Detector_System.h"
 
+#define DEBUG 1
+
 // using namespace std;
 
 BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
@@ -11,40 +13,40 @@ BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
 
     BB7_TAMEX_Calibration = new BB7_TAMEX_Calibrator(CALIBRATE);
 
-    iterator = new int[200];
-    for (int i = 0; i < 200; i++)
-    {
-        iterator[i] = 0;
-    }
+    iterator = new int[BB7_TAMEX_MODULES];
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++) iterator[i] = 0;
+
+    epoch_ch = new int*[BB7_TAMEX_MODULES];
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++) epoch_ch[i] = new int[BB7_TAMEX_CHANNELS * 2 + 1];
 
     tamex_iter = 0;
-    lead_arr = new int*[200];
-    leading_hits = new int*[200];
-    trailing_hits = new int*[200];
+    lead_arr = new int*[BB7_TAMEX_MODULES];
+    leading_hits = new int*[BB7_TAMEX_MODULES];
+    trailing_hits = new int*[BB7_TAMEX_MODULES];
 
-    coarse_T = new double[200];
-    fine_T = new double[200];
-    ch_ID = new unsigned int[200];
+    coarse_T = new double[BB7_TAMEX_MODULES];
+    fine_T = new double[BB7_TAMEX_MODULES];
+    ch_ID = new unsigned int[BB7_TAMEX_MODULES];
 
-    edge_coarse = new double*[200];
-    edge_fine = new double*[200];
-    ch_ID_edge = new unsigned int*[200];
+    edge_coarse = new double*[BB7_TAMEX_MODULES];
+    edge_fine = new double*[BB7_TAMEX_MODULES];
+    ch_ID_edge = new unsigned int*[BB7_TAMEX_MODULES];
 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
     {
-        edge_coarse[i] = new double[200];
-        edge_fine[i] = new double[200];
-        ch_ID_edge[i] = new unsigned int[200];
+        edge_coarse[i] = new double[BB7_TAMEX_MAX_HITS];
+        edge_fine[i] = new double[BB7_TAMEX_MAX_HITS];
+        ch_ID_edge[i] = new unsigned int[BB7_TAMEX_MAX_HITS];
 
-        lead_arr[i] = new int[200];
-        leading_hits[i] = new int[200];
-        trailing_hits[i] = new int[200];
+        lead_arr[i] = new int[BB7_TAMEX_MAX_HITS];
+        leading_hits[i] = new int[BB7_TAMEX_MAX_HITS];
+        trailing_hits[i] = new int[BB7_TAMEX_MAX_HITS];
     }
 }
 
 BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
 {
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < BB7_TAMEX_MAX_HITS; i++)
     {
         delete[] edge_coarse[i];
         delete[] edge_fine[i];
@@ -78,6 +80,7 @@ void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
     for (int i = 0; i < tamex_iter; i++) 
     {
         iterator[i] = 0;
+        for (int j = 0; j < BB7_TAMEX_CHANNELS * 2 + 1; j++) epoch_ch[i][j] = 0;
     }
     reset_edges();
     tamex_end = false;
@@ -86,21 +89,12 @@ void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
     while(!tamex_end)
     {
         Process_TAMEX();
-        if (!tamex_end)
-        {
-            tamex_iter++;
-        }
+        if (!tamex_end) tamex_iter++;
         this->pdata++;
     }
 
-    if (CALIBRATE)
-    {
-        calibrate_ONLINE();
-    }
-    else
-    {
-        calibrate_OFFLINE();
-    }
+    if (CALIBRATE) calibrate_ONLINE();
+    else calibrate_OFFLINE();
 }
 
 void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
@@ -165,22 +159,16 @@ void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
     pdata++;
     
     get_trigger();
-    if (am_fired[tamex_iter] > 3)
-    {
-        get_edges();
-    }
-    else
-    {
-        no_edges[tamex_iter] = true;
-    }
-
+    if (am_fired[tamex_iter] > 3) get_edges();
+    else no_edges[tamex_iter] = true;
+    
     check_trailer();
 
 }
 
 void BB7_TWINPEAKS_Detector_System::skip_padding()
 {   
-    // CEJ: sorry but this is insane
+    // CEJ: strongly dislike the consistency here
     bool still_padding = true;
     while (still_padding)
     {
@@ -198,16 +186,21 @@ void BB7_TWINPEAKS_Detector_System::skip_padding()
 
 void BB7_TWINPEAKS_Detector_System::get_trigger()
 {
-    PLACE_HOLDER* Epoch_Counter = (PLACE_HOLDER*) pdata;
+    EPOCH* hold = (EPOCH*) pdata;
 
-    // we should be doing something here...check Helena's scanner code.
+    // CEJ: starting here with helena's fixes
+    if (hold->six_eight == 0x6)
+    {   
+        if (DEBUG) std::cout << "Epoch Data! Trigger Epoch: " << hold->epoch_count << std::endl;
+        epoch_ch[tamex_iter][0] = hold->epoch_count;
+    }
 
     pdata++;
 
-    TAMEX_DATA* TDC_Data = (TAMEX_DATA*) pdata;
-    coarse_T[tamex_iter] = (double) TDC_Data->coarse_T;
-    fine_T[tamex_iter] = (double) TDC_Data->fine_T;
-    ch_ID[tamex_iter] = TDC_Data->ch_ID;
+    TAMEX_DATA* data = (TAMEX_DATA*) pdata;
+    coarse_T[tamex_iter] = (double) data->coarse_T;
+    fine_T[tamex_iter] = (double) data->fine_T;
+    ch_ID[tamex_iter] = data->ch_ID;
 
     pdata++;
 
@@ -217,7 +210,7 @@ void BB7_TWINPEAKS_Detector_System::reset_edges()
 {
     for (int i = 0; i < BB7_TAMEX_MODULES; i++)
     {
-        for (int j = 0; j < 200; j++)
+        for (int j = 0; j < BB7_TAMEX_MAX_HITS; j++)
         {
             leading_hits[i][j] = 0;
             trailing_hits[i][j] = 0;
@@ -229,54 +222,51 @@ void BB7_TWINPEAKS_Detector_System::reset_edges()
 }
 
 void BB7_TWINPEAKS_Detector_System::get_edges()
-{
+{   
+    // done with helenas fixes
     iterator[tamex_iter] = 0;
 
-    written = false; // CEJ: i have no honest to god idea what this is for
+    written = false;
+
+    int test_counter = 0;
+    int last_epoch = -1;
+    int first_epoch = 0; // seemingly unused
 
     while (no_error_reached())
     {
-        PLACE_HOLDER* TDC_Epoch_Check = (PLACE_HOLDER*) pdata;
+        EPOCH* hold = (EPOCH*) pdata;
 
-        if (TDC_Epoch_Check->six_eight == 0x6)
+        if (hold->six_eight == 0x6)
         {   
-            // this is an epoch...we need to do something here..
+            if (DEBUG) std::cout << "Epoch Data! Epoch: " << hold->epoch_count << std::endl; // CEJ: presumably TAMEX.h can be adjusted
+            last_epoch = hold->epoch_count;
             pdata++;
-            continue; 
+            continue;
         }
+        if (hold->six_eight != 0x6) written = false;
 
-        if (TDC_Epoch_Check->six_eight != 0x6)
-        {
-            written = false;
-        }
+        TAMEX_DATA* data = (TAMEX_DATA*) pdata;
 
-        TAMEX_DATA* TDC_Data = (TAMEX_DATA*) pdata;
+        epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
 
-        if (TDC_Data->leading_E == 1)
-        {
-            leading_hit = TDC_Data->leading_E;
-            edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
-            edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
-            ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID;
-            lead_arr[tamex_iter][iterator[tamex_iter]] = (TDC_Data->ch_ID % 2); // this should be giving fast and slow?
-        }
+        // From HMA:
+        // shift times relative to epoch for trigger for each channel
+        // coarse time in units of 10ns, 2048 clocks in 1 epoch
+        // subtract [(trigger epoch) - (channel epoch)] * 2048
+        // data->coarse_T = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID]) * 2048);
+        // CEJ: hmm.. helena makes the same correction twice...is this a mistake? we'll see. Commenting first out.
+        leading_hit = data->leading_E;
+        edge_coarse[tamex_iter][iterator[tamex_iter]] = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID]) * 2048);
+        edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
+        lead_arr[tamex_iter][iterator[tamex_iter]] = data->leading_E;
 
-        if (TDC_Data->leading_E == 0)
-        {
-            leading_hit = TDC_Data->leading_E;
-            edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
-            edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
-            ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID + MAX_CHA_INPUT;
-        }
-
+        if (data->leading_E == 1) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
+        if (data->leading_E == 0) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID + MAX_CHA_INPUT;
+        
         iterator[tamex_iter]++;
-        if (iterator[tamex_iter] > 100)
-        {
-            break;
-        }
-
         written = true;
         pdata++;
+
     }
 
 }
