@@ -360,6 +360,8 @@ class EventAnlProc : public TGo4EventProcessor {
      void Make_Fatima_VME_Tamex_Histos();
      void Make_Germanium_Histos();
      void Make_Finger_Histos();
+     //void Make_BB7_FEBEX_Histos();
+     void Make_BB7_TWINPEAKS_Histos();
      void Make_WR_Histos();
 
      void Make_Fat_Plas_Histos();
@@ -453,6 +455,7 @@ class EventAnlProc : public TGo4EventProcessor {
             TH1 *hFRS_FatTAM_WRdT;
             TH1 *hFRS_FatVME_FatTAM;
             TH1 *hbPlast_FatTAM;
+
 
             //FRS Histograms
             TH2  *hID_Z1_vs_T;
@@ -673,6 +676,21 @@ class EventAnlProc : public TGo4EventProcessor {
 // 	    TH2 *hFIMP_ToT_Correlation_Comb1;
 // 	    TH2 *hFIMP_ToT_Correlation_Comb2;
 
+            // BB7 TWINPEAKS HISTOS
+            TH1 *hBB7_TWINPEAKS_ToT_Slow_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_ToT_Fast_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_ToT_Fast_Side_Strip[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_ToT_Slow_Side_Strip[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Hit_Pattern_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_Lead_T_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Lead_T_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Lead_dT_coinc[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+
+            //TH1 *hBB7_TWINPEAKS_ToT_Slow_Side[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            //TH1 *hBB7_TWINPEAKS_ToT_Fast_Side[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Multiplicity_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_Multiplicity;
+            TH2 *hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7;
 
              TH1 *hFat_Lead_Fast_T[FATIMA_TAMEX_CHANNELS+1];
              TH1 *hFat_Lead_Slow_T[FATIMA_TAMEX_CHANNELS+1];

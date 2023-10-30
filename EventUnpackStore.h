@@ -175,8 +175,8 @@ public:
         bool fBB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
 
         Long64_t fBB7_TWINPEAKS_WR;
-        int fBB7_TWINPEAKS_FastChan[BB7_SIDES];
-        int fBB7_TWINPEAKS_SlowChan[BB7_SIDES];
+        int fBB7_TWINPEAKS_FastStrip[BB7_SIDES];
+        int fBB7_TWINPEAKS_SlowStrip[BB7_SIDES];
         int fBB7_TWINPEAKS_Fast_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
         int fBB7_TWINPEAKS_Fast_Lead[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
         int fBB7_TWINPEAKS_Slow_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];

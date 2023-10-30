@@ -1,6 +1,6 @@
 #include "BB7_TWINPEAKS_Detector_System.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 // using namespace std;
 
@@ -186,13 +186,13 @@ void BB7_TWINPEAKS_Detector_System::skip_padding()
 
 void BB7_TWINPEAKS_Detector_System::get_trigger()
 {
-    EPOCH* hold = (EPOCH*) pdata;
+    EPOCH* epoch = (EPOCH*) pdata;
 
     // CEJ: starting here with helena's fixes
-    if (hold->six_eight == 0x6)
+    if (epoch->six_eight == 0x6)
     {   
-        if (DEBUG) std::cout << "Epoch Data! Trigger Epoch: " << hold->epoch_count << std::endl;
-        epoch_ch[tamex_iter][0] = hold->epoch_count;
+        if (DEBUG) std::cout << "Epoch Data! Trigger Epoch: " << epoch->epoch_count << std::endl;
+        epoch_ch[tamex_iter][0] = epoch->epoch_count;
     }
 
     pdata++;
@@ -234,16 +234,16 @@ void BB7_TWINPEAKS_Detector_System::get_edges()
 
     while (no_error_reached())
     {
-        EPOCH* hold = (EPOCH*) pdata;
+        EPOCH* epoch = (EPOCH*) pdata;
 
-        if (hold->six_eight == 0x6)
+        if (epoch->six_eight == 0x6)
         {   
-            if (DEBUG) std::cout << "Epoch Data! Epoch: " << hold->epoch_count << std::endl; // CEJ: presumably TAMEX.h can be adjusted
-            last_epoch = hold->epoch_count;
+            if (DEBUG) std::cout << "Epoch Data! Epoch: " << epoch->epoch_count << std::endl; // CEJ: presumably TAMEX.h can be adjusted
+            last_epoch = epoch->epoch_count;
             pdata++;
             continue;
         }
-        if (hold->six_eight != 0x6) written = false;
+        if (epoch->six_eight != 0x6) written = false;
 
         TAMEX_DATA* data = (TAMEX_DATA*) pdata;
 

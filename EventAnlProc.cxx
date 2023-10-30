@@ -181,7 +181,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
     if(Used_Systems[5]) Make_Germanium_Histos();
     // FINGER[6], BEAM MONITOR[7]
     //if(Used_Systems[8]) Make_BB7_FEBEX_Histos();
-    //if(Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+    if(Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
     //if(Used_Systems[10]) Make_BB7_MADC_Histos();
 
         }
@@ -3914,3 +3914,221 @@ void EventAnlProc::Fat_TimeCorrection(EventUnpackStore* pInput){
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
+
+
+void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
+{   
+    // CEJ: i = 1 for plastic?
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        hBB7_TWINPEAKS_ToT_Slow_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/Tot_Sum_Slow_Side.%2d", i), Form("BB7 TwinPeaks Sum ToT Slow Side. %2d", i), 4000, 0, 4000000);
+        hBB7_TWINPEAKS_ToT_Fast_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/Tot_Sum_Fast_Side.%2d", i), Form("BB7 TwinPeaks Sum ToT Fast Side. %2d", i), 4000, 0, 4000000);
+        hBB7_TWINPEAKS_Hit_Pattern_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Stats/HitPattern_Side.%2d", i), Form("BB7 TwinPeaks Hit Pattern Side. %2d", i), BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE);
+
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_TWINPEAKS_Lead_T_Slow[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/Lead/Lead_T_Slow_Side.%2d_Strip.%2d", i, j), Form("Lead - Time Side %2d Strip %2d", i, j), 2500, 0, 2000);
+            hBB7_TWINPEAKS_Lead_T_Fast[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/Lead/Lead_T_Fast_Side.%2d_Strip.%2d", i, j), Form("Lead - Time Side %2d Strip %2d", i, j), 2500, 0, 2000);
+
+            // CEJ: do we need this? In bplast this is related to UPSTREAM and DOWNSTREAM
+            //hBB7_TWINPEAKS_Lead_dT_coinc[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Lead-LeadCoincidenceChan/Lead_dT_BB7_Side.%2d_Strip.%2d_Ref_Coincidence", i, j), Form("Lead dT BB7 Side. %2d Strip %2d Ref Coincidence", i, j), 500, -200, 200);
+
+
+            // CEJ: This name feels terrible?
+            hBB7_TWINPEAKS_ToT_Slow_Side_Strip[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/ToT/ToT_Slow_Side.%2d_Strip.%2d", i, j), Form("ToT Slow Side %2d Strip %2d", i, j), 40000., 0, 4000000.);
+            hBB7_TWINPEAKS_ToT_Fast_Side_Strip[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/ToT/Tot_Fast_Side.%2d_Strip.%2d", i, j), Form("ToT Fast Side %2d Strip %2d", i, j), 40000., 0, 4000000.);
+            
+            // CEJ: Lead-Lead reference channel?
+            // SC41L/R-Digi-Lead?
+
+        }
+
+        hBB7_TWINPEAKS_Multiplicity_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Stats/Multiplicity/BB7_Multiplicity_Side.%2d", i), Form("BB7 Multiplicity Side %2d", i), BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE);
+
+    }
+
+    hBB7_TWINPEAKS_Multiplicity = MakeTH1('D', "BB7_Layer/TWINPEAKS/Stats/Multiplicity/BB7_TWINPEAKS_Multiplicity", "BB7 Multiplicity", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES);
+    
+    hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7 = MakeTH2('D', "BB7_Layer/TWINPEAKS/BB7_TWINPEAKS_Fast_vs_Slow_Strip7", "BB7 Slow ToT vs Fast ToT - Side 0 Chan 7", 3000,0,3000000,1000,0,1000000);
+
+}
+
+
+void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput)
+{
+    bool SideFired[BB7_SIDES]; for (int i = 0; i < BB7_SIDES; i++) SideFired[i] = false;
+    ZERO_ARRAY(BB7_TWINPEAKS_Total_Hits);
+
+    // this starts at i = 1 for bplast which I'm not understanding
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+            {
+                Lead_BB7_TWINPEAKS_Fast[i][j][k] = 0;
+                ToT_BB7_TWINPEAKS_Slow[i][j][k] = 0;
+                ToT_BB7_TWINPEAKS_Fast[i][j][k] = 0;
+            }
+        }
+    }
+
+    // ------- Lead (Fast) --------- //
+
+    // I don't output this from event unpack... is it needed...
+   //  pOutput->pBB7_TWINPEAKS_Side_Fast = pInput->fBB7_TWINPEAKS_
+
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        pOutput->pBB7_TWINPEAKS_FastStrip[i] = pInput->fBB7_TWINPEAKS_FastStrip[i];
+        pOutput->pBB7_TWINPEAKS_SlowStrip[i] = pInput->fBB7_TWINPEAKS_SlowStrip[i];
+
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            if (pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_MAX_HITS)
+            {
+                pOutput->pBB7_TWINPEAKS_Fast_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j];
+                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                {
+                    Lead_BB7_TWINPEAKS_Fast[i][j][k] = pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k];
+                    if (Lead_BB7_TWINPEAKS_Fast[i][j][k] != 0)
+                    {
+                        Hits_BB7_TWINPEAKS_Lead_Fast++;
+                        pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Fast[i][j][k];
+                        hBB7_TWINPEAKS_Lead_T_Fast[i][j]->Fill(Lead_BB7_TWINPEAKS_Fast[i][j][k]);
+                        pOutput->pBB7_TWINPEAKS_FastLeadHits = Hits_BB7_TWINPEAKS_Lead_Fast;
+                    }
+
+                    if (BB7_TWINPEAKS_RefStrip0_Side0[k] > 0 && Lead_BB7_TWINPEAKS_Fast[0][j][k] > 0)
+                    {
+                        Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] = (BB7_TWINPEAKS_RefStrip0_Side0[k] - Lead_BB7_TWINPEAKS_Fast[0][j][k]) * CYCLE_TIME;
+                    }
+                    if (BB7_TWINPEAKS_RefStrip0_Side1[k] > 0 && Lead_BB7_TWINPEAKS_Fast[1][j][k] > 0)
+                    {
+                        Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] = (BB7_TWINPEAKS_RefStrip0_Side1[k] - Lead_BB7_TWINPEAKS_Fast[1][j][k]) * CYCLE_TIME;
+                    }
+
+                    if (Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] != 0 && i == 0) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[0][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref0[j][k]);
+                    if (Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] != 0 && i == 1) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[1][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref1[j][k]);
+
+                    // CEJ:SC41L/R, Ge_Trig stuff
+
+                } // loop over max hits
+
+                pOutput->pBB7_TWINPEAKS_Fast_Trail_N[i][j] = pInput->fBB7_TWINPEAKS_Fast_Trail_N[i][j];
+                pOutput->pBB7_TWINPEAKS_Slow_Trail_N[i][j] = pInput->fBB7_TWINPEAKS_Slow_Trail_N[i][j];
+
+                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                {
+                    if(pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] != 0) Hits_BB7_TWINPEAKS_Trail_Fast++;
+                    pOutput->pBB7_TWINPEAKS_Fast_TrailT[i][j][k] = pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k];  
+                    if(pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k] != 0) Hits_BB7_TWINPEAKS_Trail_Slow++;
+                    pOutput->pBB7_TWINPEAKS_Slow_TrailT[i][j][k] = pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k];  
+
+                } // loop over max hits
+
+                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                {
+                    if (pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] > 0 && pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k] > 0)
+                    {
+                        ToT_BB7_TWINPEAKS_Fast[i][j][k] = (pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] - pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k]);
+
+                        // CEJ: There is a correction for "overflows" in bPlast code that looks like an EPOCH time correction; I'm not sure we need this since its dealt with in EventProc.
+
+                        // CEJ: There is a note that says "gain matching" and then nothing happens except histogram filling...
+                        // should gain matching have occurred here?
+                        pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Fast[i][j][k];
+
+                        if (ToT_BB7_TWINPEAKS_Fast[i][j][k] > 0)
+                        {
+                            // do stuff
+                            hBB7_TWINPEAKS_ToT_Fast_Side_Strip[i][j]->Fill(ToT_BB7_TWINPEAKS_Fast[i][j][k]);
+                            hBB7_TWINPEAKS_ToT_Fast_Side[i]->Fill(ToT_BB7_TWINPEAKS_Fast[i][j][k]);
+                            hBB7_TWINPEAKS_Hit_Pattern_Side[i]->Fill(j);
+                            
+                            BB7_TWINPEAKS_Total_Hits[i]++;
+                            hBB7_TWINPEAKS_Multiplicity_Side[i]->Fill(BB7_TWINPEAKS_Total_Hits[i]);
+
+                        }
+                    }
+                } // loop over max hits
+
+
+            }
+
+            // we go here next...CEJ - WE ARE HERE, SLOW BRANCH
+
+
+
+
+
+        } // loop over strips
+    } // loop over sides
+}
+
+
+   
+
+
+    ////////////////////////////////////////////////////////////////////////////////// 
+    void EventAnlProc::Process_Plastic_Twinpeaks_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput){   
+    
+       
+     ///**---------------------------------------------LEAD (Fast) --------------------------------------------**/        
+     
+              ///Loop over channels 
+              pOutput->pbPlasDetNum_Fast= pInput->fbPlasDetNum_Fast;
+              for(int a=1; a<4; a++)
+              { ///Detector number (this is crappy coding... A.K.M)
+                    for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++)
+                    {  ///Channel number
+ ///**---------------------------------------------Plastic Fast Lead Time ----------------------------------**/    
+                      
+             ///**--------------------Plastic SLOW BRANCH  --------------------------------**/   ///
+                       pOutput->pbPlas_Slow_Lead_N[a][b] = pInput->fbPlast_Slow_Lead_N[a][b]; 
+                     if(pInput->fbPlast_Slow_Lead_N[a][b]<bPLASTIC_TAMEX_HITS){
+                     
+                           ///Slow Lead
+                             for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ 
+                    lead_bplas_slow[a][b][j] = pInput->fbPlast_Slow_Lead[a][b][j]; 
+                    if(lead_bplas_slow[a][b][j]!=0){
+                    hbPlas_Lead_T_Slow[a][b]->Fill(lead_bplas_slow[a][b][j]);
+                    hits_bplas_lead_slow++;  
+                    pOutput->pbPlas_SlowLeadT[a][b][j] = lead_bplas_slow[a][b][j];    
+                    pOutput->pbPlas_SlowLeadHits = hits_bplas_lead_slow; 
+                            }
+                            
+              ///**--------------------Plastic Slow ToT --------------------------------**/            
+                      if(pInput->fbPlast_Slow_Trail[a][b][j] >0 && pInput->fbPlast_Slow_Lead[a][b][j]>0){ 
+                
+        ToT_bplas_Slow[a][b][j] = (pInput->fbPlast_Slow_Trail[a][b][j] - pInput->fbPlast_Slow_Lead[a][b][j]);   
+                 
+                ///Correction for overflows 
+                if(ABS(ToT_bplas_Slow[a][b][j]) >(double)(COARSE_CT_RANGE>>1)) {   
+                    
+                       ToT_bplas_Slow[a][b][j] = CYCLE_TIME*(ToT_bplas_Slow[a][b][j] + COARSE_CT_RANGE);    
+                      } 
+                 else{  
+                           ToT_bplas_Slow[a][b][j]= CYCLE_TIME*ToT_bplas_Slow[a][b][j];                         
+                       }    
+                       ///Gain matching  
+               // pOutput-> pbPlas_ToTCalib[a][b][j] = fCal->Abplas_TAMEX_ZAoQ[i]* ToT_bplas[a][b][j] + fCal->Bbplas_TAMEX_ZAoQ[i];
+               pOutput-> pbPlas_Slow_ToTCalib[a][b][j] =ToT_bplas_Slow[a][b][j];
+           
+                       if(ToT_bplas_Slow[a][b][j]>0) {
+                        hbPlas_ToT_det_Slow[a][b] ->Fill(ToT_bplas_Slow[a][b][j]);   
+                    //    cout<<"ToT_bplas_Slow[a][b][j] " <<ToT_bplas_Slow[a][b][j] << endl;
+                        
+                        hbPlas_ToT_Sum_Slow[a]->Fill(ToT_bplas_Slow[a][b][j]);   
+            if(pOutput-> pbPlas_Fast_ToTCalib[1][24][j]>0 && a==1 && b==24)hbPlas_ToT_Slow_vs_Fast_Det1->Fill(ToT_bplas_Slow[1][24][j],pOutput-> pbPlas_Fast_ToTCalib[1][24][j]);
+            
+            if(pOutput-> pbPlas_Fast_ToTCalib[2][24][j]>0 && a==2 && b==24)hbPlas_ToT_Slow_vs_Fast_Det2->Fill(ToT_bplas_Slow[2][24][j],pOutput-> pbPlas_Fast_ToTCalib[2][24][j]);
+            
+                                }//ToT>0
+                            }//Lead+Trail>0               
+                        }///hits loop
+                     }///hit limit 
+                 }  ///Channel
+              }  ///Detector 
+        } ///Function bPlast Twin Peaks
+   

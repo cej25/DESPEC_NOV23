@@ -1519,7 +1519,7 @@ for (int i=0; i<10; i++){
                                     // these are fast leads
                                     // CEJ: below can be strip - scanner: find TAMEX_bPlast_Chan[i]
                                     //int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
-                                    fOutput->fBB7_TWINPEAKS_FastChan[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // Helena says: no clue what this is supposed to be?
+                                    fOutput->fBB7_TWINPEAKS_FastStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // Helena says: no clue what this is supposed to be?
                                     if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // can this ever be false?
                                     {
                                         N1_fast = fOutput->fBB7_TWINPEAKS_Fast_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
@@ -1530,7 +1530,7 @@ for (int i=0; i<10; i++){
                                 {
                                     // these are slow leads
                                     //int chan_BB7_TWINPEAKS_slow_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, 2) / 2) -1];
-                                    fOutput->fBB7_TWINPEAKS_SlowChan[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // HMA - again what is this for?
+                                    fOutput->fBB7_TWINPEAKS_SlowStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // HMA - again what is this for?
                                     if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
                                     {
                                         N1_slow = fOutput->fBB7_TWINPEAKS_Slow_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;

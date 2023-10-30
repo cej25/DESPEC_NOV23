@@ -229,8 +229,8 @@ void  EventUnpackStore::Clear(Option_t *t)
 
     if (fBB7_TWINPEAKS_WR != 0)
     {
-        ZERO_ARRAY(fBB7_TWINPEAKS_FastChan);
-        ZERO_ARRAY(fBB7_TWINPEAKS_SlowChan);
+        ZERO_ARRAY(fBB7_TWINPEAKS_FastStrip);
+        ZERO_ARRAY(fBB7_TWINPEAKS_SlowStrip);
         ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead_N);
         ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead);
         ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Lead_N);
