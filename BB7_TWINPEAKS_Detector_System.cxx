@@ -70,7 +70,7 @@ BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
 
 void BB7_TWINPEAKS_Detector_System::get_Event_data(Raw_Event* RAW)
 {
-    RAW->set_DATA_PLASTIC_TWINPEAKS(iterator, edge_coarse, edge_fine, ch_ID_edge, coarse_T, fine_T, tamex_iter, lead_arr);
+    RAW->set_DATA_BB7_TWINPEAKS(iterator, edge_coarse, edge_fine, ch_ID_edge, coarse_T, fine_T, tamex_iter, lead_arr);
 }
 
 void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
@@ -92,7 +92,7 @@ void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
         if (!tamex_end) tamex_iter++;
         this->pdata++;
     }
-
+    
     if (CALIBRATE) calibrate_ONLINE();
     else calibrate_OFFLINE();
 }

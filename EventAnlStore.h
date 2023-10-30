@@ -46,6 +46,9 @@ class EventAnlStore : public TGo4EventElement {
       Long64_t pFAT_Tamex_WR;
       Long64_t pAIDA_WR;
       Long64_t pGe_WR;
+      Long64_t pBB7_FEBEX_WR;
+      Long64_t pBB7_TWINPEAKS_WR;
+      Long64_t pBB7_MADC_WR;
       ///FRS Outputs
 
       Float_t pFRS_AoQ;

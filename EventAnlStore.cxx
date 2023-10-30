@@ -195,6 +195,41 @@ void EventAnlStore::Clear(Option_t *t)
     ZERO_ARRAY(pGeOverFlow);
   }
   pGe_WR = 0;
+
+  if (pBB7_FEBEX_WR != 0)
+  {
+      // clear stuff here
+      //CEJ
+  }
+  pBB7_FEBEX_WR = 0;
+
+  if (pBB7_TWINPEAKS_WR != 0)
+  {
+      // clear what we should clear
+      //CEJ
+      ZERO_ARRAY(pBB7_TWINPEAKS_FastStrip);
+      ZERO_ARRAY(pBB7_TWINPEAKS_SlowStrip);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Fast_Lead_N);
+      ZERO_ARRAY(pBB7_TWINPEAKS_FastLeadT);
+      pBB7_TWINPEAKS_FastLeadHits = 0;
+      ZERO_ARRAY(pBB7_TWINPEAKS_Fast_Trail_N);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Slow_Trail_N);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Fast_TrailT);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Slow_TrailT);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Fast_ToTCalib);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Slow_ToTCalib);
+      ZERO_ARRAY(pBB7_TWINPEAKS_Slow_Lead_N);
+      ZERO_ARRAY(pBB7_TWINPEAKS_SlowLeadT);
+      pBB7_TWINPEAKS_SlowLeadHits = 0;
+
+  }
+  pBB7_TWINPEAKS_WR = 0;
+
+  // BB7 MADC 
+
+
+
+
   //FINGER
   /*
      pFing_tot = 0;

@@ -163,8 +163,8 @@ class EventAnlProc : public TGo4EventProcessor {
       void ProcessAida(EventUnpackStore* pInput, EventAnlStore* pOutput);
 
 
-      int PrcID_Conv[7];
-      int Used_Systems[7];
+      int PrcID_Conv[NUM_SUBSYS];
+      int Used_Systems[NUM_SUBSYS];
       int event_number;
       bool VMEorTAMEX_bPlas;
       bool VMEorTAMEX_fatima;
@@ -353,18 +353,18 @@ class EventAnlProc : public TGo4EventProcessor {
 
       // BB7 variables and array
       int BB7_TWINPEAKS_Total_Hits[BB7_SIDES];  
-      double Lead_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
-      double Lead_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
-      double ToT_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
-      double ToT_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double Lead_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double Lead_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double ToT_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double ToT_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
       int Hits_BB7_TWINPEAKS_Lead_Fast;
       int Hits_BB7_TWINPEAKS_Trail_Fast;
       int Hits_BB7_TWINPEAKS_Lead_Slow;
       int Hits_BB7_TWINPEAKS_Trail_Slow;
-      double BB7_TWINPEAKS_RefStrip0_Side0[BB7_TAMEX_MAX_HITS];
-      double Lead_Lead_BB7_TWINPEAKS_Ref0[BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
-      double BB7_TWINPEAKS_RefStrip0_Side1[BB7_TAMEX_MAX_HITS];
-      double Lead_Lead_BB7_TWINPEAKS_Ref1[BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double BB7_TWINPEAKS_RefStrip0_Side0[BB7_TAMEX_ANL_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref0[BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double BB7_TWINPEAKS_RefStrip0_Side1[BB7_TAMEX_ANL_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref1[BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
 
      void Make_FRS_Histos();
      void Make_Aida_Histos();

@@ -389,6 +389,13 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
 
         fOutput -> fProcID[PrcID_Conv] = PrcID_Conv;
         
+      // CEJ: some weird stuff here
+       /*  if (Used_Systems[9])
+  {
+      std::cout << PrcID << std::endl;
+      std::cout << PrcID_Conv << std::endl;
+  }*/
+
       //  if(PrcID_Conv==5) cout<<fOutput->fTrigger;
 
         sub_evt_length  = (psubevt->GetDlen() - 2) / 2;
@@ -1478,11 +1485,12 @@ for (int i=0; i<10; i++){
         int N1_fast = 0;
         int N1_slow = 0;
 
-        if (Used_Systems[9] && PrcID_Conv == 9)
+        if (Used_Systems[9] == 1 && PrcID_Conv == 9)
         {   
+
             // loop over TAMEX modules
             for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)
-            { 
+            {
                 // loop over hits per board
                 // Helena has a condition to check hits < 640 in scanner code....do we need a similar check?
                 BB7_TWINPEAKS_Fired[i] = RAW->get_BB7_TWINPEAKS_am_Fired(i);
@@ -1498,7 +1506,6 @@ for (int i=0; i<10; i++){
                     auto idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
                     BB7_TWINPEAKS_Side = BB7_TWINPEAKS_Map[idx].first;
                     BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
-
                     // adding 1, dividing by 2, minusing 1: maps physical channel to fast with 0 based index?
                     //BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
 
@@ -1506,7 +1513,7 @@ for (int i=0; i<10; i++){
                     // Now i'm making changes based on BB7 layer
                     // (in case it breaks)
                     if (BB7_TWINPEAKS_Side > -1 && BB7_TWINPEAKS_Strip > -1) // check det num
-                    {
+                    {   
                         // NOW define Fast and Slow
                         if (BB7_TWINPEAKS_Channel_ID > 0 && BB7_TWINPEAKS_Channel_ID < 66)
                         {

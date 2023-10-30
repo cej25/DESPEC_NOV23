@@ -73,7 +73,8 @@
 #define BB7_FEBEX_MAX_HITS BB7_FEBEX_MAX_CHANNELS
 #define BB7_TAMEX_MODULES 9 // CEJ: USE 9 FOR TRICKING PLASTIC DATA
 #define BB7_TAMEX_CHANNELS 16 // CEJ: 32 tdc channels, 16 * fast+slow tamex channels
-#define BB7_TAMEX_MAX_HITS 200 // CEJ: no idea
+#define BB7_TAMEX_MAX_HITS 200
+#define BB7_TAMEX_ANL_HITS 5 // why is this 5 and max hits for unpacking is 200?
 #define BB7_MADC_MODULES 2
 #define BB7_MADC_CHANNELS 32
 #define BB7_MADC_MAX_HITS (BB7_MADC_MODULES * BB7_MADC_CHANNELS)

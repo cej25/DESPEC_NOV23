@@ -158,7 +158,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
 //     VMEandTAMEX_fatima = VME_AND_TAMEX_Fatima;
 
 
-  for (int i = 0; i<7; i++){
+  for (int i = 0; i<NUM_SUBSYS; i++){
       if(pInput->fProcID[i]>-1){
       PrcID_Conv[i] = pInput->fProcID[i];
       pOutput->pPrcID_Conv[i] = pInput->fProcID[i];
@@ -623,6 +623,63 @@ if(Fatmult > 0){
         }
 
             Process_Germanium_Histos(pOutput);
+      }
+      
+      // ------- 9 for BB7 TWINPEAKS --------------
+      if (PrcID_Conv[9] == 9 && Used_Systems[9] == 1)
+      {     
+
+          // we should clear a bunch of arrays here I believe
+          
+          for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+          {
+              BB7_TWINPEAKS_RefStrip0_Side0[k] = 0;
+              BB7_TWINPEAKS_RefStrip0_Side1[k] = 0;
+          }
+
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+              {
+                  Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] = 0;
+                  Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] = 0;
+              }
+          }
+
+          // CEJ come back to
+          /*for (int i = 0; i < BB7_SIDES; i++)
+          {
+              for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+              {
+                  for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                  {
+                      // this would be for SC41 signals 
+                  }
+              }
+          }*/
+          
+          pOutput->pBB7_TWINPEAKS_WR =pInput->fBB7_TWINPEAKS_WR;
+          // CEJ: other trigger stuff below here
+
+          // this bit makes no sense to me..why is i going "up to" the side that triggers?
+          // we loop over less if side 0 triggers instead of 1? etc
+          // yeah i really can't understand
+          // lets come back to it once the rest compiles
+          /*for (int i = 0; i < pInput->fBB7_TWINPEAKS_Fast_Side; i++)
+          {
+              for (int j = 0; j < pInput->fBB7_TWINPEAKS_FastStrip; j++)
+              {
+                  for (int k = 0; k <= pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j]; k++)
+                  {
+                      BB7_TWINPEAKS_RefStrip0_Side0[k] = pInput->fBB7_TWINPEAKS_Fast_Lead[0][BB7_TWINPEAKS_REF_STRIP_SIDE0][k];
+                      BB7_TWINPEAKS_RefStrip0_Side1[k] = pInput->fBB7_TWINPEAKS_Fast_Lead[1][BB7_TWINPEAKS_REF_STRIP_SIDE1][k];
+                  }
+              }
+          }*/
+          // what about the slow stuff? this is very confusing.
+                 
+
+          Process_BB7_TWINPEAKS_Histos(pInput,pOutput);
       }
 
  ///--------------------------------------/**Finger Input**/------------------------------------------///
@@ -3867,7 +3924,7 @@ void EventAnlProc::FRS_Gates(){
 ///-------------------------------------------------------------------------------------------------------
 
 void EventAnlProc::get_used_systems(){
-    for(int i = 0;i < 6;i++) Used_Systems[i] = false;
+    for(int i = 0;i < NUM_SUBSYS;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -3885,7 +3942,7 @@ void EventAnlProc::get_used_systems(){
     Used_Systems[i] = (id == 1);
     i++;
   }
-  string DET_NAME[7] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER"};
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","GERMANIUM","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
 
 }
@@ -3964,7 +4021,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
     {
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
         {
-            for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+            for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
             {
                 Lead_BB7_TWINPEAKS_Fast[i][j][k] = 0;
                 ToT_BB7_TWINPEAKS_Slow[i][j][k] = 0;
@@ -3973,6 +4030,8 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
         }
     }
 
+
+
     // ------- Lead (Fast) --------- //
 
     // I don't output this from event unpack... is it needed...
@@ -3980,19 +4039,21 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
 
     for (int i = 0; i < BB7_SIDES; i++)
     {
+
         pOutput->pBB7_TWINPEAKS_FastStrip[i] = pInput->fBB7_TWINPEAKS_FastStrip[i];
         pOutput->pBB7_TWINPEAKS_SlowStrip[i] = pInput->fBB7_TWINPEAKS_SlowStrip[i];
 
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
         {
-            if (pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_MAX_HITS)
+            if (pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_MAX_HITS) // BB7_TAMEX_ANL_HITS
             {
                 pOutput->pBB7_TWINPEAKS_Fast_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j];
-                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
                 {
                     Lead_BB7_TWINPEAKS_Fast[i][j][k] = pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k];
                     if (Lead_BB7_TWINPEAKS_Fast[i][j][k] != 0)
-                    {
+                    {     
+
                         Hits_BB7_TWINPEAKS_Lead_Fast++;
                         pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Fast[i][j][k];
                         hBB7_TWINPEAKS_Lead_T_Fast[i][j]->Fill(Lead_BB7_TWINPEAKS_Fast[i][j][k]);
@@ -4018,7 +4079,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                 pOutput->pBB7_TWINPEAKS_Fast_Trail_N[i][j] = pInput->fBB7_TWINPEAKS_Fast_Trail_N[i][j];
                 pOutput->pBB7_TWINPEAKS_Slow_Trail_N[i][j] = pInput->fBB7_TWINPEAKS_Slow_Trail_N[i][j];
 
-                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
                 {
                     if(pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] != 0) Hits_BB7_TWINPEAKS_Trail_Fast++;
                     pOutput->pBB7_TWINPEAKS_Fast_TrailT[i][j][k] = pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k];  
@@ -4027,7 +4088,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
 
                 } // loop over max hits
 
-                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
                 {
                     if (pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] > 0 && pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k] > 0)
                     {
@@ -4059,10 +4120,10 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
             // we go here next...CEJ - WE ARE HERE, SLOW BRANCH
 
             pOutput->pBB7_TWINPEAKS_Slow_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j];
-            if (pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j] < BB7_TAMEX_MAX_HITS)
+            if (pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j] < BB7_TAMEX_MAX_HITS) // TAMEX_MAX_ANL_HITS
             {
                 // Slow Lead
-                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
                 {
                     Lead_BB7_TWINPEAKS_Slow[i][j][k] = pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k];
                     if (Lead_BB7_TWINPEAKS_Slow[i][j][k] != 0)

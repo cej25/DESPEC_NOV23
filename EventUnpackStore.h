@@ -104,7 +104,7 @@ public:
         //General Output
         Int_t     fevent_number;
         Int_t     fTrigger;
-        Int_t     fProcID[7];
+        Int_t     fProcID[NUM_SUBSYS];
         Int_t     fScalar_fired;
         Int_t     fScalar_ID;
 

@@ -939,7 +939,7 @@ void Raw_Event::set_DATA_BB7_MADC(int Hits, int* Side, int* Strip, int* ADC_Data
 
 
 void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coarse_BB7_TWINPEAKS, double** Edge_Fine_BB7_TWINPEAKS, UInt** ch_ed_BB7_TWINPEAKS, double* Coarse_Trigger_BB7_TWINPEAKS, double* Fine_Trigger_BB7_TWINPEAKS, int amount_hit_BB7_TWINPEAKS, int** Lead_Arr_BB7_TWINPEAKS)
-{
+{   
     this->amount_hit_BB7_TWINPEAKS = amount_hit_BB7_TWINPEAKS;
 
     // loop over TAMEX modules
