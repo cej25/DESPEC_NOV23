@@ -350,6 +350,22 @@ class EventAnlProc : public TGo4EventProcessor {
       double maxToT_added;
       int    maxToT_added_Chan;
 
+
+      // BB7 variables and array
+      int BB7_TWINPEAKS_Total_Hits[BB7_SIDES];  
+      double Lead_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double Lead_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double ToT_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double ToT_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      int Hits_BB7_TWINPEAKS_Lead_Fast;
+      int Hits_BB7_TWINPEAKS_Trail_Fast;
+      int Hits_BB7_TWINPEAKS_Lead_Slow;
+      int Hits_BB7_TWINPEAKS_Trail_Slow;
+      double BB7_TWINPEAKS_RefStrip0_Side0[BB7_TAMEX_MAX_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref0[BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      double BB7_TWINPEAKS_RefStrip0_Side1[BB7_TAMEX_MAX_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref1[BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+
      void Make_FRS_Histos();
      void Make_Aida_Histos();
     // void Make_Plastic_VME_Histos();
@@ -371,6 +387,7 @@ class EventAnlProc : public TGo4EventProcessor {
    //  void Process_Plastic_VME_Histos(EventAnlStore* pOutput);
      void Process_Plastic_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Plastic_Twinpeaks_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
+     void Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Fatima_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Fatima_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
 
@@ -691,6 +708,8 @@ class EventAnlProc : public TGo4EventProcessor {
             TH1 *hBB7_TWINPEAKS_Multiplicity_Side[BB7_SIDES];
             TH1 *hBB7_TWINPEAKS_Multiplicity;
             TH2 *hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7;
+            TH1 *hBB7_TWINPEAKS_Lead_Lead_Ref_Det[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+
 
              TH1 *hFat_Lead_Fast_T[FATIMA_TAMEX_CHANNELS+1];
              TH1 *hFat_Lead_Slow_T[FATIMA_TAMEX_CHANNELS+1];

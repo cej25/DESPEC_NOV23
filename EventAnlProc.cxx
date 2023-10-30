@@ -4054,81 +4054,42 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                 } // loop over max hits
 
 
-            }
+            } // hit count check
 
             // we go here next...CEJ - WE ARE HERE, SLOW BRANCH
 
+            pOutput->pBB7_TWINPEAKS_Slow_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j];
+            if (pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j] < BB7_TAMEX_MAX_HITS)
+            {
+                // Slow Lead
+                for (int k = 0; k < BB7_TAMEX_MAX_HITS; k++)
+                {
+                    Lead_BB7_TWINPEAKS_Slow[i][j][k] = pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k];
+                    if (Lead_BB7_TWINPEAKS_Slow[i][j][k] != 0)
+                    {
+                        hBB7_TWINPEAKS_Lead_T_Slow[i][j]->Fill(Lead_BB7_TWINPEAKS_Slow[i][j][k]);
+                        Hits_BB7_TWINPEAKS_Lead_Slow++;
+                        pOutput->pBB7_TWINPEAKS_SlowLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Slow[i][j][k];
+                        pOutput->pBB7_TWINPEAKS_SlowLeadHits = Hits_BB7_TWINPEAKS_Lead_Slow;
+                    }
 
+                    // Slow ToT
+                    if (pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k] > 0 && pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k] > 0)
+                    { 
+                        ToT_BB7_TWINPEAKS_Slow[i][j][k] = (pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k] - pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k]);
+                        // now there is some correction for overflow, as before with Fast branch.
+                        // now some note about gain matching and a commented line
+                        pOutput->pBB7_TWINPEAKS_Slow_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Slow[i][j][k];
 
-
-
+                        if (ToT_BB7_TWINPEAKS_Slow[i][j][k] > 0)
+                        {
+                            hBB7_TWINPEAKS_ToT_Slow_Side_Strip[i][j]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
+                            hBB7_TWINPEAKS_ToT_Slow_Side[i]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
+                            if (pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k] > 0 && i == 0 && j == 7) hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7->Fill(ToT_BB7_TWINPEAKS_Slow[0][7][k], pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k]);                            
+                        } // j'fine
+                    } // Slow ToT if condition
+                } // loop over max hits
+            } // hit count check
         } // loop over strips
     } // loop over sides
 }
-
-
-   
-
-
-    ////////////////////////////////////////////////////////////////////////////////// 
-    void EventAnlProc::Process_Plastic_Twinpeaks_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput){   
-    
-       
-     ///**---------------------------------------------LEAD (Fast) --------------------------------------------**/        
-     
-              ///Loop over channels 
-              pOutput->pbPlasDetNum_Fast= pInput->fbPlasDetNum_Fast;
-              for(int a=1; a<4; a++)
-              { ///Detector number (this is crappy coding... A.K.M)
-                    for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++)
-                    {  ///Channel number
- ///**---------------------------------------------Plastic Fast Lead Time ----------------------------------**/    
-                      
-             ///**--------------------Plastic SLOW BRANCH  --------------------------------**/   ///
-                       pOutput->pbPlas_Slow_Lead_N[a][b] = pInput->fbPlast_Slow_Lead_N[a][b]; 
-                     if(pInput->fbPlast_Slow_Lead_N[a][b]<bPLASTIC_TAMEX_HITS){
-                     
-                           ///Slow Lead
-                             for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ 
-                    lead_bplas_slow[a][b][j] = pInput->fbPlast_Slow_Lead[a][b][j]; 
-                    if(lead_bplas_slow[a][b][j]!=0){
-                    hbPlas_Lead_T_Slow[a][b]->Fill(lead_bplas_slow[a][b][j]);
-                    hits_bplas_lead_slow++;  
-                    pOutput->pbPlas_SlowLeadT[a][b][j] = lead_bplas_slow[a][b][j];    
-                    pOutput->pbPlas_SlowLeadHits = hits_bplas_lead_slow; 
-                            }
-                            
-              ///**--------------------Plastic Slow ToT --------------------------------**/            
-                      if(pInput->fbPlast_Slow_Trail[a][b][j] >0 && pInput->fbPlast_Slow_Lead[a][b][j]>0){ 
-                
-        ToT_bplas_Slow[a][b][j] = (pInput->fbPlast_Slow_Trail[a][b][j] - pInput->fbPlast_Slow_Lead[a][b][j]);   
-                 
-                ///Correction for overflows 
-                if(ABS(ToT_bplas_Slow[a][b][j]) >(double)(COARSE_CT_RANGE>>1)) {   
-                    
-                       ToT_bplas_Slow[a][b][j] = CYCLE_TIME*(ToT_bplas_Slow[a][b][j] + COARSE_CT_RANGE);    
-                      } 
-                 else{  
-                           ToT_bplas_Slow[a][b][j]= CYCLE_TIME*ToT_bplas_Slow[a][b][j];                         
-                       }    
-                       ///Gain matching  
-               // pOutput-> pbPlas_ToTCalib[a][b][j] = fCal->Abplas_TAMEX_ZAoQ[i]* ToT_bplas[a][b][j] + fCal->Bbplas_TAMEX_ZAoQ[i];
-               pOutput-> pbPlas_Slow_ToTCalib[a][b][j] =ToT_bplas_Slow[a][b][j];
-           
-                       if(ToT_bplas_Slow[a][b][j]>0) {
-                        hbPlas_ToT_det_Slow[a][b] ->Fill(ToT_bplas_Slow[a][b][j]);   
-                    //    cout<<"ToT_bplas_Slow[a][b][j] " <<ToT_bplas_Slow[a][b][j] << endl;
-                        
-                        hbPlas_ToT_Sum_Slow[a]->Fill(ToT_bplas_Slow[a][b][j]);   
-            if(pOutput-> pbPlas_Fast_ToTCalib[1][24][j]>0 && a==1 && b==24)hbPlas_ToT_Slow_vs_Fast_Det1->Fill(ToT_bplas_Slow[1][24][j],pOutput-> pbPlas_Fast_ToTCalib[1][24][j]);
-            
-            if(pOutput-> pbPlas_Fast_ToTCalib[2][24][j]>0 && a==2 && b==24)hbPlas_ToT_Slow_vs_Fast_Det2->Fill(ToT_bplas_Slow[2][24][j],pOutput-> pbPlas_Fast_ToTCalib[2][24][j]);
-            
-                                }//ToT>0
-                            }//Lead+Trail>0               
-                        }///hits loop
-                     }///hit limit 
-                 }  ///Channel
-              }  ///Detector 
-        } ///Function bPlast Twin Peaks
-   
