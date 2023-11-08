@@ -942,12 +942,70 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
 {   
     this->amount_hit_BB7_TWINPEAKS = amount_hit_BB7_TWINPEAKS;
 
-    // loop over TAMEX modules
+    // HELENA CODE
+    // first she resets everything... should we do this? why isn't it done anywhere else?
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
+    {   
+        // 100 is max iterator.. this needs clarifying
+        for (int j = 0; j < 100; j++)
+        {
+            leading_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            trailing_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            leading_array_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+        }
+    }
+
+
     for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
+    {
+        // no if check
+        iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
+        trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
+        trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
+        fired_tamex_BB7_TWINPEAKS[i] = (iterator_BB7_TWINPEAKS[i] > 0);
+        leading_hits_BB7_TWINPEAKS[i] = 0;
+        trailing_hits_BB7_TWINPEAKS[i] = 0;
+
+        for (int j = 0; j < iterator_BB7_TWINPEAKS[i]; j++)
+        {
+            ch_ID_BB7_TWINPEAKS[i][j] = ch_ed_BB7_TWINPEAKS[i][j];
+            leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 1)
+            {
+                coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]);
+                leading_hits_BB7_TWINPEAKS[i]++;
+                leading_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+            }
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] > 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 0)
+            {
+                coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                trailing_hits_BB7_TWINPEAKS[i]++;
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j] - 33);
+                if (phys_channel_BB7_TWINPEAKS[i][j] < 100)
+                {
+                    trailing_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+                }
+            }
+        }
+    }
+
+
+
+    // loop over TAMEX modules
+    /*for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
     {
         if (i < BB7_TAMEX_MODULES && it_BB7_TWINPEAKS[i] < 100)
         {   
-            // CEJ: what is the point of this???!?!?!?
+            
             iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
             trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
             trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
@@ -986,7 +1044,7 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 }
             }
         }
-    }
+    }*/
 }
 
 
@@ -1348,7 +1406,7 @@ double Raw_Event::get_BB7_TWINPEAKS_fine_trail(int i, int j) { return fine_T_edg
 double Raw_Event::get_BB7_TWINPEAKS_Lead_Lead(int i, int j)
 { 
     double T_lead_BB7_TWINPEAKS1 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]);
-    double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j+2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j+2]);
+    double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j + 2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j + 2]);
     return T_lead_BB7_TWINPEAKS1 - T_lead_BB7_TWINPEAKS2;
 }
 double Raw_Event::get_BB7_TWINPEAKS_TOT(int i,int j)

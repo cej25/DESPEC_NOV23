@@ -63,9 +63,9 @@
 #define FatTAMEX_TimeMachineCh2 54
 
 // BB7 LAYER
-#define BB7_SIDES 2
-#define BB7_STRIPS_PER_SIDE 32
-#define BB7_IMPLANT_E_THRESHOLD 200 // in keV
+#define BB7_SIDES 5 // 2 for Nov tests
+#define BB7_STRIPS_PER_SIDE 32 // up to
+#define BB7_IMPLANT_E_THRESHOLD 200 // in keV // 
 
 #define BB7_FEBEX_MODULES 4
 #define BB7_FEBEX_CHAN_PER_MOD 16

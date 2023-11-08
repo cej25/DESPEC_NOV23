@@ -52,9 +52,9 @@ BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
         delete[] edge_fine[i];
         delete[] ch_ID_edge[i];
 
-        delete lead_arr[i];
-        delete leading_hits[i];
-        delete trailing_hits[i];
+        delete[] lead_arr[i];
+        delete[] leading_hits[i];
+        delete[] trailing_hits[i];
     }
 
     delete[] edge_coarse;
@@ -188,7 +188,6 @@ void BB7_TWINPEAKS_Detector_System::get_trigger()
 {
     EPOCH* epoch = (EPOCH*) pdata;
 
-    // CEJ: starting here with helena's fixes
     if (epoch->six_eight == 0x6)
     {   
         if (DEBUG) std::cout << "Epoch Data! Trigger Epoch: " << epoch->epoch_count << std::endl;
@@ -307,17 +306,79 @@ void BB7_TWINPEAKS_Detector_System::check_trailer()
 
 void BB7_TWINPEAKS_Detector_System::calibrate_ONLINE()
 {
-    // calibrate
+    BB7_TAMEX_Calibration->get_data(edge_fine, ch_ID_edge, tamex_iter, iterator);
+
+    double max_count = 1000000.;
+    cal_count++;
+
+    Calibration_Done = false;
+
+    if (cal_count > max_count)
+    {
+        BB7_TAMEX_Calibration->ONLINE_CALIBRATION();
+        Calibration_Done = true;
+    }
+
 }
 
 void BB7_TWINPEAKS_Detector_System::calibrate_OFFLINE()
 {
     // calibrate
+    int channel_ID_tmp = 0;
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
+    {
+        for (int j = 0; j < iterator[i]; j++)
+        {
+            channel_ID_tmp = (int) ch_ID_edge[i][j];
+            if (edge_coarse[i][j] != 131313) edge_fine[i][j] = BB7_TAMEX_Calibration->get_Calibration_val(edge_fine[i][j], i, channel_ID_tmp);
+            else edge_fine[i][j] = 131313;
+        }
+    }
+
 }
 
 void BB7_TWINPEAKS_Detector_System::get_calib_type()
 {
-    // read a file, do something else
+    // CEJ: maybe this can be removed with AIDA-style calibrations for new layer
+    std::ifstream file("Configuration_Files/BB7/BB7_TWINPEAKS_CALIB_FILE.txt");
+    if (file.fail())
+    {
+        std::cerr << "Could not find calibration type file for BB7 Layer" << std::endl;
+        exit(0);
+    }
+    string line; const char* format = "%s %d"; 
+    char s[100]; 
+    int val;
+    CALIBRATE = false;
+    bool FORCE = false;
+
+    while (file.good())
+    {
+        getline(file, line, '\n');
+        if (line[0] == '#') continue;
+        sscanf(line.c_str(), format, &s, &val);
+        if (string(s) == string("ONLINE")) CALIBRATE = (val == 1);
+        if (string(s) == string("FORCE")) FORCE = (val == 1);
+    }
+    file.close();
+
+    // only FORCE possible if ONLINE active
+    FORCE = (CALIBRATE) ? FORCE : false;
+
+    // rewrite CALIB_TYPE file if FORCE = false
+    if (!FORCE)
+    {
+        std::ofstream out("Configuration_Files/BB7/BB7_TWINPEAKS_CALIB_FILE.txt");
+        out << "#BB7 TWINPEAKS calibration type file" << std::endl;
+        out << "#This file is rewritten to OFFLINE after reading, if FORCE is not set to 1" << std::endl;
+        out << "ONLINE\t\t0" << std::endl;
+        out << "FORCE\t\t0" << std::endl;
+    }
+    else
+    {
+        std::cout << "ONLINE analysis in FORCED mode. Disable in BB7_TAMEX_CALIB_FILE.txt" << std::endl;
+    }
+
 }
 
 int* BB7_TWINPEAKS_Detector_System::get_pdata() { return pdata; }

@@ -2156,249 +2156,6 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
 }
                                                     ///End of Aida ///
 
- /**----------------------------------------------------------------------------------------------**/
-     /**--------------------------------------  bPlastic  TAMEX ----------------------------------------------   **/
-     //**----------------------------------------------------------------------------------------------**/
-
-//     void EventAnlProc::Make_Plastic_Tamex_Histos(){
-// 
-//          for (int i =1; i<4; i++)
-//             {
-//                 hbPlas_ToT_Sum[i] = MakeTH1('D', Form("bPlastic/ToT_Sum_Det.%2d",i), Form("bPlastic Sum ToT Det. %2d",i), 5000, 0, 3000000);
-// 
-//                  hbPlas_hit_pattern_det[i]= MakeTH1('D', Form("bPlastic/Stats/HitPattern_Det.%2d",i), Form("bPlastic Hit pattern Det. %2d",i), bPLASTIC_CHAN_PER_DET, 0, bPLASTIC_CHAN_PER_DET);
-// 
-//           for(int j=0; j<bPLASTIC_CHAN_PER_DET; j++){
-// 
-//              hbPlas_Lead_T[i][j] = MakeTH1('D', Form("bPlastic/Lead-/Lead T Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 2000);
-// 
-//               if(i<3){//Take only cards with bPlast channels
-// 
-//             hbPlas_Lead_dT_coinc[i][j] = MakeTH1('D', Form("bPlastic/Lead-LeadCoincidenceChan/Lead dT Plas Det. %2d Ch %d Ref Coincidence",i,j), Form("Lead dT Plas Det. %2d Ch %d Ref Coincidence",i,j),500,-200,200);
-//         }
-// 
-//             hbPlas_ToT_det[i][j] = MakeTH1('D', Form("bPlastic/ToT/ToT Plas Det. %2d Ch. %2d",  i,j), Form("ToT Det. %2d Ch. %2d", i,j),20000, 0., 200000.);
-// 
-//             hbPlas_Multiplicity_Chan[i][j] = MakeTH1('D', Form("bPlastic/Stats/Mulitplicity_per_Chan/bPlast Multiplicity Det. %2d Ch. %2d",  i,j), Form("ToT Det. %2d Ch. %2d", i,j),50, 0., 50.);
-// 
-//             hbPlas_lead_lead_ref_det[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. - Ch. %d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// 
-// //         hbPlas_lead_lead_ref_det2[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. %2d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// //         hbPlas_lead_lead_ref_det3[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. %2d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// 
-//        // hbPlas_lead_lead_gated[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Egated/Lead-Lead Egated Plas Det. %2d Ch. %2d",  i,j), Form("Lead - Lead Energy gated Det. %2d Ch.  %2d", i,j),2500, -50000., 50000.);
-// 
-//        // hbPlas_SC41L_lead[i][j] = MakeTH1('D', Form("bPlastic/SC41-Lead_Plas/SC41_Lead Plas Det. %2d Ch.%02d", i,j), Form("SC41 Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4002, -100000., 100000.);
-//          hbPlas_fatimatamex_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/FatTamChan-Lead_bPlas/(bPlast)FatTamChan_Lead bPlas Det.%2d Ch.%02d", i,j), Form("FATIMA tamex channel in bPlast: Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_fatimavme_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/FatVMEChan-Lead_bPlas/(bPlast)FatVMEChan_Lead bPlas Det.%2d Ch.%02d", i,j), Form("FATIMA VME channel in bPlast: Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_fatimavme_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/SC41R_Anal-Lead_bPlas/SC41R_Ana_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41R Analogue Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_SC41L_Digi_lead[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/SC41L_Digi-Lead_bPlas/SC41L_Digi_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41L Digital Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_SC41R_Digi_lead[i][j] = MakeTH1('D', Form("bPlastic/SC41R_Digi-Lead_bPlas/SC41R_Digi_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41R Digital Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//           }
-//   }
-// 
-//         // New histogram looking at correlation between Fibre implanted channels 1 and 9 (2 and 10 if A=1->4 etc). H.M.A (don't blame me though...)
-// 
-// //         hFIMP_ToT_Correlation_Comb1 = MakeTH2('D', "bPlastic/FIMP_ToT_Correlation_Comb1", "ToT vs ToT for 2 FIMP channels, combination 1",500,0,100000,500,0,100000);
-// //
-// //         hFIMP_ToT_Correlation_Comb2 = MakeTH2('D', "bPlastic/FIMP_ToT_Correlation_Comb2", "ToT vs ToT for 2 FIMP channels, combination 2",500,0,100000,500,0,100000);
-// 
-// //         hSC41_Analogue_Tamex = MakeTH1('D',"bPlastic/SC41/Analogue L-R","SC41 Analogue L - R",4002, -100000., 100000.);
-// //         hSC41_Digital_Tamex = MakeTH1('D',"bPlastic/SC41/Digital L-R","SC41 Analogue L - R",4002, -100000., 100000.);
-// 
-// 
-//         hbPlas_Multiplicity_Det1 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Det1","bPlastic Multiplicity Det 1",32,0,32);
-//         hbPlas_Multiplicity_Det2 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Det2","bPlastic Multiplicity Det 2",32,0,32);
-//        /* hbPlas_Multiplicity_Det3 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Fibre","bPlastic Multiplicity Fibre",32,0,32); */
-// 
-// 
-// 
-//     }
-    ///////////////////////////////////////////////////
-    /*void EventAnlProc::Process_Plastic_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput){
-
-         fired_det1=false, fired_det2=false;
-         ZERO_ARRAY(bPlas_tot_hits);
-//          for(int i=1; i<4; i++){
-//              for(int j=0; j<16; j++){
-//              bPlas_tot_hits[i][j]=0;
-//              }
-//          }
-         bool Fibre=false;
-
-
-         for(int a=1; a<4; a++){
-                 for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++){
-                     for(int k=0; k<bPLASTIC_TAMEX_HITS; k++){
-                        lead_bplas[a][b][k]=0;
-                        ToT_bplas[a][b][k] = 0;
-                     }
-                 }
-         }
-
-
-
-
-     ///**---------------------------------------------LEAD -------------------------------------------------**/
-//          /*  ///Loop on channels First
-// 
-//               for(int i=1; i<4; i++){ ///Detector number
-//                  for (int j = 0; j < 16; j++){  ///Channel number
-// 
-//                 for(int k=0; k< bPLASTIC_TAMEX_HITS; k++){
-//                     //Fat_RefCh[j] = pInput->fFat_Lead_PMT[1][j];
-//                     bPlas_RefCh0_Det1[k] = pInput->fbPlas_Lead_PMT[1][0][k];
-//                     bPlas_RefCh0_Det2[k] = pInput->fbPlas_Lead_PMT[2][0][k];
-//                     bPlas_RefCh0_Det3[k] = pInput->fbPlas_Lead_PMT[3][0][k];
-// 
-//                         }
-//                     }
-//               }
-//             ////////////////////////////
-//               ///Loop over channels
-//               pOutput->pbPlasDetNum= pInput->fbPlasDetNum;
-//            // cout<<"pInput->fbPlasDetNum " <<pInput->fbPlasDetNum << endl;
-//               for(int a=1; a<4; a++){ ///Detector number
-//                     pOutput->pbPlasChan[a]= pInput->fbPlasChan[a];
-// 
-//                  for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++){  ///Channel number
-// 
-// 
-//  ///**---------------------------------------------Plastic Lead Time ----------------------------------**/
-// 
-//             if(pInput->fbPlas_PMT_Lead_N[a][b]<bPLASTIC_TAMEX_HITS){
-//                 pOutput->pbPlas_PMT_Lead_N[a][b] = pInput->fbPlas_PMT_Lead_N[a][b];
-// 
-//                for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ ///Hits
-//                    // if(j<20){
-// 
-//                     lead_bplas[a][b][j] = pInput->fbPlas_Lead_PMT[a][b][j];
-// 
-//                 if(lead_bplas[a][b][j]!=0){
-//                     hbPlas_Lead_T[a][b]->Fill(lead_bplas[a][b][j]);
-//                     hits_bplas_lead++;
-//                     pOutput->pbPlas_LeadT[a][b][j] = lead_bplas[a][b][j];
-//                     pOutput->pbPlas_LeadHits = hits_bplas_lead;
-//                     pOutput->pbPlas_LeadT_Avg = lead_bplas[a][b][j]/hits_bplas_lead;
-// 
-//     ///**---------------------------bPlast Channels - AND signal  ----------------------------------**/
-//         if(a==bPLASTIC_DOWNSTREAM_DET && pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_DOWN_COIN][0] !=0 && lead_bplas[bPLASTIC_DOWNSTREAM_DET][b][j]!=0){ // s452 a==1 is the downstream detector. Coincidence is in a=3, b=0.
-//         hbPlas_Lead_dT_coinc[bPLASTIC_DOWNSTREAM_DET][b]->Fill((lead_bplas[bPLASTIC_DOWNSTREAM_DET][b][j] - pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_DOWN_COIN][0])*5);
-//      }
-//    //  cout<<"a " << a << " b " << b << " j " << j << endl;
-//      if(a==bPLASTIC_UPSTREAM_DET && pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_UP_COIN][0] != 0&&  lead_bplas[bPLASTIC_UPSTREAM_DET][b][j]!=0){ // s452 a==2 is the upstream detector. Coincidence is in a=3, b=1.
-// 
-//         hbPlas_Lead_dT_coinc[bPLASTIC_UPSTREAM_DET][b]->Fill((lead_bplas[bPLASTIC_UPSTREAM_DET][b][j] - pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_UP_COIN][0])*5);
-//      }
-//     }
-// 
-// 
-// //     ///**---------------------------------------------Plastic Lead Ref dT ----------------------------------**/
-// //
-// //                     if(i>15 && pInput->fbPlas_Lead_PMT[16][j]>0 && pInput->fbPlas_Lead_PMT[a][b][j]>0) {
-// 
-//         if(bPlas_RefCh0_Det1[j]>0 && lead_bplas[1][b][j]>0){
-//             lead_lead_bplas_Ref1[b][j] = (bPlas_RefCh0_Det1[j] -  lead_bplas[1][b][j])*CYCLE_TIME;
-// 
-//         }
-//         if(bPlas_RefCh0_Det2[j]>0 && lead_bplas[2][b][j]>0){
-//             lead_lead_bplas_Ref2[b][j] = (bPlas_RefCh0_Det2[j] -  lead_bplas[2][b][j])*CYCLE_TIME;
-//         }
-//               if(lead_lead_bplas_Ref1[b][j]!=0 && a==1) hbPlas_lead_lead_ref_det[1][b] ->Fill(lead_lead_bplas_Ref1[b][j]);
-// 
-//        // cout<<"ANL EVENT " << pInput->fevent_number << " a " << a << " b " << b << " j " << j << endl;
-//               if(lead_lead_bplas_Ref2[b][j]!=0 && a==2) hbPlas_lead_lead_ref_det[2][b] ->Fill(lead_lead_bplas_Ref2[b][j]);
-// 
-// //
-//               ///Reference signals
-//                 ///Fatima tamex OR in bplast tamex
-//                if(bPlas_TAM_FATTAM>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimatamex_dT[a][b][j] = (bPlas_TAM_FATTAM -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_fatimatamex_dT[a][b]->Fill(bPlas_fatimatamex_dT[a][b][j] );
-//                 }
-//                 ///Fatima VME OR in bplast tamex
-//                 if(bPlas_TAM_FATVME>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimavme_dT[a][b][j] = (bPlas_TAM_FATVME -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_fatimavme_dT[a][b]->Fill(bPlas_fatimavme_dT[a][b][j] );
-//                     }
-//                   ///SC41L in bplast tamex
-//                 if(bPlas_TAM_SC41L_DIG>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimatamex_dT[a][b][j] = (bPlas_TAM_SC41L_DIG -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_SC41L_Digi_lead[a][b]->Fill(SC41L_DIG_lead_bPlas[a][b][j] );
-//                     }
-//                     ///SC41R in bplast tamex
-//                 if(bPlas_TAM_SC41R_DIG>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimavme_dT[a][b][j] = (bPlas_TAM_SC41R_DIG -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_SC41R_Digi_lead[a][b]->Fill(SC41R_DIG_lead_bPlas[a][b][j] );
-//                     }
-// 
-//                 }
-// 
-//             ///AKM note: lead clear of malloc 29.04.21
-// //
-// //
-// //       ///**---------------------------------------------Plastic Trail ----------------------------------**/
-// //
-//                 pOutput->pbPlas_PMT_Trail_N[a][b] = pInput->fbPlas_PMT_Trail_N[a][b];
-//                 if(a<4 && b<bPLASTIC_CHAN_PER_DET){
-//                for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ ///Hits
-//                // if(j<20){
-// 
-//                    /* trail_bplas[a][b][j] = ; */
-// 
-//                     //hbPlas_Trail_T[a][b]->Fill(trail_bplas[a][b][j]);
-//                   if(pOutput->pbPlas_TrailT[a][b][j]!=0)  hits_bplas_trail++;
-//                     pOutput->pbPlas_TrailT[a][b][j] = pInput->fbPlas_Trail_PMT[a][b][j];
-//                         }
-//                     }
-//                     ///AKM note: trail clear of malloc 29.04.21
-// 
-// //
-// //    ///**--------------------Plastic ToT --------------------------------**/
-// //
-//               for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){
-// 
-//                   if(pInput->fbPlas_Trail_PMT[a][b][j] >0 && pInput->fbPlas_Lead_PMT[a][b][j]>0){
-// 
-//         ToT_bplas[a][b][j] = (pInput->fbPlas_Trail_PMT[a][b][j] - pInput->fbPlas_Lead_PMT[a][b][j]);
-// 
-//                 ///Correction for overflows
-//                 if(ABS(ToT_bplas[a][b][j]) >(double)(COARSE_CT_RANGE>>1)) {
-// 
-//                        ToT_bplas[a][b][j] = CYCLE_TIME*(ToT_bplas[a][b][j] + COARSE_CT_RANGE);
-//                       }
-//                  else{
-//                            ToT_bplas[a][b][j]= CYCLE_TIME*ToT_bplas[a][b][j];
-//                        }
-//                        ///Gain matching
-//                // pOutput-> pbPlas_ToTCalib[a][b][j] = fCal->Abplas_TAMEX_ZAoQ[i]* ToT_bplas[a][b][j] + fCal->Bbplas_TAMEX_ZAoQ[i];
-//                pOutput-> pbPlas_ToTCalib[a][b][j] =ToT_bplas[a][b][j];
-// 
-//                        if(ToT_bplas[a][b][j]>0) {
-//                         hbPlas_ToT_det[a][b] ->Fill(ToT_bplas[a][b][j]);
-//                         hbPlas_ToT_Sum[a]->Fill(ToT_bplas[a][b][j]);
-//                         hbPlas_hit_pattern_det[a]->Fill(b);
-//                           //bPlas_tot_hits++;
-//                           bPlas_tot_hits[a][b]++;
-// 
-//                           hbPlas_Multiplicity_Chan[a][b] ->Fill(bPlas_tot_hits[a][b]);
-// 
-//                          if(a==1) hbPlas_Multiplicity_Det1->Fill(bPlas_tot_hits[1][b]);
-//                          if(a==2) hbPlas_Multiplicity_Det2->Fill(bPlas_tot_hits[2][b]);
-//                       //   if(a==3) hbPlas_Multiplicity_Det3->Fill(bPlas_tot_hits);
-// 
-//                           }//ToT>0
-//                         }//Lead+Trail>0
-//                       }//hits
-//                     }//Limit hits loop
-//                  }  //Channel
-//               }  ///Detector
-//         }*/ ///Function*/
 
          /**----------------------------------------------------------------------------------------------**/   
      /**--------------------------------------  bPlastic TwinPeaks -----------------------------------**/
@@ -4006,6 +3763,7 @@ void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
 
     hBB7_TWINPEAKS_Multiplicity = MakeTH1('D', "BB7_Layer/TWINPEAKS/Stats/Multiplicity/BB7_TWINPEAKS_Multiplicity", "BB7 Multiplicity", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES);
     
+    // CEJ: this is breaking something.... I don't know what.
     hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7 = MakeTH2('D', "BB7_Layer/TWINPEAKS/BB7_TWINPEAKS_Fast_vs_Slow_Strip7", "BB7 Slow ToT vs Fast ToT - Side 0 Chan 7", 3000,0,3000000,1000,0,1000000);
 
 }
@@ -4015,6 +3773,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
 {
     bool SideFired[BB7_SIDES]; for (int i = 0; i < BB7_SIDES; i++) SideFired[i] = false;
     ZERO_ARRAY(BB7_TWINPEAKS_Total_Hits);
+    Hits_BB7_TWINPEAKS_Lead_Fast = 0; // CEJ THIS IS A TEST
 
     // this starts at i = 1 for bplast which I'm not understanding
     for (int i = 0; i < BB7_SIDES; i++)
@@ -4045,15 +3804,14 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
 
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
         {
-            if (pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_MAX_HITS) // BB7_TAMEX_ANL_HITS
+            if (pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_ANL_HITS) // BB7_TAMEX_MAX_HITS
             {
                 pOutput->pBB7_TWINPEAKS_Fast_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j];
                 for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
                 {
                     Lead_BB7_TWINPEAKS_Fast[i][j][k] = pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k];
                     if (Lead_BB7_TWINPEAKS_Fast[i][j][k] != 0)
-                    {     
-
+                    {
                         Hits_BB7_TWINPEAKS_Lead_Fast++;
                         pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Fast[i][j][k];
                         hBB7_TWINPEAKS_Lead_T_Fast[i][j]->Fill(Lead_BB7_TWINPEAKS_Fast[i][j][k]);
@@ -4069,8 +3827,9 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                         Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] = (BB7_TWINPEAKS_RefStrip0_Side1[k] - Lead_BB7_TWINPEAKS_Fast[1][j][k]) * CYCLE_TIME;
                     }
 
-                    if (Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] != 0 && i == 0) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[0][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref0[j][k]);
-                    if (Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] != 0 && i == 1) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[1][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref1[j][k]);
+                    // these aren't even MADE.. ?
+                    //if (Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] != 0 && i == 0) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[0][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref0[j][k]);
+                    //if (Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] != 0 && i == 1) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[1][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref1[j][k]);
 
                     // CEJ:SC41L/R, Ge_Trig stuff
 
@@ -4094,8 +3853,15 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                     {
                         ToT_BB7_TWINPEAKS_Fast[i][j][k] = (pInput->fBB7_TWINPEAKS_Fast_Trail[i][j][k] - pInput->fBB7_TWINPEAKS_Fast_Lead[i][j][k]);
 
-                        // CEJ: There is a correction for "overflows" in bPlast code that looks like an EPOCH time correction; I'm not sure we need this since its dealt with in EventProc.
-
+                        // CEJ: Correction for Overflows
+                        if(ABS(ToT_BB7_TWINPEAKS_Fast[i][j][k]) > (double)(COARSE_CT_RANGE >> 1)) 
+                        {
+                            ToT_BB7_TWINPEAKS_Fast[i][j][k] = CYCLE_TIME * (ToT_BB7_TWINPEAKS_Fast[i][j][k] + COARSE_CT_RANGE);    
+                        } 
+                        else
+                        {
+                            ToT_BB7_TWINPEAKS_Fast[i][j][k] = CYCLE_TIME * ToT_BB7_TWINPEAKS_Fast[i][j][k];                         
+                        } // concerned about this
                         // CEJ: There is a note that says "gain matching" and then nothing happens except histogram filling...
                         // should gain matching have occurred here?
                         pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Fast[i][j][k];
@@ -4110,15 +3876,14 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                             BB7_TWINPEAKS_Total_Hits[i]++;
                             hBB7_TWINPEAKS_Multiplicity_Side[i]->Fill(BB7_TWINPEAKS_Total_Hits[i]);
 
+
                         }
                     }
                 } // loop over max hits
 
 
             } // hit count check
-
-            // we go here next...CEJ - WE ARE HERE, SLOW BRANCH
-
+            
             pOutput->pBB7_TWINPEAKS_Slow_Lead_N[i][j] = pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j];
             if (pInput->fBB7_TWINPEAKS_Slow_Lead_N[i][j] < BB7_TAMEX_MAX_HITS) // TAMEX_MAX_ANL_HITS
             {
@@ -4137,8 +3902,19 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
                     // Slow ToT
                     if (pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k] > 0 && pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k] > 0)
                     { 
+
                         ToT_BB7_TWINPEAKS_Slow[i][j][k] = (pInput->fBB7_TWINPEAKS_Slow_Trail[i][j][k] - pInput->fBB7_TWINPEAKS_Slow_Lead[i][j][k]);
-                        // now there is some correction for overflow, as before with Fast branch.
+
+                        // CEJ: Correction for Overflow
+                        if(ABS(ToT_BB7_TWINPEAKS_Slow[i][j][k]) > (double)(COARSE_CT_RANGE >> 1)) 
+                        {
+                            ToT_BB7_TWINPEAKS_Slow[i][j][k] = CYCLE_TIME * (ToT_BB7_TWINPEAKS_Slow[i][j][k] + COARSE_CT_RANGE);    
+                        } 
+                        else
+                        {
+                            ToT_BB7_TWINPEAKS_Slow[i][j][k] = CYCLE_TIME * ToT_BB7_TWINPEAKS_Slow[i][j][k];                         
+                        } // concerned about this
+
                         // now some note about gain matching and a commented line
                         pOutput->pBB7_TWINPEAKS_Slow_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Slow[i][j][k];
 
