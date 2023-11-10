@@ -17,7 +17,7 @@ public:
   int      IsData(std::ifstream &f);
 
   ///Define correlations of interest
- Bool_t GSetup_corr_FRS_Ge, GSetup_corr_FRS_Gamma_Gamma, GSetup_corr_FRS_Ge_long, GSetup_corr_FRS_fat, GSetup_corr_FRS_Aida, GSetup_corr_FRS_bPlast ;
+ Bool_t GSetup_corr_FRS_Ge, GSetup_corr_FRS_Gamma_Gamma, GSetup_corr_FRS_Ge_long, GSetup_corr_FRS_fat, GSetup_corr_FRS_Aida, GSetup_corr_FRS_bPlast, GSetup_corr_FRS_BB7_FEBEX, GSetup_corr_FRS_BB7_TWINPEAKS;
  Bool_t GSetup_corr_FRS_Fatima_LT;
  Bool_t GSetup_corr_Beta_Gamma_bPlastSpillOff;
  Bool_t GSetup_corr_Beta_Gamma, GSetup_corr_Beta_Gamma_Gamma, GSetup_corr_Beta_Gamma_Fatima, GSetup_corr_Beta_Gamma_Fatima_LT;
@@ -103,7 +103,11 @@ public:
  Int_t GAIDA_TM_Fattam_TLow, GAIDA_TM_Fattam_THigh;
  //20. 
  Int_t GAIDA_TM_bPlast_TLow, GAIDA_TM_bPlast_THigh;
- 
+ // 21.
+ Int_t GbPlast_TM_BB7_TWINPEAKS_TLow, GbPlast_TM_BB7_TWINPEAKS_THigh;
+ // 22.
+ Int_t GAIDA_TM_BB7_TWINPEAKS_TLow, GAIDA_TM_BB7_TWINPEAKS_THigh;
+ // febex
  
  Int_t GbPlast_Egate_low, GbPlast_Egate_high;
 // Int_t GbPlast_GAL_TLow, GbPlast_GAL_THigh;

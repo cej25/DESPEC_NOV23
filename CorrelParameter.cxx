@@ -14,6 +14,9 @@ CorrelParameter::CorrelParameter()
     GSetup_corr_FRS_fat = false;
     GSetup_corr_FRS_Fatima_LT = false;
     
+    GSetup_corr_FRS_BB7_FEBEX = false;
+    GSetup_corr_FRS_BB7_TWINPEAKS = false;
+
     GSetup_corr_FRS_Aida =false;
     GSetup_corr_Beta_Gamma_bPlastSpillOff=false;
     GSetup_corr_Beta_Gamma=false;
@@ -56,8 +59,11 @@ CorrelParameter::CorrelParameter()
     GAIDA_TM_Fattam_THigh = 0;
     GAIDA_TM_bPlast_TLow = 0;
     GAIDA_TM_bPlast_THigh = 0;
-    
-   
+    GbPlast_TM_BB7_TWINPEAKS_TLow = 0;
+    GbPlast_TM_BB7_TWINPEAKS_THigh = 0;
+    GAIDA_TM_BB7_TWINPEAKS_TLow = 0;
+    GAIDA_TM_BB7_TWINPEAKS_THigh = 0;
+
 //     GGe_SCI41_Low=0;
 //     GGe_SCI41_High=0;
     GGe1_Ge2_Low =0;
@@ -117,7 +123,7 @@ CorrelParameter::CorrelParameter()
 CorrelParameter::CorrelParameter(const Text_t* name)
 : TGo4Parameter(name)
 {
-  ifstream    file;
+  std::ifstream    file;
   
       file.open("Configuration_Files/DESPEC_General_Setup/Correlations_config.dat");
   if (file.fail()) {
@@ -171,6 +177,10 @@ CorrelParameter::CorrelParameter(const Text_t* name)
          GAIDA_TM_Fattam_THigh = 1000;
          GAIDA_TM_bPlast_TLow = -1000;
          GAIDA_TM_bPlast_THigh = 1000;
+         GbPlast_TM_BB7_TWINPEAKS_TLow = -1000;
+         GbPlast_TM_BB7_TWINPEAKS_THigh = 1000;
+         GAIDA_TM_BB7_TWINPEAKS_TLow = -1000;
+         GAIDA_TM_BB7_TWINPEAKS_THigh = 1000;
          
          
 //          GGe_SCI41_Low=-20000;
@@ -233,7 +243,7 @@ CorrelParameter::CorrelParameter(const Text_t* name)
   }
   
 else {
-cout << "CorrelParameter - reading from Configuration_Files/DESPEC_General_Setup/Correlations_config.dat";
+    cout << "CorrelParameter - reading from Configuration_Files/DESPEC_General_Setup/Correlations_config.dat";
         ///Detector system correlation pairs
        if(IsData(file)) file >> GSetup_corr_FRS_Aida;
        if(IsData(file)) file >> GSetup_corr_FRS_bPlast;
@@ -305,6 +315,10 @@ cout << "CorrelParameter - reading from Configuration_Files/DESPEC_General_Setup
        ///20. AIDA Timemachine - bPlast WR Time Gate
        if(IsData(file)) file >> GAIDA_TM_bPlast_TLow >>GAIDA_TM_bPlast_THigh;
        
+       // 21. bPlast TimeMachine - BB7 TWINPEAKS WR Time Gate
+       if (IsData(file)) file >> GbPlast_TM_BB7_TWINPEAKS_TLow >> GbPlast_TM_BB7_TWINPEAKS_THigh;
+
+       if (IsData(file)) file >> GAIDA_TM_BB7_TWINPEAKS_TLow >> GAIDA_TM_BB7_TWINPEAKS_THigh;
        
        
        
