@@ -525,6 +525,9 @@ using namespace std;
             TH1* hBB7_FEBEX_Raw_E_Sum_Side[BB7_SIDES];
             TH1* hBB7_FEBEX_Raw_E_Sum_Total;
             TH1* hBB7_FEBEX_Hit_Pattern;
+
+            BB7_FEBEX_UnpackData BB7_FEBEX;
+
             // tamex??
             TH1* hBB7_MADC_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
             TH1* hBB7_MADC_Raw_E_Sum_Side[BB7_SIDES];

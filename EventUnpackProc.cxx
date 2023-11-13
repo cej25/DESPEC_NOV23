@@ -52,6 +52,7 @@
 #include "Germanium_Detector_System.h"
 #include "FRS_Detector_System.h"
 #include "BB7_FEBEX_Detector_System.h"
+#include "BB7_FEBEX_Event_Store.h"
 #include "BB7_TWINPEAKS_Detector_System.h"
 #include "BB7_MADC_Detector_System.h"
 
@@ -649,6 +650,9 @@ for (int i=0; i<10; i++){
          ///--------------------------------------------------------------------------------------------///
                                             /** Output AIDA **/
         ///--------------------------------------------------------------------------------------------///
+        
+
+
 
         if (Used_Systems[1] && PrcID_Conv==1){
           TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
@@ -1366,19 +1370,38 @@ for (int i=0; i<10; i++){
          } // BM output
 
           if (Used_Systems[8] && PrcID_Conv == 8)
-          {
-              for (int i = fOutput->fBB7_FEBEX_Hits; i<RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
-              {
-                  fOutput->fBB7_FEBEX_Side[i] =  RAW->get_BB7_FEBEX_Side(i);
-                  fOutput->fBB7_FEBEX_Strip[i] =  RAW->get_BB7_FEBEX_Strip(i);
-                  fOutput->fBB7_FEBEX_Chan_Energy[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
-                  fOutput->fBB7_FEBEX_Chan_Time[i] = RAW->get_BB7_FEBEX_Chan_Time(i);
-                  fOutput->fBB7_FEBEX_Chan_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
+          {   
+              BB7_FEBEX_Event hit;
+
+              for (int i = fOutput->fBB7_FEBEX_Hits; i < RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
+              {   
+                  hit.Side = RAW->get_BB7_FEBEX_Side(i);
+                  hit.Strip = RAW->get_BB7_FEBEX_Strip(i);
+                  hit.Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                  hit.Time = RAW->get_BB7_FEBEX_Chan_Time(i);
+                 // hit.CF = RAW->get_BB7_FEBEX_Chan_CF(i);
+                 // hit.Pileup = RAW->get_BB7_FEBEX_Pileup(i);
+                 // hit.Overflow = RAW->get_BB7_FEBEX_Overflow(i);
+
+                  if (hit.Energy > BB7_IMPLANT_E_THRESHOLD)
+                  {
+                      // event is implant
+                      // push back a vector for each hit in the event
+                      BB7_FEBEX.Implants.push_back(hit);
+                  }
+                  else
+                  {
+                      BB7_FEBEX.Decays.push_back(hit);
+                  }
+
                   fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
-                  fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
-                  fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
                   fOutput->fBB7_FEBEX_Hits++;
+
               }
+
+              fOutput->fBB7_FEBEX.push_back(BB7_FEBEX);
+
+
           } // output BB7 FEBEX
 
 
@@ -3744,3 +3767,7 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
+
+
+// maybe some things in unpack need adjusting....
+

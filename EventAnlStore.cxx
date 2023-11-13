@@ -202,6 +202,7 @@ void EventAnlStore::Clear(Option_t *t)
       //CEJ
   }
   pBB7_FEBEX_WR = 0;
+  pBB7_FEBEX.clear();
 
   if (pBB7_TWINPEAKS_WR != 0)
   {

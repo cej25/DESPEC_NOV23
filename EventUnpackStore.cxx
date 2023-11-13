@@ -216,6 +216,7 @@ void  EventUnpackStore::Clear(Option_t *t)
    
     // should sum/event time be zeroed?
      if (fBB7_FEBEX_WR != 0) {
+        fBB7_FEBEX.clear();
         fBB7_FEBEX_Hits = 0;
         ZERO_ARRAY(fBB7_FEBEX_Side);
         ZERO_ARRAY(fBB7_FEBEX_Strip);

@@ -40,6 +40,8 @@
 #include "TFRSParameter.h"
 #include "DESPECAnalysis.h"
 
+#include "BB7_FEBEX_Event_Store.h"
+
  //#define AIDA_CALIBRATE 1
  //#define AIDA_CALIBRATE_CLUSTER 1
 
@@ -180,7 +182,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
     if(Used_Systems[4]) Make_Fatima_Tamex_Histos();
     if(Used_Systems[5]) Make_Germanium_Histos();
     // FINGER[6], BEAM MONITOR[7]
-    //if(Used_Systems[8]) Make_BB7_FEBEX_Histos();
+    if(Used_Systems[8]) Make_BB7_FEBEX_Histos();
     if(Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
     //if(Used_Systems[10]) Make_BB7_MADC_Histos();
 
@@ -352,62 +354,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
    ///-------------------------------- /**bPlastic VME Input**/ --------------------------------///
         ///Disabled A.M. 11.12.19
 
-///--------------------------------------/**bPlastic TAMEX Input**/------------------------------------------///
 
-
-//   if (PrcID_Conv[2] ==2 && Used_Systems[2]==1 && bPLASTIC_TWINPEAKS==0){
-// 
-//       for(int i=0; i<bPLASTIC_TAMEX_HITS; i++){
-//          bPlas_RefCh0_Det1[i] =0;
-//          bPlas_RefCh0_Det2[i] =0;
-//         // bPlas_RefCh0_Det3[i] =0;
-//          }
-//           for (int j = 0; j < bPLASTIC_CHAN_PER_DET; j++)
-//                 {
-//                     for(int k=0; k<bPLASTIC_TAMEX_HITS;k++){
-//                         lead_lead_bplas_Ref1[j][k]=0;
-//                         lead_lead_bplas_Ref2[j][k]=0;
-//                         lead_lead_fat_Ref0[j][k]=0;
-//                     }
-//                 }
-// 
-//          for (int i=1; i<4; i++){
-//             for (int j = 0; j < bPLASTIC_CHAN_PER_DET; j++)
-//                 {
-//                     for(int k=0; k<bPLASTIC_TAMEX_HITS;k++){
-//                  SC41L_ANA_lead_bPlas[i][j][k] = 0;
-//                  SC41R_ANA_lead_bPlas[i][j][k] = 0;
-//                  SC41L_DIG_lead_bPlas[i][j][k] = 0;
-//                  SC41R_DIG_lead_bPlas[i][j][k] = 0;
-//                     }
-//                 }
-//             }
-// 
-//                 pOutput->pbPLAS_WR = pInput->fbPlas_WR;
-// 
-//                 bPlas_TAM_FATTAM = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_FATTAMEX][0];
-//                 bPlas_TAM_FATVME = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_FATVME][0];
-//                 bPlas_TAM_SC41L_DIG = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][SC41L_bPLASTIC][0];
-//                 bPlas_TAM_SC41R_DIG = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][SC41R_bPLASTIC][0];
-// 
-//        ///bPlas_AND_Coinc[j] = pInput->fFat_Lead_PMT[9][j];
-// 
-//   // if(pOutput->pEvent_Number==100598)
-//      for(int i=1; i<4; i++){ ///Detector number
-//                  for (int j = 0; j <bPLASTIC_CHAN_PER_DET ; j++){  ///Channel number
-// 
-//                 for(int k=0; k<bPLASTIC_TAMEX_HITS; k++){
-//                     //Fat_RefCh[j] = pInput->fFat_Lead_PMT[1][j];
-//                     bPlas_RefCh0_Det1[k] = pInput->fbPlas_Lead_PMT[1][bPlastRefCh_Det1][k];
-//                     bPlas_RefCh0_Det2[k] = pInput->fbPlas_Lead_PMT[2][bPlastRefCh_Det2][k];
-// //                     bPlas_RefCh0_Det3[k] = pInput->fbPlas_Lead_PMT[3][bPlastRefCh_Det3][k];
-// 
-//                         }
-//                     }
-//               }
-//   Process_Plastic_Tamex_Histos(pInput,pOutput);
-// 
-//    }
 ///--------------------------------------/**bPlastic TwinPeaks TAMEX Input**/------------------------------------------///
   
   if (PrcID_Conv[2] ==2 && Used_Systems[2]==1 && bPLASTIC_TWINPEAKS==1){
@@ -624,6 +571,15 @@ if(Fatmult > 0){
 
             Process_Germanium_Histos(pOutput);
       }
+
+
+      if (PrcID_Conv[8] == 8 && Used_Systems[8] == 1)
+      { 
+          // pass things along to correl
+          // process histograms
+          Process_BB7_FEBEX_Histos(pInput, pOutput);
+      }
+
       
       // ------- 9 for BB7 TWINPEAKS --------------
       if (PrcID_Conv[9] == 9 && Used_Systems[9] == 1)
@@ -2035,6 +1991,60 @@ void EventAnlProc::ProcessAida(EventUnpackStore* pInputMain, EventAnlStore* pOut
   }
 }
 
+std::vector<BB7_FEBEX_Cluster> EventAnlProc::EventsToClustersBB7(std::vector<BB7_FEBEX_Event> const& events)
+{
+    // remove noisy/bad strips?
+
+    std::vector<BB7_FEBEX_Cluster> clusters;
+    for (auto & i : events)
+    {   
+        // don't cluster invald events
+        if (i.Side == -1 || i.Strip == -1) continue; 
+        
+        bool added = false;
+        BB7_FEBEX_Cluster* cluster;  
+        // try to add event to an existing cluster
+        auto it = std::begin(clusters);
+        while (it != std::end(clusters))
+        {
+            auto & j = *it;
+            // with aida cluster there is a high energy veto
+            // defining implant, and config for y/n clustering
+            // decays/implants. here we just assume true always?
+            bool docluster = true;
+            if (docluster && j.IsAdjacent(i) && j.IsGoodTime(i))
+            {
+                if (!added)
+                {
+                    j.AddEvent(i);
+                    cluster = &j;
+                    added = true;
+                }
+                else // if matched again, two clusters merged into one and old removed
+                {
+                    j.AddCluster(j);
+                    it = clusters.erase(it);
+                    continue;
+                }
+            }
+            it++;
+
+            // otherwise make a new cluster
+            if (!added)
+            {
+                BB7_FEBEX_Cluster new_cluster;
+                new_cluster.AddEvent(i);
+                clusters.push_back(new_cluster);
+            }
+
+        } // clusters loop
+    } // event loop
+
+    // code to remove fault strips?
+
+    return clusters;
+}
+
 
 std::vector<AidaCluster> EventAnlProc::EventsToClusters(std::vector<AidaEvent> const& events)
 {
@@ -2117,6 +2127,35 @@ std::vector<AidaCluster> EventAnlProc::EventsToClusters(std::vector<AidaEvent> c
 
   return clusters;
 }
+
+
+BB7_FEBEX_Hit EventAnlProc::BB7_FEBEX_ClusterPairToHit(std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster> const& i)
+{
+    BB7_FEBEX_Hit hit;
+    hit.StripX = i.first.Strip;
+    hit.StripY = i.second.Strip; // idk?
+    
+    // position stuff //
+
+    hit.StripXMin = i.first.StripMin;
+    hit.StripXMax = i.first.StripMax;
+    hit.StripYMin = i.second.StripMin;
+    hit.StripYMax = i.second.StripMax;
+    hit.ClusterSizeX = i.first.N;
+    hit.ClusterSizeY = i.second.N;
+
+    hit.EnergyFront = i.first.Energy;
+    hit.EnergyBack = i.second.Energy;
+    hit.Energy = hit.EnergyFront;
+
+    // CEJ: should first always be < second? electronics limit?
+    hit.Time = std::min(i.first.Time, i.second.Time);
+    hit.TimeFront = i.first.Time;
+    hit.TimeBack = i.second.Time;
+
+    return hit;
+}
+
 
 AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const& i)
 {
@@ -3015,6 +3054,12 @@ if(Fatmult > 0){
        // hGe_Time_Diff_vs_Energy[k] = MakeTH2('D',Form("Germanium/Germanium_dT_vs_Energy_Spectra/Germanium_dT_vs_E%2d",k), Form("Germanium Time Difference Vs Channel Energy Channel %2d",k),5000,0,5000,100,-1000,1000);
       //}
         }
+
+
+        
+
+
+
     ///-----------------------------------------------------------------------------------------------------------------------------------------------------------------------///
     void EventAnlProc::Process_Germanium_Histos(EventAnlStore* pOutput)
     {
@@ -3929,4 +3974,166 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventA
             } // hit count check
         } // loop over strips
     } // loop over sides
+}
+
+
+
+// we need a mix of germanium(febex) and aida analysis here I suppose
+void EventAnlProc::Make_BB7_FEBEX_Histos()
+{
+   // hBB7_FEBEX_ESum_LowE = MakeTH1('I', 'BB7_LAYER/FEBEX/Sum/BB7_FEBEX_ESum_LowE', "BB7 FEBEX Energy Sum - Low Energy branch", 10000, 0, 5000); // CEJ: limits need adjusting obviously
+   // hBB7_FEBEX_ESum_HighE = MakeTH1('I', 'BB7_LAYER/FEBEX/Sum/BB7_FEBEX_ESum_HighE', "BB7 FEBEX Energy Sum - High Energy branch", 20000, 0, 20000);
+   // hBB7_FEBEX_Multiplicity = MakeTH1('I', "BB7_LAYER/FEBEX/Stats/BB7_FEBEX_Multiplciity", "BB7 FEBEX Multiplciity", BB7_SIDES * BB7_STRIPS_PER_SIDE, 0, BB7_SIDES * BB7_STRIPS_PER_SIDE);
+
+    // 37.8 from AIDA // mm
+    double BB7_xmax = 37.8;
+    double BB7_ymax = 37.8;
+    // ------ //
+    
+    hBB7_FEBEX_implants_strip_xy = MakeTH2('I', "BB7_Layer/FEBEX/Implants/implants_strip_XY", "implant hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_FEBEX_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_FEBEX_implants_pos_xy = MakeTH2('D', "BB7_Layer/FEBEX/Implants/implants_pos_XY", "implant position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_FEBEX_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_FEBEX_implants_e = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_energy", "implant energy", 2000, 0, 20000, "Implant Energy/MeV");
+    hBB7_FEBEX_implants_e_xy = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_energy_XY", "implant front energy vs back energy", 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_FEBEX_implants_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_time_delta", "implant front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_FEBEX_implants_strip_1d_energy = MakeTH2('D', "BB7_Layer/FEBEX/Decays/implants_strip_1d_energy", "implants 1D strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_FEBEX_implants_strip_1d  = MakeTH1('I', "BB7_Layer/FEBEX/Implants/implants_strip_1d", "implant 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_FEBEX_implants_per_event  = MakeTH1('I', "BB7_Layer/FEBEX/Implants/implants_per_event", "implants per event", 100, 0, 100, "Number of implants");
+    hBB7_FEBEX_implants_x_ex  = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_x_ex", "Ex vs X position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "X Strip", "X Energy");
+    hBB7_FEBEX_implants_y_ey  = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_y_ey", "Ey vs Y position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "Y Strip", "Y Energy");
+
+    hBB7_FEBEX_decays_strip_xy  = MakeTH2('I', "BB7_Layer/FEBEX/Decays/decays_strip_XY", "decay hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_FEBEX_decays_pos_xy  = MakeTH2('D', "BB7_Layer/FEBEX/Decays/decays_pos_XY", "decay position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_FEBEX_decays_e  = MakeTH1('F', "BB7_Layer/FEBEX/Decays/decays_energy", "decay energy", 1000, 0, 20000, "Decay Energy/keV");
+    hBB7_FEBEX_decays_e_xy  = MakeTH2('F', "BB7_Layer/FEBEX/Decays/decays_energy_XY", "decay front energy vs back energy", 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_FEBEX_decays_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Decays/decays_time_delta", "decay front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_FEBEX_decays_strip_1d  = MakeTH1('I', "BB7_Layer/FEBEX/Decays/decays_strip_1d", "BB7 FEBEX decay 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_FEBEX_decays_strip_1d_energy = MakeTH2('D', "BB7_LAYER/FEBEX/Decays/decays_strip_1d_energy", "BB7 FEBEX decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_FEBEX_decays_per_event = MakeTH1('I', "BB7_LAYER/FEBEX/Decays/decays_per_event", "BB7 FEBEX decays per event", 100, 0, 100, "Numer of decays");
+    
+
+
+}
+
+
+void EventAnlProc::Process_BB7_FEBEX_Histos(EventUnpackStore* pInputMain, EventAnlStore* pOutput)
+{   
+    pOutput->pBB7_FEBEX_WR = pInputMain->fBB7_FEBEX_WR;
+
+    for (BB7_FEBEX_UnpackData & pInputD : pInputMain->fBB7_FEBEX)
+    {
+        BB7_FEBEX_UnpackData *pInput = &pInputD;
+
+        BB7_FEBEX_AnlData BB7_FEBEX;
+        if (pInput->Implants.size() > 0)
+        { 
+            // cluster events on adjaced strips
+            std::vector<BB7_FEBEX_Cluster> ImplantClusters = EventsToClustersBB7(pInput->Implants);
+
+            // Front-Back matching
+            std::vector<std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster>> hits;
+
+            for (auto & i : ImplantClusters)
+            {   
+                {
+                    int offset = 0;
+                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    hBB7_FEBEX_implants_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+
+                if (i.Side != 0) continue;
+
+                for (auto & j : ImplantClusters)
+                {
+                    if (j.Side != 1) continue;
+                    
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_IMPLANT) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j cluster
+            } // i cluster
+            
+            for (auto & i : hits)
+            {
+                BB7_FEBEX_Hit hit = BB7_FEBEX_ClusterPairToHit(i);
+                
+                BB7_FEBEX.Implants.push_back(hit);
+                hBB7_FEBEX_implants_strip_xy->Fill(hit.StripX, hit.StripY);
+
+                hBB7_FEBEX_implants_pos_xy->Fill(hit.PosX, hit.PosY);
+                // time_delta uses fast_time w/ AIDA
+                hBB7_FEBEX_implants_time_delta->Fill(hit.TimeFront - hit.TimeBack);
+                hBB7_FEBEX_implants_e->Fill(hit.Energy);
+                hBB7_FEBEX_implants_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                hBB7_FEBEX_implants_x_ex->Fill(hit.StripX, hit.EnergyFront);
+                hBB7_FEBEX_implants_y_ey->Fill(hit.StripY, hit.EnergyBack);
+                // fill both strips from fb-matched hit
+                hBB7_FEBEX_implants_strip_1d->Fill(i.first.Strip);
+                hBB7_FEBEX_implants_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+
+            }
+
+            if (hits.size() > 0)
+            {
+                hBB7_FEBEX_implants_per_event->Fill(hits.size());
+                //BB7_goodImplantEvents++;
+            }
+        } // Implant loop
+        else if (pInput->Decays.size() > 1)
+        {
+            // decayEvents++
+            // CEJ: ignoring some pulser stuff from AIDA loop
+            std::vector<BB7_FEBEX_Cluster> DecayClusters = EventsToClustersBB7(pInput->Decays);
+            std::vector<std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster>> hits;
+            // unordered_map for aida_hash?
+
+            for (auto & i : DecayClusters)
+            {
+                {
+                    int offset = 0;
+                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    hBB7_FEBEX_decays_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+
+                if (i.Side != 0) continue;
+
+                for (auto & j : DecayClusters)
+                {
+                    if (j.Side != 1) continue;
+
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_DECAY) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j clusters loop
+            } // i clusters loop
+
+            for (auto & i : hits)
+            {
+                BB7_FEBEX_Hit hit = BB7_FEBEX_ClusterPairToHit(i);
+
+                BB7_FEBEX.Decays.push_back(hit);
+
+                hBB7_FEBEX_decays_strip_xy->Fill(hit.StripX, hit.StripY);
+                hBB7_FEBEX_decays_pos_xy->Fill(hit.PosX, hit.PosY);
+                hBB7_FEBEX_decays_e->Fill(hit.Energy);
+                hBB7_FEBEX_decays_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                hBB7_FEBEX_decays_time_delta->Fill(hit.TimeFront - hit.TimeBack);
+                // Fill both strips
+                hBB7_FEBEX_decays_strip_1d->Fill(i.first.Strip);
+                hBB7_FEBEX_decays_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+            }
+
+            if (hits.size() > 0) // clusters.size()?
+            {
+                hBB7_FEBEX_decays_per_event->Fill(hits.size());
+            }
+
+        } // Decay loop
+
+        pOutput->pBB7_FEBEX.push_back(BB7_FEBEX);
+    }
+
 }

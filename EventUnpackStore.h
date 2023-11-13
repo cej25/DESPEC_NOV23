@@ -18,6 +18,7 @@
 
 
 #include "AIDA_Event.h"
+#include "BB7_FEBEX_Event_Store.h"
 #include "TGo4EventElement.h"
 
 // KW add
@@ -35,6 +36,12 @@ struct AidaUnpackData {
 
       std::vector<AidaHit> Implants;
       std::vector<AidaHit> Decays;
+};
+
+struct BB7_FEBEX_UnpackData
+{
+    std::vector<BB7_FEBEX_Event> Implants;
+    std::vector<BB7_FEBEX_Event> Decays;
 };
 
 class EventUnpackStore : public TGo4EventElement {
@@ -163,6 +170,9 @@ public:
          // BB7
          Long64_t fBM_WR;
          Long64_t fBB7_FEBEX_WR;
+
+        std::vector<BB7_FEBEX_UnpackData> fBB7_FEBEX;
+
 
         int fBB7_FEBEX_Hits;
         int fBB7_FEBEX_Side[BB7_FEBEX_MAX_HITS];

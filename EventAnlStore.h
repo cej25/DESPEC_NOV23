@@ -25,6 +25,13 @@ struct AidaAnlData {
       std::vector<AidaHit> Implants;
       std::vector<AidaHit> Decays;
       };
+
+struct BB7_FEBEX_AnlData
+{
+      std::vector<BB7_FEBEX_Hit> Implants;
+      std::vector<BB7_FEBEX_Hit> Decays;
+};
+
 class EventAnlStore : public TGo4EventElement {
    public:
       EventAnlStore() : TGo4EventElement() {}
@@ -111,7 +118,8 @@ class EventAnlStore : public TGo4EventElement {
       Float_t plastIMP_DSSD2_StripX = .0;
       Float_t plastIMP_DSSD3_StripX = .0;
 
-
+      
+      std::vector<BB7_FEBEX_AnlData> pBB7_FEBEX;
      ///AIDA output
        //AidaAnlData pAida;
       std::vector<AidaAnlData> pAida;
