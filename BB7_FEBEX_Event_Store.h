@@ -22,8 +22,6 @@ class BB7_FEBEX_Event : public TObject
         void Zero();
         virtual ~BB7_FEBEX_Event() {}; 
 
-
-
         ClassDef(BB7_FEBEX_Event, 1);
 
 };
@@ -86,7 +84,7 @@ class BB7_FEBEX_Hit : public TObject
         void Zero();
         virtual ~BB7_FEBEX_Hit() {};
 
-        ClassDef(BB7_FEBEX_Hit, 1)
+        ClassDef(BB7_FEBEX_Hit, 3)
 };
 
 #endif

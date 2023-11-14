@@ -455,9 +455,9 @@ class EventAnlProc : public TGo4EventProcessor {
 
             // same histograms, for BB7 layer (FEBEX/TWINPEAKS)
             TH2* hBB7_FEBEX_implants_strip_xy;
-            TH2* hBB7_FEBEX_implants_strip_xy_stopped;
+            //TH2* hBB7_FEBEX_implants_strip_xy_stopped;
             TH2* hBB7_FEBEX_implants_pos_xy;
-            TH2* hBB7_FEBEX_implants_pos_xy_stopped;
+            //TH2* hBB7_FEBEX_implants_pos_xy_stopped;
             TH1* hBB7_FEBEX_implants_e;
             TH1* hBB7_FEBEX_implants_e_xy;
             TH1* hBB7_FEBEX_implants_time_delta;
@@ -479,9 +479,9 @@ class EventAnlProc : public TGo4EventProcessor {
             TH1* hBB7_FEBEX_decays_channel; 
 
             TH2* hBB7_TWINPEAKS_implants_strip_xy;
-            TH2* hBB7_TWINPEAKS_implants_strip_xy_stopped;
+            //TH2* hBB7_TWINPEAKS_implants_strip_xy_stopped;
             TH2* hBB7_TWINPEAKS_implants_pos_xy;
-            TH2* hBB7_TWINPEAKS_implants_pos_xy_stopped;
+            //TH2* hBB7_TWINPEAKS_implants_pos_xy_stopped;
             TH1* hBB7_TWINPEAKS_implants_e;
             TH1* hBB7_TWINPEAKS_implants_e_xy;
             TH1* hBB7_TWINPEAKS_implants_time_delta;

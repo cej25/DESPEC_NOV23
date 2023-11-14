@@ -34,6 +34,10 @@
 #pragma link C++ class AIDA_Event+;
 #pragma link C++ class AidaEvent+;
 #pragma link C++ class AidaHit+;
+#pragma link C++ class BB7_FEBEX_Event+;
+#pragma link C++ class BB7_FEBEX_Hit+;
+#pragma link C++ class BB7_TWINPEAKS_Event+;
+#pragma link C++ class BB7_TWINPEAKS_Hit+;
 #pragma link C++ class FRS_Detector_System+;
 #pragma link C++ class AidaAnlData+;
 #pragma link C++ class vector<AidaAnlData>+;
@@ -43,7 +47,10 @@
 #pragma link C++ class AidaPauseResume+;
 #pragma link C++ class vector<AidaPauseResume>+;
 #pragma link C++ class AidaUnpackData+;
-
+#pragma link C++ class BB7_FEBEX_UnpackData+;
+#pragma link C++ class BB7_FEBEX_AnlData+;
+#pragma link C++ class BB7_TWINPEAKS_UnpackData+;
+#pragma link C++ class BB7_TWINPEAKS_AnlData+;
 
 
 #pragma link C++ class TFRSParameter+;

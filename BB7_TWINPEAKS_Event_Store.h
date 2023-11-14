@@ -19,7 +19,7 @@ class BB7_TWINPEAKS_Event : public TObject
         ClassDef(BB7_TWINPEAKS_Event, 1);
 };
 
-class BB7_TWINPEAKS_Cluster : public TObject
+class BB7_TWINPEAKS_Cluster// : public TObject
 {
     public:
         int Side;
@@ -76,7 +76,7 @@ class BB7_TWINPEAKS_Hit : public TObject
         void Zero();
         virtual ~BB7_TWINPEAKS_Hit() {};
 
-        ClassDef(BB7_TWINPEAKS_Hit, 1);
+        ClassDef(BB7_TWINPEAKS_Hit, 3);
 };
 
 #endif 

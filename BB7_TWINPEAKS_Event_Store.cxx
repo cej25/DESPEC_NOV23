@@ -1,6 +1,48 @@
 #include "BB7_TWINPEAKS_Event_Store.h"
 #include <iostream>
 
+BB7_TWINPEAKS_Event::BB7_TWINPEAKS_Event()
+{
+    Zero();
+}
+
+void BB7_TWINPEAKS_Event::Zero()
+{
+    Side = 0;
+    Strip = 0;
+    Energy = 0;
+    Time = 0;
+}
+
+void BB7_TWINPEAKS_Hit::Zero()
+{
+    StripX = 0;
+    StripY = 0;
+    PosX = 0;
+    PosY = 0;
+
+    Energy = 0;
+    EnergyFront = 0;
+    EnergyBack = 0;
+    Time = 0;
+    TimeFront = 0;
+    TimeBack = 0;
+}
+
+void BB7_TWINPEAKS_Cluster::Zero()
+{
+    Side = 0;
+    Energy = 0;
+    Strip = 0;
+    Time = 0;
+    StripMin = 0;
+    StripMax = 0;
+    TimeMin = 0;
+    TimeMax = 0;
+    StripSum = 0;
+    N = 0;
+}
+
 void BB7_TWINPEAKS_Cluster::AddEvent(BB7_TWINPEAKS_Event const& event)
 {   
 

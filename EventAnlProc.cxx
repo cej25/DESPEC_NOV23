@@ -1994,11 +1994,14 @@ void EventAnlProc::ProcessAida(EventUnpackStore* pInputMain, EventAnlStore* pOut
 std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(std::vector<BB7_TWINPEAKS_Event> const& events)
 { 
     // deal with noisy/bad strips?
+    // something in here is setting every side to 0 i think
 
     std::vector<BB7_TWINPEAKS_Cluster> clusters;
     for (auto & i : events)
     {
         if (i.Side == -1 || i.Strip == -1) continue;
+
+        if (i.Side > 0) std::cout << "AND IN HERE SIDE IS > 0 TOOOOOOO" << std::endl;
 
         bool added = false;
         BB7_TWINPEAKS_Cluster* cluster;
@@ -2008,7 +2011,7 @@ std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(
             auto & j = *it;
             bool docluster = true;
             if (docluster && j.IsAdjacent(i) && j.IsGoodTime(i))
-            {
+            {   
                 if (!added)
                 {
                     j.AddEvent(i);
@@ -2017,20 +2020,20 @@ std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(
                 }
                 else
                 {
-                    j.AddCluster(j);
+                    cluster->AddCluster(j);
                     it = clusters.erase(it);
                     continue;
                 }
             }
             it++;
+        } // while clusters
 
-            if (!added)
-            {
-                BB7_TWINPEAKS_Cluster new_cluster;
-                new_cluster.AddEvent(i);
-                clusters.push_back(new_cluster);
-            }
-        } // clusters loop
+        if (!added)
+        {
+            BB7_TWINPEAKS_Cluster new_cluster;
+            new_cluster.AddEvent(i);
+            clusters.push_back(new_cluster);
+        }
     } // event loop
 
     // code to remove faulty/bad strips
@@ -2069,22 +2072,22 @@ std::vector<BB7_FEBEX_Cluster> EventAnlProc::BB7_FEBEX_EventsToClusters(std::vec
                 }
                 else // if matched again, two clusters merged into one and old removed
                 {
-                    j.AddCluster(j);
+                    cluster->AddCluster(j);
                     it = clusters.erase(it);
                     continue;
                 }
             }
             it++;
+        }
 
-            // otherwise make a new cluster
-            if (!added)
-            {
-                BB7_FEBEX_Cluster new_cluster;
-                new_cluster.AddEvent(i);
-                clusters.push_back(new_cluster);
-            }
+        // otherwise make a new cluster
+        if (!added)
+        {
+            BB7_FEBEX_Cluster new_cluster;
+            new_cluster.AddEvent(i);
+            clusters.push_back(new_cluster);
+        }
 
-        } // clusters loop
     } // event loop
 
     // code to remove fault strips?
@@ -3889,20 +3892,18 @@ void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
     // CEJ: this is still breaking something (14/11/23).... I don't know what.
     hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7 = MakeTH2('D', "BB7_Layer/TWINPEAKS/BB7_TWINPEAKS_Fast_vs_Slow_Strip7", "BB7 Slow ToT vs Fast ToT - Side 0 Chan 7", 3000,0,3000000,1000,0,1000000);
 
-
-     // in mm
-    double BB7_xmax = BB7_XLENGTH / 2;
+    // ---- implants/decays ... I'll keep lead/times and tots above like plastic for now //
+    double BB7_xmax = BB7_XLENGTH / 2; // in mm
     double BB7_ymax = BB7_YLENGTH / 2;
-    // ------ //
     
     hBB7_TWINPEAKS_implants_strip_xy = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants/implants_strip_XY", "implant hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
-    hBB7_TWINPEAKS_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    //hBB7_TWINPEAKS_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
     hBB7_TWINPEAKS_implants_pos_xy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Implants/implants_pos_XY", "implant position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
-    hBB7_TWINPEAKS_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    //hBB7_TWINPEAKS_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
     hBB7_TWINPEAKS_implants_e = MakeTH1('F', "BB7_Layer/TWINPEAKS/Implants/implants_energy", "implant energy", 2000, 0, 20000, "Implant Energy/MeV");
     hBB7_TWINPEAKS_implants_e_xy = MakeTH2('F', "BB7_Layer/TWINPEAKS/Implants/implants_energy_XY", "implant front energy vs back energy", 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
     hBB7_TWINPEAKS_implants_time_delta  = MakeTH1('F', "BB7_Layer/TWINPEAKS/Implants/implants_time_delta", "implant front vs back time", 1000, -10000, 10000, "Time Difference/ns");
-    hBB7_TWINPEAKS_implants_strip_1d_energy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Decays/implants_strip_1d_energy", "implants 1D strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_TWINPEAKS_implants_strip_1d_energy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Implants/implants_strip_1d_energy", "implants 1D strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
     hBB7_TWINPEAKS_implants_strip_1d  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Implants/implants_strip_1d", "implant 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
     hBB7_TWINPEAKS_implants_per_event  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Implants/implants_per_event", "implants per event", 100, 0, 100, "Number of implants");
     hBB7_TWINPEAKS_implants_x_ex  = MakeTH2('F', "BB7_Layer/TWINPEAKS/Implants/implants_x_ex", "Ex vs X position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "X Strip", "X Energy");
@@ -3914,8 +3915,8 @@ void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
     hBB7_TWINPEAKS_decays_e_xy  = MakeTH2('F', "BB7_Layer/TWINPEAKS/Decays/decays_energy_XY", "decay front energy vs back energy", 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
     hBB7_TWINPEAKS_decays_time_delta  = MakeTH1('F', "BB7_Layer/TWINPEAKS/Decays/decays_time_delta", "decay front vs back time", 1000, -10000, 10000, "Time Difference/ns");
     hBB7_TWINPEAKS_decays_strip_1d  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Decays/decays_strip_1d", "BB7 TWINPEAKS decay 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
-    hBB7_TWINPEAKS_decays_strip_1d_energy = MakeTH2('D', "BB7_LAYER/TWINPEAKS/Decays/decays_strip_1d_energy", "BB7 TWINPEAKS decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
-    hBB7_TWINPEAKS_decays_per_event = MakeTH1('I', "BB7_LAYER/TWINPEAKS/Decays/decays_per_event", "BB7 TWINPEAKS decays per event", 100, 0, 100, "Numer of decays");
+    hBB7_TWINPEAKS_decays_strip_1d_energy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Decays/decays_strip_1d_energy", "BB7 TWINPEAKS decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_TWINPEAKS_decays_per_event = MakeTH1('I', "BB7_Layer/TWINPEAKS/Decays/decays_per_event", "BB7 TWINPEAKS decays per event", 100, 0, 100, "Numer of decays");
     
 
     
@@ -3926,9 +3927,6 @@ void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
 
 void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, EventAnlStore* pOutput)
 {
-
-    BB7_TWINPEAKS_Event evt;
-
     bool SideFired[BB7_SIDES]; for (int i = 0; i < BB7_SIDES; i++) SideFired[i] = false;
     ZERO_ARRAY(BB7_TWINPEAKS_Total_Hits);
     Hits_BB7_TWINPEAKS_Lead_Fast = 0; // CEJ: THIS IS A TEST
@@ -3946,12 +3944,12 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
         }
     }
 
-
-
     // ------- Lead (Fast) --------- //
 
     // I don't output this from event unpack... is it needed...
    //  pOutput->pBB7_TWINPEAKS_Side_Fast = pInput->fBB7_TWINPEAKS_
+
+    BB7_TWINPEAKS_UnpackData BB7_TWINPEAKS_Unp;
 
     for (int i = 0; i < BB7_SIDES; i++)
     {
@@ -3960,11 +3958,10 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
         pOutput->pBB7_TWINPEAKS_FastStrip[i] = pInputMain->fBB7_TWINPEAKS_FastStrip[i];
         pOutput->pBB7_TWINPEAKS_SlowStrip[i] = pInputMain->fBB7_TWINPEAKS_SlowStrip[i];
 
-        evt.Side = i; // i don't like this
-        evt.Strip = pInputMain->fBB7_TWINPEAKS_FastStrip[i];
-
         for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
-        {
+        {     
+            //BB7_TWINPEAKS_Event evt;
+
             if (pInputMain->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_ANL_HITS) // BB7_TAMEX_MAX_HITS
             {
                 pOutput->pBB7_TWINPEAKS_Fast_Lead_N[i][j] = pInputMain->fBB7_TWINPEAKS_Fast_Lead_N[i][j];
@@ -3977,6 +3974,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
                         pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Fast[i][j][k];
                         hBB7_TWINPEAKS_Lead_T_Fast[i][j]->Fill(Lead_BB7_TWINPEAKS_Fast[i][j][k]);
                         pOutput->pBB7_TWINPEAKS_FastLeadHits = Hits_BB7_TWINPEAKS_Lead_Fast;
+                        
                     }
 
                     if (BB7_TWINPEAKS_RefStrip0_Side0[k] > 0 && Lead_BB7_TWINPEAKS_Fast[0][j][k] > 0)
@@ -3992,10 +3990,11 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
                     //if (Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] != 0 && i == 0) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[0][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref0[j][k]);
                     //if (Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] != 0 && i == 1) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[1][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref1[j][k]);
 
-                    // CEJ:SC41L/R, Ge_Trig stuff
+                    // CEJ:SC41L/R stuff
 
                 } // loop over max hits
 
+                
                 pOutput->pBB7_TWINPEAKS_Fast_Trail_N[i][j] = pInputMain->fBB7_TWINPEAKS_Fast_Trail_N[i][j];
                 pOutput->pBB7_TWINPEAKS_Slow_Trail_N[i][j] = pInputMain->fBB7_TWINPEAKS_Slow_Trail_N[i][j];
 
@@ -4079,17 +4078,42 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
                         // now some note about gain matching and a commented line
                         pOutput->pBB7_TWINPEAKS_Slow_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Slow[i][j][k];
 
+
                         if (ToT_BB7_TWINPEAKS_Slow[i][j][k] > 0)
                         {
                             hBB7_TWINPEAKS_ToT_Slow_Side_Strip[i][j]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
                             hBB7_TWINPEAKS_ToT_Slow_Side[i]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
                             if (pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k] > 0 && i == 0 && j == 7) hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7->Fill(ToT_BB7_TWINPEAKS_Slow[0][7][k], pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k]);                            
+
+                            // if we see this condition, now we find FAST LEAD time from same {k} hit
+                            BB7_TWINPEAKS_Event evt;
+                            evt.Side = i;
+                            if (evt.Side > 0) std::cout << "SIDE IS NOT ZERO SEEEEE" << std::endl;
+                            
+                            evt.Strip = j;
+                            evt.Time = pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k];
+                            evt.Energy = ToT_BB7_TWINPEAKS_Slow[i][j][k];
+
+                            // CEJ just for compilation...no calibration to energy performed..
+                            if (evt.Energy > BB7_IMPLANT_E_THRESHOLD)
+                            {
+                                BB7_TWINPEAKS_Unp.Implants.push_back(evt);
+                                //std::cout << "implant!" << std::endl;
+                            }
+                            else
+                            {
+                                BB7_TWINPEAKS_Unp.Decays.push_back(evt);
+                                //std::cout << "decay!" << std::endl;
+                            }
+
                         } // j'fine
                     } // Slow ToT if condition
                 } // loop over max hits
             } // hit count check
         } // loop over strips
     } // loop over sides
+
+    pOutput->pBB7_TWINPEAKS_Unp.push_back(BB7_TWINPEAKS_Unp);
 
     // CEJ:
     // in above loop feed ToTs as E, FAST LEAD times as Time
@@ -4112,16 +4136,18 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
 
             for (auto & i : ImplantClusters)
             {
+                if (i.Side > 0) std::cout << "Side is > 0" << std::endl;
+
                 {
-                    int offset = 0;
-                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    int offset = i.Side * BB7_STRIPS_PER_SIDE;
                     hBB7_TWINPEAKS_implants_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
                 }
 
                 if (i.Side != 0) continue;
 
                 for (auto & j : ImplantClusters)
-                {
+                { 
+                      
                     if (j.Side != 1) continue;
 
                     if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_IMPLANT) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
@@ -4135,7 +4161,6 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
             {
                 BB7_TWINPEAKS_Hit hit = BB7_TWINPEAKS_ClusterPairToHit(i);
 
-                // CEJ: this is problematic
                 BB7_TWINPEAKS_Anl.Implants.push_back(hit);
                 hBB7_TWINPEAKS_implants_strip_xy->Fill(hit.StripX, hit.StripY);
                 hBB7_TWINPEAKS_implants_pos_xy->Fill(hit.PosX, hit.PosY);
@@ -4159,15 +4184,17 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
 
         } // implants
         else if (pInput->Decays.size() > 1)
-        {
+        {   
+            //std::cout << "are we here? missing decay 1d strip E" << std::endl;
+            
             std::vector<BB7_TWINPEAKS_Cluster> DecayClusters = BB7_TWINPEAKS_EventsToClusters(pInput->Decays);
             std::vector<std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster>> hits;
 
             for (auto & i : DecayClusters)
             {
                 {
-                    int offset = 0;
-                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    int offset = i.Side * BB7_STRIPS_PER_SIDE;
+                   // if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
                     hBB7_TWINPEAKS_decays_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
                 }
                 
@@ -4222,9 +4249,9 @@ void EventAnlProc::Make_BB7_FEBEX_Histos()
     // ------ //
     
     hBB7_FEBEX_implants_strip_xy = MakeTH2('I', "BB7_Layer/FEBEX/Implants/implants_strip_XY", "implant hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
-    hBB7_FEBEX_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    //hBB7_FEBEX_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
     hBB7_FEBEX_implants_pos_xy = MakeTH2('D', "BB7_Layer/FEBEX/Implants/implants_pos_XY", "implant position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
-    hBB7_FEBEX_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    //hBB7_FEBEX_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
     hBB7_FEBEX_implants_e = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_energy", "implant energy", 2000, 0, 20000, "Implant Energy/MeV");
     hBB7_FEBEX_implants_e_xy = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_energy_XY", "implant front energy vs back energy", 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
     hBB7_FEBEX_implants_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_time_delta", "implant front vs back time", 1000, -10000, 10000, "Time Difference/ns");
@@ -4240,8 +4267,8 @@ void EventAnlProc::Make_BB7_FEBEX_Histos()
     hBB7_FEBEX_decays_e_xy  = MakeTH2('F', "BB7_Layer/FEBEX/Decays/decays_energy_XY", "decay front energy vs back energy", 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
     hBB7_FEBEX_decays_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Decays/decays_time_delta", "decay front vs back time", 1000, -10000, 10000, "Time Difference/ns");
     hBB7_FEBEX_decays_strip_1d  = MakeTH1('I', "BB7_Layer/FEBEX/Decays/decays_strip_1d", "BB7 FEBEX decay 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
-    hBB7_FEBEX_decays_strip_1d_energy = MakeTH2('D', "BB7_LAYER/FEBEX/Decays/decays_strip_1d_energy", "BB7 FEBEX decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
-    hBB7_FEBEX_decays_per_event = MakeTH1('I', "BB7_LAYER/FEBEX/Decays/decays_per_event", "BB7 FEBEX decays per event", 100, 0, 100, "Numer of decays");
+    hBB7_FEBEX_decays_strip_1d_energy = MakeTH2('D', "BB7_Layer/FEBEX/Decays/decays_strip_1d_energy", "BB7 FEBEX decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_FEBEX_decays_per_event = MakeTH1('I', "BB7_Layer/FEBEX/Decays/decays_per_event", "BB7 FEBEX decays per event", 100, 0, 100, "Numer of decays");
     
 
 
