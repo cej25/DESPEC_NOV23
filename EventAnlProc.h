@@ -478,35 +478,37 @@ class EventAnlProc : public TGo4EventProcessor {
             TH1* hBB7_FEBEX_decays_per_event;
             TH1* hBB7_FEBEX_decays_channel; 
 
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_strip_xy;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_strip_xy_stopped;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_pos_xy;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_pos_xy_stopped;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_e;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_e_xy;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_time_delta;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_strip_1d;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_strip_1d_energy;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_per_event;
-            std::vector<TH1*> hBB7_TWINPEAKS_implants_channels;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_x_ex;
-            std::vector<TH2*> hBB7_TWINPEAKS_implants_y_ey;
+            TH2* hBB7_TWINPEAKS_implants_strip_xy;
+            TH2* hBB7_TWINPEAKS_implants_strip_xy_stopped;
+            TH2* hBB7_TWINPEAKS_implants_pos_xy;
+            TH2* hBB7_TWINPEAKS_implants_pos_xy_stopped;
+            TH1* hBB7_TWINPEAKS_implants_e;
+            TH1* hBB7_TWINPEAKS_implants_e_xy;
+            TH1* hBB7_TWINPEAKS_implants_time_delta;
+            TH1* hBB7_TWINPEAKS_implants_strip_1d;
+            TH2* hBB7_TWINPEAKS_implants_strip_1d_energy;
+            TH1* hBB7_TWINPEAKS_implants_per_event;
+            TH1* hBB7_TWINPEAKS_implants_channels;
+            TH2* hBB7_TWINPEAKS_implants_x_ex;
+            TH2* hBB7_TWINPEAKS_implants_y_ey;
 
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_strip_xy;
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_pos_xy;
-            std::vector<TH1*> hBB7_TWINPEAKS_decays_e;
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_e_xy;
-            std::vector<TH1*> hBB7_TWINPEAKS_decays_time_delta;
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_strip_1d;
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_strip_1d_energy;
-            std::vector<TH2*> hBB7_TWINPEAKS_decays_per_event;
-            std::vector<TH1*> hBB7_TWINPEAKS_decays_channel;
+            TH2* hBB7_TWINPEAKS_decays_strip_xy;
+            TH2* hBB7_TWINPEAKS_decays_pos_xy;
+            TH1* hBB7_TWINPEAKS_decays_e;
+            TH2* hBB7_TWINPEAKS_decays_e_xy;
+            TH1* hBB7_TWINPEAKS_decays_time_delta;
+            TH1* hBB7_TWINPEAKS_decays_strip_1d;
+            TH2* hBB7_TWINPEAKS_decays_strip_1d_energy;
+            TH1* hBB7_TWINPEAKS_decays_per_event;
+            TH1* hBB7_TWINPEAKS_decays_channel;
 
 
             std::vector<AidaCluster> EventsToClusters(std::vector<AidaEvent> const&);
-            std::vector<BB7_FEBEX_Cluster> EventsToClustersBB7(std::vector<BB7_FEBEX_Event> const&);
+            std::vector<BB7_FEBEX_Cluster> BB7_FEBEX_EventsToClusters(std::vector<BB7_FEBEX_Event> const&);
+            std::vector<BB7_TWINPEAKS_Cluster> BB7_TWINPEAKS_EventsToClusters(std::vector<BB7_TWINPEAKS_Event> const&);
             AidaHit ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const&);
             BB7_FEBEX_Hit BB7_FEBEX_ClusterPairToHit(std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster> const&);
+            BB7_TWINPEAKS_Hit BB7_TWINPEAKS_ClusterPairToHit(std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster> const&);
 
 
             int      IsData(std::ifstream &f);

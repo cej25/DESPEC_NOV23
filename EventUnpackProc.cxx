@@ -1417,11 +1417,11 @@ for (int i=0; i<10; i++){
         int BB7_TWINPEAKS_Strip = -1;
         int BB7_TWINPEAKS_Channel_ID = -1;
         int BB7_TWINPEAKS_Physical_Channel = -1;
-        //int N1_fast_bb7 = 0;
-        //int N1_slow_bb7 = 0;
 
         if (Used_Systems[9] == 1 && PrcID_Conv == 9)
         {
+            
+            //BB7_TWINPEAKS_Event hit;
 
             // loop over TAMEX modules
             for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)

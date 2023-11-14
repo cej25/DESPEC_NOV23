@@ -19,6 +19,7 @@
 //#include "TSCNUnpackEvent.h"
 #include "EventUnpackStore.h"
 #include "AIDA_Event.h"
+#include "BB7_TWINPEAKS_Event_Store.h"
 #include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
 struct AidaAnlData {
@@ -30,6 +31,12 @@ struct BB7_FEBEX_AnlData
 {
       std::vector<BB7_FEBEX_Hit> Implants;
       std::vector<BB7_FEBEX_Hit> Decays;
+};
+
+struct BB7_TWINPEAKS_AnlData
+{
+      std::vector<BB7_TWINPEAKS_Hit> Implants;
+      std::vector<BB7_TWINPEAKS_Hit> Decays;
 };
 
 class EventAnlStore : public TGo4EventElement {
@@ -120,6 +127,9 @@ class EventAnlStore : public TGo4EventElement {
 
       
       std::vector<BB7_FEBEX_AnlData> pBB7_FEBEX;
+      std::vector<BB7_TWINPEAKS_UnpackData> pBB7_TWINPEAKS_Unp;
+      std::vector<BB7_TWINPEAKS_AnlData> pBB7_TWINPEAKS;
+
      ///AIDA output
        //AidaAnlData pAida;
       std::vector<AidaAnlData> pAida;

@@ -7,14 +7,16 @@ class BB7_FEBEX_Event : public TObject
 {
     public:
 
-        // raw data
-
-        // map to layer
-        bool HighEnergy; // we already distinguish implants...
         int Side;
         int Strip;
         double Energy;
         int64_t Time;
+
+        int64_t CF;
+        bool Pileup;
+        bool Overflow;
+
+        // CF, PILEUP, OVERFLOW
 
         BB7_FEBEX_Event();
         void Zero();
@@ -30,13 +32,11 @@ class BB7_FEBEX_Cluster : public TObject
 {
     public:
         int Side;
-        bool HighEnergy; // implant
         double Energy;
         double Strip;
         int64_t Time;
         int N;
-
-        // CF, PILEUP, OVERFLOW
+        // CF, PILEUP, OVERFLOW etc
 
         BB7_FEBEX_Cluster() { Zero(); }
         void Zero();
@@ -45,8 +45,8 @@ class BB7_FEBEX_Cluster : public TObject
         void AddEvent(BB7_FEBEX_Event const& event);
         void AddCluster(BB7_FEBEX_Cluster const& cluster);
         bool IsAdjacent(BB7_FEBEX_Event const& event) const;
-        bool IsGoodTime(BB7_FEBEX_Cluster const& cluster, int window) const;
         bool IsGoodTime(BB7_FEBEX_Event const& event, int window = 2000) const;
+        bool IsGoodTime(BB7_FEBEX_Cluster const& cluster, int window) const;
 
         int StripMin;
         int StripMax;

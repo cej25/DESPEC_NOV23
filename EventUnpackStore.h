@@ -19,6 +19,7 @@
 
 #include "AIDA_Event.h"
 #include "BB7_FEBEX_Event_Store.h"
+#include "BB7_TWINPEAKS_Event_Store.h"
 #include "TGo4EventElement.h"
 
 // KW add
@@ -42,6 +43,12 @@ struct BB7_FEBEX_UnpackData
 {
     std::vector<BB7_FEBEX_Event> Implants;
     std::vector<BB7_FEBEX_Event> Decays;
+};
+
+struct BB7_TWINPEAKS_UnpackData
+{
+    std::vector<BB7_TWINPEAKS_Event> Implants;
+    std::vector<BB7_TWINPEAKS_Event> Decays;
 };
 
 class EventUnpackStore : public TGo4EventElement {

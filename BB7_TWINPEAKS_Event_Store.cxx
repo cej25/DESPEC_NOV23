@@ -1,12 +1,11 @@
-#include "BB7_FEBEX_Event_Store.h"
+#include "BB7_TWINPEAKS_Event_Store.h"
 #include <iostream>
 
-void BB7_FEBEX_Cluster::AddEvent(BB7_FEBEX_Event const& event)
-{
-    // if SIDE/STRIP == -1?
+void BB7_TWINPEAKS_Cluster::AddEvent(BB7_TWINPEAKS_Event const& event)
+{   
 
+    // energy comes from ToTs, Time is epoch+coarse-fine (FAST LEAD)
     Energy += event.Energy;
-
     if (event.Strip < StripMin) StripMin = event.Strip;
     if (event.Strip > StripMax) StripMax = event.Strip;
     if (event.Time < TimeMin) TimeMin = event.Time;
@@ -14,14 +13,13 @@ void BB7_FEBEX_Cluster::AddEvent(BB7_FEBEX_Event const& event)
     StripSum += event.Strip;
     Strip = (double) StripSum / ++N;
     Time = TimeMin;
+
 }
 
-void BB7_FEBEX_Cluster::AddCluster(BB7_FEBEX_Cluster const& cluster)
-{   
-    // if SIDE/STRIP == -1?
-
-    if (cluster.StripMin < StripMin) StripMin = cluster.StripMin;
-    if (cluster.StripMax > StripMax) StripMax = cluster.StripMax;
+void BB7_TWINPEAKS_Cluster::AddCluster(BB7_TWINPEAKS_Cluster const& cluster)
+{
+    if (cluster.StripMin < StripMin) StripMin = cluster.Strip;
+    if (cluster.StripMax > StripMax) StripMax = cluster.Strip;
     if (cluster.Time < TimeMin) TimeMin = cluster.Time;
     if (cluster.Time > TimeMax) TimeMax = cluster.Time;
     Energy += cluster.Energy;
@@ -29,28 +27,24 @@ void BB7_FEBEX_Cluster::AddCluster(BB7_FEBEX_Cluster const& cluster)
     N += cluster.N;
     Strip = (double) StripSum / N;
     Time = TimeMin;
-
 }
 
-bool BB7_FEBEX_Cluster::IsAdjacent(BB7_FEBEX_Event const& event) const
+bool BB7_TWINPEAKS_Cluster::IsAdjacent(BB7_TWINPEAKS_Event const& event) const
 {
-    // skip SIDE/STRIP == -1?
     if (event.Side != Side) return false;
-    if (event.Strip >= StripMin - 1 && event.Strip <= StripMax + 1) return true;
+    if (event.Strip >= Strip - 1 && event.Strip <= StripMax + 1) return true;
     return false;
 }
 
-bool BB7_FEBEX_Cluster::IsGoodTime(BB7_FEBEX_Event const& event, int window) const
+bool BB7_TWINPEAKS_Cluster::IsGoodTime(BB7_TWINPEAKS_Event const& event, int window) const
 {
     if (event.Time >= TimeMin - window && event.Time <= TimeMax + window) return true;
     return false;
 }
 
-bool BB7_FEBEX_Cluster::IsGoodTime(BB7_FEBEX_Cluster const& cluster, int window) const
+bool BB7_TWINPEAKS_Cluster::IsGoodTime(BB7_TWINPEAKS_Cluster const& cluster, int window) const
 {
-    // skip SIDE/STRIP == -1?
     if (cluster.TimeMin >= TimeMin - window && cluster.TimeMin <= TimeMax + window) return true;
     if (cluster.TimeMax >= TimeMin - window && cluster.TimeMax <= TimeMax + window) return true;
     return false;
 }
-
