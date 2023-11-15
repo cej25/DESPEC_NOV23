@@ -52,6 +52,7 @@
 #include "Germanium_Detector_System.h"
 #include "FRS_Detector_System.h"
 #include "BB7_FEBEX_Detector_System.h"
+#include "BB7_FEBEX_Event_Store.h"
 #include "BB7_TWINPEAKS_Detector_System.h"
 #include "BB7_MADC_Detector_System.h"
 
@@ -64,6 +65,7 @@
 
 #include <string>
 
+#define DEBUG 0
 
 using namespace std;
 
@@ -132,6 +134,8 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
 
   if(Used_Systems[1]) Make_AIDA_Histos();
 
+  // if (Used_Systems[2]) Make_bPlast_TWINPEAKS_Histos();//?
+
   if(Used_Systems[3])  Make_FATIMA_Histos();
 
  // if(Used_Systems[4]) Make_FATIMA_TAMEX_Histos();
@@ -153,6 +157,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   load_FingerID_File();
   load_FatTamex_Allocationfile();
   load_bPlasticTamex_Allocationfile();
+  load_BB7_TWINPEAKS_AllocationFile();
   PrintDespecParameters();
 
     WR_count = 0;
@@ -385,6 +390,13 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
 
         fOutput -> fProcID[PrcID_Conv] = PrcID_Conv;
         
+      // CEJ: some weird stuff here
+       /*  if (Used_Systems[9])
+  {
+      std::cout << PrcID << std::endl;
+      std::cout << PrcID_Conv << std::endl;
+  }*/
+
       //  if(PrcID_Conv==5) cout<<fOutput->fTrigger;
 
         sub_evt_length  = (psubevt->GetDlen() - 2) / 2;
@@ -638,6 +650,9 @@ for (int i=0; i<10; i++){
          ///--------------------------------------------------------------------------------------------///
                                             /** Output AIDA **/
         ///--------------------------------------------------------------------------------------------///
+        
+
+
 
         if (Used_Systems[1] && PrcID_Conv==1){
           TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
@@ -890,8 +905,8 @@ for (int i=0; i<10; i++){
                     if(chan_bPlast_fast_lead>-1 && chan_bPlast_fast_lead<bPLASTIC_CHAN_PER_DET) {
   
                         int N1_fast = fOutput->fbPlast_Fast_Lead_N[bPlasdetnum_fast][chan_bPlast_fast_lead]++;
-          
                         fOutput->fbPlast_Fast_Lead[bPlasdetnum_fast][chan_bPlast_fast_lead][N1_fast] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
+
                            }
                         }
                       }
@@ -913,6 +928,7 @@ for (int i=0; i<10; i++){
           
                     fOutput->fbPlast_Slow_Lead[bPlasdetnum_fast][chan_bPlast_slow_lead][N1_slow] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
                     
+
                             }
                     }
               }///End of lead hits
@@ -958,67 +974,11 @@ for (int i=0; i<10; i++){
                 } ///end tamex hits loop
             } ///End proc ID 2
        // }
-        ///--------------------------------------------------------------------------------------------///
-                                                /**Output bPLASTIC TAMEX  **/
-        ///--------------------------------------------------------------------------------------------///
-//            if(bPLASTIC_TWINPEAKS==0){
-//             int bPlasfired[3];
-//             int Phys_Channel_Lead_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int Phys_Channel_Trail_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int N1 =0;
-//             int bPlasdetnum=-1;
-// 
-//         if (Used_Systems[2]&& PrcID_Conv==2){
-//       // cout<<"Event " << event_number<<endl;
-//        for (int i=0; i<RAW->get_PLASTIC_tamex_hits(); i++){///Loop over tamex ID's
-// 
-//             int chan=-1;
-// 
-//            //fOutput->fbPlas_TAMEX_ID = i;
-//             bPlasfired[i] = RAW->get_PLASTIC_am_Fired(i); ///Iterator
-// 
-// 
-//             //TAMEX_bPlast_Det[bPlastTamID][bPlastTamCh]
-// 
-// 
-//             for(int j = 0;j < bPlasfired[i];j++){
-// 
-//               if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 1){ //Lead odd j
-//                   //Phys_Channel_Lead_bPlas[TAMID][Hit]
-//                 Phys_Channel_Lead_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Lead_bPlas[i][j]);
-//                 if(chan>-1){
-//                 /// PMT allocation succeeded
-//                 bPlasdetnum=TAMEX_bPlast_Det[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 fOutput->fbPlasDetNum = bPlasdetnum;
-//                 fOutput->fbPlasChan[bPlasdetnum]=  chan;
-//                 N1 = fOutput->fbPlas_PMT_Lead_N[bPlasdetnum][chan]++;
-// 
-// 
-//             if(N1>-1 && N1<bPLASTIC_TAMEX_HITS){
-// 
-//                fOutput->fbPlas_Lead_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_lead_T(i,j);
-//                   }
-//                 }
-//               }
-//                if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 0){ //Trail even j
-// 
-//                 Phys_Channel_Trail_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Trail_bPlas[i][j]);
-// 
-//                if(chan>-1){
-// 
-//                 /// PMT allocation succeeded
-//                  N1 = fOutput->fbPlas_PMT_Trail_N[bPlasdetnum][chan]++;
-//                 if(N1>-1&& N1<bPLASTIC_TAMEX_HITS){
-//              fOutput->fbPlas_Trail_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_trail_T(i,j);
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
+        
+
+
+
+
 
          ///--------------------------------------------------------------------------------------------///
                                                 /**Output FATIMA VME **/
@@ -1389,97 +1349,8 @@ for (int i=0; i<10; i++){
         }
         ///--------------------------------------------------------------------------------------------///
                                         /** Output FINGER **/
-  ///--------------------------------------------------------------------------------------------///
-      if (Used_Systems[6]&& PrcID_Conv==6){
 
-          int Phys_Channel_Lead[FINGER_TAMEX_MODULES][FINGER_TAMEX_HITS] = {0,0};
-          int Phys_Channel_Trail[FINGER_TAMEX_MODULES][FINGER_TAMEX_HITS] = {0,0};
-
-          int fingfired[FINGER_TAMEX_MODULES] = {0};
-
-          for (int i=0; i<RAW->get_FINGER_tamex_hits(); i++){
-            fingfired[i] = RAW->get_FINGER_am_Fired(i);
-
-            for(int j = 0;j < fingfired[i];j++){
-
-              if(RAW->get_FINGER_CH_ID(i,j) % 2 == 1){ //Lead odd j
-                Phys_Channel_Lead[i][j] = fingID[i][RAW->get_FINGER_physical_channel(i, j)]; //From allocation file
-                int chan = Phys_Channel_Lead[i][j];
-
-                if (chan < 0)
-                  continue;
-
-                // PMT allocation succeeded
-                int N1 = fOutput->fFing_PMT_Lead_N[chan]++;
-                fOutput->fFing_Lead_PMT[chan][N1] = RAW->get_FINGER_lead_T(i,j);
-
-                // PMT "0" is the trigger
-                if (chan == 0 || chan == 1){
-                    fOutput->fFing_SC41_lead[chan][N1] = RAW->get_FINGER_lead_T(i,j);
-                  continue;
-                }
-                // chan = "PMT" number
-                // this maps to two strips to fill in
-                if (chan % 2 == 0) // even PMT = up pmts
-                {
-                  int strip1 = chan;
-                  int strip2 = chan + 1;
-                  int N1 = fOutput->fFing_Strip_N_LU[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_LU[strip2]++;
-                  fOutput->fFing_Lead_Up[strip1][N1] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Lead_Up[strip2][N2] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Strip_N[strip1]++;
-                  fOutput->fFing_Strip_N[strip2]++;
-                                }
-                else // odd = lower PMT
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_LD[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_LD[strip2]++;
-                  fOutput->fFing_Lead_Down[strip1][N1] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Lead_Down[strip2][N2] = RAW->get_FINGER_lead_T(i,j);
-                      }
-              }
-              else{ //Trail even j
-                Phys_Channel_Trail[i][j] = fingID[i][RAW->get_FINGER_physical_channel(i,j)];
-
-                int chan = Phys_Channel_Trail[i][j];
-                if (chan < 0)
-                  continue;
-
-                // PMT allocation succeeded
-                int N1 = fOutput->fFing_PMT_Trail_N[chan]++;
-                fOutput->fFing_Trail_PMT[chan][N1] = RAW->get_FINGER_trail_T(i,j);
-                 // PMT "0" is the trigger
-                if (chan == 0 || chan == 1){
-                    fOutput->fFing_SC41_trail[chan][N1] = RAW->get_FINGER_trail_T(i,j);
-
-                  continue;
-                }
-                if (chan % 2 == 0) // even PMT = up pmts
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_TU[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_TU[strip2]++;
-                  fOutput->fFing_Trail_Up[strip1][N1] = RAW->get_FINGER_trail_T(i,j);
-                  fOutput->fFing_Trail_Up[strip2][N2] = RAW->get_FINGER_trail_T(i,j);
-                 }
-                else // odd = lower PMT
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_TD[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_TD[strip2]++;
-                  fOutput->fFing_Trail_Down[strip1][N1] = RAW->get_FINGER_trail_T(i,j);
-                  fOutput->fFing_Trail_Down[strip2][N2] = RAW->get_FINGER_trail_T(i,j);
-                }
-              }
-            }
-          }
-        }
-         ///--------------------------------------------------------------------------------------------///
+         
          if (Used_Systems[7] && PrcID_Conv==7)
          {
              
@@ -1499,22 +1370,180 @@ for (int i=0; i<10; i++){
          } // BM output
 
           if (Used_Systems[8] && PrcID_Conv == 8)
-          {
-              for (int i = fOutput->fBB7_FEBEX_Hits; i<RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
-              {
-                  fOutput->fBB7_FEBEX_Side[i] =  RAW->get_BB7_FEBEX_Side(i);
-                  fOutput->fBB7_FEBEX_Strip[i] =  RAW->get_BB7_FEBEX_Strip(i);
-                  fOutput->fBB7_FEBEX_Chan_Energy[i] = RAW->get_BB7_FEBEX_Chan_Energy(i);
-                  fOutput->fBB7_FEBEX_Chan_Time[i] = RAW->get_BB7_FEBEX_Chan_Time(i);
-                  fOutput->fBB7_FEBEX_Chan_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
-                  fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
-                  fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
-                  fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
-                  fOutput->fBB7_FEBEX_Hits++;
-              }
-          } // output BB7 FEBEX
-        
+          {   
+              BB7_FEBEX_Event hit;
 
+              for (int i = fOutput->fBB7_FEBEX_Hits; i < RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
+              {   
+                  hit.Side = RAW->get_BB7_FEBEX_Side(i);
+                  hit.Strip = RAW->get_BB7_FEBEX_Strip(i);
+                  hit.Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                  hit.Time = RAW->get_BB7_FEBEX_Chan_Time(i);
+                 // hit.CF = RAW->get_BB7_FEBEX_Chan_CF(i);
+                 // hit.Pileup = RAW->get_BB7_FEBEX_Pileup(i);
+                 // hit.Overflow = RAW->get_BB7_FEBEX_Overflow(i);
+
+                  if (hit.Energy > BB7_IMPLANT_E_THRESHOLD)
+                  {
+                      // event is implant
+                      // push back a vector for each hit in the event
+                      BB7_FEBEX.Implants.push_back(hit);
+                  }
+                  else
+                  {
+                      BB7_FEBEX.Decays.push_back(hit);
+                  }
+
+                  fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
+                  fOutput->fBB7_FEBEX_Hits++;
+
+              }
+
+              fOutput->fBB7_FEBEX.push_back(BB7_FEBEX);
+
+
+          } // output BB7 FEBEX
+
+
+        // --- CEJ:  BB7 twinpeaks output ---  //
+        // bPlast currently just a series of detectors, mapped in Raw_Event
+        // we need to map to a Side and Strip and fOutput this
+        // so discrimination is fast/slow - lead/trail - side - strip
+        // important: mapping uses a map not a 2D array.
+
+        // CEJ: can go in header
+        int BB7_TWINPEAKS_Fired[BB7_TAMEX_MODULES];
+        int BB7_TWINPEAKS_Side = -1;
+        int BB7_TWINPEAKS_Strip = -1;
+        int BB7_TWINPEAKS_Channel_ID = -1;
+        int BB7_TWINPEAKS_Physical_Channel = -1;
+
+        if (Used_Systems[9] == 1 && PrcID_Conv == 9)
+        {
+            
+            //BB7_TWINPEAKS_Event hit;
+
+            // loop over TAMEX modules
+            for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)
+            {   
+                // loop over hits per board
+                // Helena has a condition to check hits < 640 in scanner code....do we need a similar check?
+                BB7_TWINPEAKS_Fired[i] = RAW->get_BB7_TWINPEAKS_am_Fired(i);
+                for (int j = 0; j < BB7_TWINPEAKS_Fired[i]; j++)
+                {
+                    
+                    BB7_TWINPEAKS_Channel_ID = RAW->get_BB7_TWINPEAKS_CH_ID(i, j);
+                    // now use _Channel_ID to get _physical_strip or something
+   
+
+                    // this is where the issue is coming from i think
+                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1;
+                    auto idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                    BB7_TWINPEAKS_Side = BB7_TWINPEAKS_Map[idx].first;
+                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+                    // adding 1, dividing by 2, minusing 1: maps physical channel to fast with 0 based index?
+                    //BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
+
+                    // CEJ: i have taken corrections from Helena
+                    // Now i'm making changes based on BB7 layer
+                    // (in case it breaks) -- yup, i think it did break
+                    if (BB7_TWINPEAKS_Side > -1 && BB7_TWINPEAKS_Side < BB7_SIDES && BB7_TWINPEAKS_Strip > -1 && BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // check det num
+                    {   
+                        // NOW define Fast and Slow
+                        if (BB7_TWINPEAKS_Channel_ID > 0 && BB7_TWINPEAKS_Channel_ID < 66)
+                        {
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 1 && RAW->get_BB7_TWINPEAKS_lead_T(i, j) > 0)
+                            {
+                                // LEADS
+
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
+                                {
+                                    // these are fast leads
+                                    // CEJ: below can be strip - scanner: find TAMEX_bPlast_Chan[i]
+                                    //int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
+                                    fOutput->fBB7_TWINPEAKS_FastStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // Helena says: no clue what this is supposed to be?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // can this ever be false?
+                                    {
+                                        int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // fast leads
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // these are slow leads
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+
+
+                                    //int chan_BB7_TWINPEAKS_slow_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, 2) / 2) -1];
+                                    fOutput->fBB7_TWINPEAKS_SlowStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // HMA - again what is this for?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        int N1_slow_bb7 = fOutput->fBB7_TWINPEAKS_Slow_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow_bb7] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // slow leads
+                            } // lead hits
+
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 0 && RAW->get_BB7_TWINPEAKS_trail_T(i, j) > 0)
+                            {
+                                // TRAILS
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID  > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
+                                {     
+
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+                                    // fast trails
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        /*if (fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a fast trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }*/
+                                        int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        
+                                    }
+                                } // fast trails
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // slow trails
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+
+                                    
+                                    //int chan_BB7_TWINPEAKS_slow_trail = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2)];
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        /*if (fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a slow trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }*/
+                                        int N1_slow_bb7 = fOutput->fBB7_TWINPEAKS_Slow_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        
+                                    }
+
+                                } // slow trails
+                            } // trails
+                        } // chans between 0 and 66
+                    } // check Side and Strip
+                } // loop over hits
+            } // loop over tamex modules
+
+       
+            
+        } // proc id 9
+       
+      
         ///--------------------------------------------------------------------------------------------///
 
       } //End of subevent loop
@@ -1681,6 +1710,46 @@ void EventUnpackProc::load_bPlasticTamex_Allocationfile(){
    // cout<<"TAMEX_bPlast_Det " <<TAMEX_bPlast_Det[bPlastTamID] <<" TAMEX_bPlast_Chan "<<TAMEX_bPlast_Chan[bPlastTamID][bPlastTamCh]<<" bPlast_det " <<bPlast_det << " bPlastTamID " << bPlastTamID <<" bPlastTamCh " << bPlastTamCh<<" bPlast_ch" <<bPlast_ch << endl;
   }
 }
+
+// ------------ CEJ: LOAD TAMEX ALLOCATION FOR BB7 --------  //
+
+void EventUnpackProc::load_BB7_TWINPEAKS_AllocationFile()
+{
+    std::ifstream file("Configuration_Files/BB7/BB7_TWINPEAKS_allocation.txt");
+    std::cout << "Loading BB7 TWINPEAKS Detector Map" << std::endl;
+    if (file.fail())
+    {
+        std::cerr << "Could not find BB7 TWINPEAKS allocation file!" << std::endl;
+        exit(0);
+    }
+
+    // CEJ: make a map like Germanium? This is less confusing to me
+    constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
+
+    while (file.good())
+    {
+        if (file.peek() == '#')
+        {
+            file.ignore(ignore, '\n');
+            continue;
+        }
+
+        // #TAMEXID | TAMEXCH | SIDE | STRIP      
+        file >> bb7_twinpeaks_mod >> bb7_twinpeaks_chan >> bb7_twinpeaks_side >> bb7_twinpeaks_strip;
+
+        file.ignore(ignore, '\n');
+
+        BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)] = std::make_pair(bb7_twinpeaks_side, bb7_twinpeaks_strip);
+
+        std::cout << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].first << " | " << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].second << std::endl;
+
+    }
+}
+
+
+
+
+
 //---------------------------------------------------------------------------------------------------
 void EventUnpackProc::load_FingerID_File(){
 
@@ -3181,8 +3250,6 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
 { 
     
     int Hits = RAW->get_BB7_FEBEX_Hits();
-
-    
     for (int i = 0; i < Hits; i++)
     {   
         int Side = RAW->get_BB7_FEBEX_Side(i);
@@ -3200,6 +3267,60 @@ void EventUnpackProc::Fill_BB7_FEBEX_Histos()
         
     }
 
+}
+
+
+
+void EventUnpackProc::Make_BB7_TWINPEAKS_Histos()
+{
+    // what RAW would we want here...
+    // Lead-Lead from Fast and ToT from Slow?
+
+}
+
+void EventUnpackProc::Fill_BB7_TWINPEAKS_Histos()
+{
+    // stuff
+
+}
+
+void EventUnpackProc::Make_BB7_MADC_Histos()
+{
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 2000000.);
+        }
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 2000000.);
+    }
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 2000000.);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_MADC_Hit_Pattern = MakeTH1('I', "BB7_Layer/MADC/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+}
+
+
+void EventUnpackProc::Fill_BB7_MADC_Histos()
+{
+    int Hits = RAW->get_BB7_MADC_Hits();
+    for (int i = 0; i < Hits; i++)
+    {   
+        int Side = RAW->get_BB7_MADC_Side(i);
+        int Strip = RAW->get_BB7_MADC_Strip(i);
+        if (Side > -1 && Strip > -1)
+        {
+            int Energy = RAW->get_BB7_MADC_ADC(i);
+
+            hBB7_MADC_Raw_E[Side][Strip]->Fill(Energy);
+            hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+            hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
+            // CEJ: currently 1-64, could be per side or febex module
+            hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        }
+    }
+    
 }
 
 
@@ -3642,55 +3763,11 @@ const  char* EventUnpackProc::tpc_name_ext1[7]={"TPC21_","TPC22_","TPC23_","TPC2
 const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24","TPC41","TPC42","TPC31"};
 
 
+
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
 
 
-void EventUnpackProc::Make_BB7_MADC_Histos()
-{
-    for (int i = 0; i < BB7_SIDES; i++)
-    {
-        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
-        {
-            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 200000.);
-        }
-        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 200000.);
-    }
-    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 200000.);
+// maybe some things in unpack need adjusting....
 
-    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
-    hBB7_MADC_Hit_Pattern = MakeTH1('I', "BB7_Layer/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
-
-}
-
-void EventUnpackProc::Fill_BB7_MADC_Histos()
-{
-    int Hits = RAW->get_BB7_MADC_Hits();
-    for (int i = 0; i < Hits; i++)
-    { 
-        int Side = RAW->get_BB7_MADC_Side(i);
-        int Strip = RAW->get_BB7_MADC_Strip(i);
-        int Energy = RAW->get_BB7_MADC_ADC(i);
-
-        hBB7_MADC_Raw_E[Side][Strip]->Fill(Energy);
-        hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
-        hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
-        // CEJ: currently 1-64, could be per side or febex module
-        hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
-    }
-    
-}
-
-
-
-void EventUnpackProc::Make_BB7_TWINPEAKS_Histos()
-{
-    // stuff
-}
-
-void EventUnpackProc::Fill_BB7_TWINPEAKS_Histos()
-{
-    // stuff
-
-}

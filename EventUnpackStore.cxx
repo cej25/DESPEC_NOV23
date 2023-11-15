@@ -216,6 +216,7 @@ void  EventUnpackStore::Clear(Option_t *t)
    
     // should sum/event time be zeroed?
      if (fBB7_FEBEX_WR != 0) {
+        fBB7_FEBEX.clear();
         fBB7_FEBEX_Hits = 0;
         ZERO_ARRAY(fBB7_FEBEX_Side);
         ZERO_ARRAY(fBB7_FEBEX_Strip);
@@ -226,6 +227,20 @@ void  EventUnpackStore::Clear(Option_t *t)
         ZERO_ARRAY(fBB7_FEBEX_Overflow);
     }
     fBB7_FEBEX_WR = 0;
+
+    if (fBB7_TWINPEAKS_WR != 0)
+    {
+        ZERO_ARRAY(fBB7_TWINPEAKS_FastStrip);
+        ZERO_ARRAY(fBB7_TWINPEAKS_SlowStrip);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Lead);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Lead_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Lead);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Trail_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Fast_Trail);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Trail_N);
+        ZERO_ARRAY(fBB7_TWINPEAKS_Slow_Trail);
+    }
 
     fBB7_TWINPEAKS_WR = 0;
     fBB7_MADC_WR = 0;

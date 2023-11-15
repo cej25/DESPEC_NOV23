@@ -89,29 +89,7 @@ CalibParameter::CalibParameter(const Text_t *name)
   }
   file.close();
   
-  //-----------------------------------------------------------------------------------------------------//
-//    file.open("Configuration_Files/FATIMA/FATIMA_Energy_Calibration.txt");
-//   if (file.fail()) {
-//     cout << "ERROR:  Could not open file: FATIMA_Energy_Calibration.txt ! (params set to 0 1 and 0)\n";
-//     for (i = 0; i < FAT_MAX_VME_CHANNELS; i++){
-//        DetIDFAT = i; 
-//        Extra1fat[i] = 0;    
-//        Afat[i] = 0;
-//        Bfat[i] = 0;
-//        Cfat[i] = 1;
-//        Dfat[i] = 0;
-//     }
-//   }
-//   
-//    else {
-//     cout << "CalibParameter - reading calibration from: FATIMA_Energy_Calibration.txt\n";
-//     for (i = 0; i < 50; i++){
-//       if(IsData(file)) file >> DetIDFAT>> Extra1fat[i]   >> Afat[i] >> Bfat[i] >>Cfat[i] >>Dfat[i] ;
-//        if (file.fail()) cout << "ERROR reading FATIMA_Energy_Calibration.txt\n ";
-//     }
-//   }
-//   file.close();
-
+  /*
    //-----------------------------------------------------------------------------------------------------//
    file.open("Configuration_Files/FATIMA/FATIMA_TAMEX_Energy_Slow_Calibration.txt");
   if (file.fail()) {
@@ -154,10 +132,10 @@ CalibParameter::CalibParameter(const Text_t *name)
        if (file.fail()) cout << "ERROR reading FATIMA_Ref_Time_Correction.txt\n";
     }
   }
-  file.close();
+  file.close();*/ 
   
   //------------------------------------------------------------------------------//
-  file.open("Configuration_Files/Germanium/Germanium_Energy_Calibration.txt");
+  /*file.open("Configuration_Files/Germanium/Germanium_Energy_Calibration.txt");
   if (file.fail()) {
     cout << "ERROR:  Could not open file: Germanium_Energy_Calibration.txt ! (params set to 1 and 0)\n";
     for (i = 0; i < Germanium_MAX_CHANNELS; i++){
@@ -220,7 +198,7 @@ CalibParameter::CalibParameter(const Text_t *name)
        if (file.fail()) cout << "ERROR reading Germanium_CFD_TimeAlignment.txt\n";
     }
   }
-  file.close();
+  file.close();*/
 }
 //------------------------------------------------------------------------------//
 
@@ -318,8 +296,9 @@ Bool_t CalibParameter::UpdateFrom(TGo4Parameter *pp)
        CGe[i]  = from->CGe[i];
        
        Ge_cfd_align_par[i] = from->Ge_cfd_align_par[i];
-       
-       cout << "CalibParameter - Parameter : " << GetName() << " UPDATED\n";
+
+      // CEJ: switching off a bunch of unnecessary commits upon startup
+      //cout << "CalibParameter - Parameter : " << GetName() << " UPDATED\n";
      }
   }
      

@@ -82,7 +82,7 @@ void BB7_FEBEX_Detector_System::Process_MBS(int* pdata)
     Hits = 0;
 
     this->pdata = pdata; // CEJ: i hate this
-    reset_fired_channels();
+    reset_fired_channels(); // does this even work?
 
     // loop through padding
     FEBEX_Add* Padding = (FEBEX_Add*) this->pdata;

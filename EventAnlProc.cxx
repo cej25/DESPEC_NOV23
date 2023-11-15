@@ -40,6 +40,8 @@
 #include "TFRSParameter.h"
 #include "DESPECAnalysis.h"
 
+#include "BB7_FEBEX_Event_Store.h"
+
  //#define AIDA_CALIBRATE 1
  //#define AIDA_CALIBRATE_CLUSTER 1
 
@@ -158,7 +160,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
 //     VMEandTAMEX_fatima = VME_AND_TAMEX_Fatima;
 
 
-  for (int i = 0; i<7; i++){
+  for (int i = 0; i<NUM_SUBSYS; i++){
       if(pInput->fProcID[i]>-1){
       PrcID_Conv[i] = pInput->fProcID[i];
       pOutput->pPrcID_Conv[i] = pInput->fProcID[i];
@@ -179,7 +181,10 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
     if(Used_Systems[3]) Make_Fatima_Histos();
     if(Used_Systems[4]) Make_Fatima_Tamex_Histos();
     if(Used_Systems[5]) Make_Germanium_Histos();
-    //if (Used_Systems[6]) Make_Finger_Histos();
+    // FINGER[6], BEAM MONITOR[7]
+    if(Used_Systems[8]) Make_BB7_FEBEX_Histos();
+    if(Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+    //if(Used_Systems[10]) Make_BB7_MADC_Histos();
 
         }
 
@@ -349,62 +354,7 @@ Bool_t EventAnlProc::BuildEvent(TGo4EventElement* dest)
    ///-------------------------------- /**bPlastic VME Input**/ --------------------------------///
         ///Disabled A.M. 11.12.19
 
-///--------------------------------------/**bPlastic TAMEX Input**/------------------------------------------///
 
-
-//   if (PrcID_Conv[2] ==2 && Used_Systems[2]==1 && bPLASTIC_TWINPEAKS==0){
-// 
-//       for(int i=0; i<bPLASTIC_TAMEX_HITS; i++){
-//          bPlas_RefCh0_Det1[i] =0;
-//          bPlas_RefCh0_Det2[i] =0;
-//         // bPlas_RefCh0_Det3[i] =0;
-//          }
-//           for (int j = 0; j < bPLASTIC_CHAN_PER_DET; j++)
-//                 {
-//                     for(int k=0; k<bPLASTIC_TAMEX_HITS;k++){
-//                         lead_lead_bplas_Ref1[j][k]=0;
-//                         lead_lead_bplas_Ref2[j][k]=0;
-//                         lead_lead_fat_Ref0[j][k]=0;
-//                     }
-//                 }
-// 
-//          for (int i=1; i<4; i++){
-//             for (int j = 0; j < bPLASTIC_CHAN_PER_DET; j++)
-//                 {
-//                     for(int k=0; k<bPLASTIC_TAMEX_HITS;k++){
-//                  SC41L_ANA_lead_bPlas[i][j][k] = 0;
-//                  SC41R_ANA_lead_bPlas[i][j][k] = 0;
-//                  SC41L_DIG_lead_bPlas[i][j][k] = 0;
-//                  SC41R_DIG_lead_bPlas[i][j][k] = 0;
-//                     }
-//                 }
-//             }
-// 
-//                 pOutput->pbPLAS_WR = pInput->fbPlas_WR;
-// 
-//                 bPlas_TAM_FATTAM = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_FATTAMEX][0];
-//                 bPlas_TAM_FATVME = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_FATVME][0];
-//                 bPlas_TAM_SC41L_DIG = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][SC41L_bPLASTIC][0];
-//                 bPlas_TAM_SC41R_DIG = pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][SC41R_bPLASTIC][0];
-// 
-//        ///bPlas_AND_Coinc[j] = pInput->fFat_Lead_PMT[9][j];
-// 
-//   // if(pOutput->pEvent_Number==100598)
-//      for(int i=1; i<4; i++){ ///Detector number
-//                  for (int j = 0; j <bPLASTIC_CHAN_PER_DET ; j++){  ///Channel number
-// 
-//                 for(int k=0; k<bPLASTIC_TAMEX_HITS; k++){
-//                     //Fat_RefCh[j] = pInput->fFat_Lead_PMT[1][j];
-//                     bPlas_RefCh0_Det1[k] = pInput->fbPlas_Lead_PMT[1][bPlastRefCh_Det1][k];
-//                     bPlas_RefCh0_Det2[k] = pInput->fbPlas_Lead_PMT[2][bPlastRefCh_Det2][k];
-// //                     bPlas_RefCh0_Det3[k] = pInput->fbPlas_Lead_PMT[3][bPlastRefCh_Det3][k];
-// 
-//                         }
-//                     }
-//               }
-//   Process_Plastic_Tamex_Histos(pInput,pOutput);
-// 
-//    }
 ///--------------------------------------/**bPlastic TwinPeaks TAMEX Input**/------------------------------------------///
   
   if (PrcID_Conv[2] ==2 && Used_Systems[2]==1 && bPLASTIC_TWINPEAKS==1){
@@ -622,6 +572,72 @@ if(Fatmult > 0){
             Process_Germanium_Histos(pOutput);
       }
 
+
+      if (PrcID_Conv[8] == 8 && Used_Systems[8] == 1)
+      { 
+          // pass things along to correl
+          // process histograms
+          Process_BB7_FEBEX_Histos(pInput, pOutput);
+      }
+
+      
+      // ------- 9 for BB7 TWINPEAKS --------------
+      if (PrcID_Conv[9] == 9 && Used_Systems[9] == 1)
+      {     
+
+          // we should clear a bunch of arrays here I believe
+          
+          for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+          {
+              BB7_TWINPEAKS_RefStrip0_Side0[k] = 0;
+              BB7_TWINPEAKS_RefStrip0_Side1[k] = 0;
+          }
+
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+              {
+                  Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] = 0;
+                  Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] = 0;
+              }
+          }
+
+          // CEJ come back to
+          /*for (int i = 0; i < BB7_SIDES; i++)
+          {
+              for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+              {
+                  for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                  {
+                      // this would be for SC41 signals 
+                  }
+              }
+          }*/
+          
+          pOutput->pBB7_TWINPEAKS_WR =pInput->fBB7_TWINPEAKS_WR;
+          // CEJ: other trigger stuff below here
+
+          // this bit makes no sense to me..why is i going "up to" the side that triggers?
+          // we loop over less if side 0 triggers instead of 1? etc
+          // yeah i really can't understand
+          // lets come back to it once the rest compiles
+          /*for (int i = 0; i < pInput->fBB7_TWINPEAKS_Fast_Side; i++)
+          {
+              for (int j = 0; j < pInput->fBB7_TWINPEAKS_FastStrip; j++)
+              {
+                  for (int k = 0; k <= pInput->fBB7_TWINPEAKS_Fast_Lead_N[i][j]; k++)
+                  {
+                      BB7_TWINPEAKS_RefStrip0_Side0[k] = pInput->fBB7_TWINPEAKS_Fast_Lead[0][BB7_TWINPEAKS_REF_STRIP_SIDE0][k];
+                      BB7_TWINPEAKS_RefStrip0_Side1[k] = pInput->fBB7_TWINPEAKS_Fast_Lead[1][BB7_TWINPEAKS_REF_STRIP_SIDE1][k];
+                  }
+              }
+          }*/
+          // what about the slow stuff? this is very confusing.
+                 
+
+          Process_BB7_TWINPEAKS_Histos(pInput,pOutput);
+      }
+
  ///--------------------------------------/**Finger Input**/------------------------------------------///
 
   pOutput->SetValid(isValid);
@@ -629,6 +645,10 @@ if(Fatmult > 0){
 
  }  //End of BuildEvent
 
+
+// --------------------------------------- BB7 Input (FEBEX) --------------------------------------------///
+
+   // BB7_FEBEX_Hits = -1;
 
 
 
@@ -1971,6 +1991,109 @@ void EventAnlProc::ProcessAida(EventUnpackStore* pInputMain, EventAnlStore* pOut
   }
 }
 
+std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(std::vector<BB7_TWINPEAKS_Event> const& events)
+{ 
+    // deal with noisy/bad strips?
+    // something in here is setting every side to 0 i think
+
+    std::vector<BB7_TWINPEAKS_Cluster> clusters;
+    for (auto & i : events)
+    {
+        if (i.Side == -1 || i.Strip == -1) continue;
+
+        bool added = false;
+        BB7_TWINPEAKS_Cluster* cluster;
+        auto it = std::begin(clusters);
+        while (it != std::end(clusters))
+        {
+            auto & j = *it;
+            bool docluster = true;
+            if (docluster && j.IsAdjacent(i) && j.IsGoodTime(i))
+            {   
+                
+                if (!added)
+                {
+                    j.AddEvent(i);
+                    cluster = &j;
+                    added = true;
+                }
+                else
+                {
+                    cluster->AddCluster(j);
+                    it = clusters.erase(it);
+                    continue;
+                }
+            }
+            it++;
+        } // while clusters
+
+        if (!added)
+        {
+            BB7_TWINPEAKS_Cluster new_cluster;
+            new_cluster.AddEvent(i);
+            clusters.push_back(new_cluster);
+        }
+    } // event loop
+
+    // code to remove faulty/bad strips
+
+    return clusters;
+}
+
+std::vector<BB7_FEBEX_Cluster> EventAnlProc::BB7_FEBEX_EventsToClusters(std::vector<BB7_FEBEX_Event> const& events)
+{
+    // remove noisy/bad strips?
+
+    std::vector<BB7_FEBEX_Cluster> clusters;
+    for (auto & i : events)
+    {   
+        // don't cluster invald events
+        if (i.Side == -1 || i.Strip == -1) continue; 
+        
+        bool added = false;
+        BB7_FEBEX_Cluster* cluster;  
+        // try to add event to an existing cluster
+        auto it = std::begin(clusters);
+        while (it != std::end(clusters))
+        {
+            auto & j = *it;
+            // with aida cluster there is a high energy veto
+            // defining implant, and config for y/n clustering
+            // decays/implants. here we just assume true always?
+            bool docluster = true;
+            if (docluster && j.IsAdjacent(i) && j.IsGoodTime(i))
+            {
+                if (!added)
+                {
+                    j.AddEvent(i);
+                    cluster = &j;
+                    added = true;
+                }
+                else // if matched again, two clusters merged into one and old removed
+                {
+                    cluster->AddCluster(j);
+                    it = clusters.erase(it);
+                    continue;
+                }
+            }
+            it++;
+        }
+
+        // otherwise make a new cluster
+        if (!added)
+        {
+            BB7_FEBEX_Cluster new_cluster;
+            new_cluster.AddEvent(i);
+            clusters.push_back(new_cluster);
+        }
+
+    } // event loop
+
+    // code to remove fault strips?
+
+    return clusters;
+}
+
 
 std::vector<AidaCluster> EventAnlProc::EventsToClusters(std::vector<AidaEvent> const& events)
 {
@@ -2054,6 +2177,66 @@ std::vector<AidaCluster> EventAnlProc::EventsToClusters(std::vector<AidaEvent> c
   return clusters;
 }
 
+BB7_TWINPEAKS_Hit EventAnlProc::BB7_TWINPEAKS_ClusterPairToHit(std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster> const& i)
+{
+    BB7_TWINPEAKS_Hit hit;
+    hit.StripX = i.first.Strip;
+    hit.StripY = i.second.Strip;
+
+    // centre on zero
+    hit.PosX = BB7_XLENGTH * i.first.Strip / BB7_STRIPS_PER_SIDE - BB7_XLENGTH / 2; // -xoffset..
+    hit.PosY = BB7_YLENGTH * i.second.Strip / BB7_STRIPS_PER_SIDE - BB7_YLENGTH / 2;
+
+    hit.StripXMin = i.first.StripMin;
+    hit.StripYMax = i.first.StripMax;
+    hit.StripYMin = i.second.StripMin;
+    hit.StripYMax = i.second.StripMax;
+    hit.ClusterSizeX = i.first.N;
+    hit.ClusterSizeY = i.second.N;
+
+    hit.EnergyFront = i.first.Energy;
+    hit.EnergyBack = i.second.Energy;
+    hit.Energy = hit.EnergyFront;
+
+    hit.Time = std::min(i.first.Time, i.second.Time);
+    hit.TimeFront = i.first.Time;
+    hit.TimeBack = i.second.Time;
+
+    return hit;
+}
+
+BB7_FEBEX_Hit EventAnlProc::BB7_FEBEX_ClusterPairToHit(std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster> const& i)
+{
+    BB7_FEBEX_Hit hit;
+    hit.StripX = i.first.Strip;
+    hit.StripY = i.second.Strip;
+    
+    // position stuff -- need dimensions -- centres at 0//
+    hit.PosX = BB7_XLENGTH * i.first.Strip / BB7_STRIPS_PER_SIDE - BB7_XLENGTH / 2;
+    hit.PosY = BB7_YLENGTH * i.second.Strip / BB7_STRIPS_PER_SIDE - BB7_YLENGTH / 2;
+    //hit.PosX = 75.6 * i.first.Strip / 128. - 37.75;
+    //hit.PosY = 75.6 * i.second.Strip / 128. - 37.75;
+
+    hit.StripXMin = i.first.StripMin;
+    hit.StripXMax = i.first.StripMax;
+    hit.StripYMin = i.second.StripMin;
+    hit.StripYMax = i.second.StripMax;
+    hit.ClusterSizeX = i.first.N;
+    hit.ClusterSizeY = i.second.N;
+
+    hit.EnergyFront = i.first.Energy;
+    hit.EnergyBack = i.second.Energy;
+    hit.Energy = hit.EnergyFront;
+
+    // CEJ: should first always be < second? electronics limit?
+    hit.Time = std::min(i.first.Time, i.second.Time);
+    hit.TimeFront = i.first.Time;
+    hit.TimeBack = i.second.Time;
+
+    return hit;
+}
+
+
 AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const& i)
 {
   AidaHit hit;
@@ -2092,249 +2275,6 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
 }
                                                     ///End of Aida ///
 
- /**----------------------------------------------------------------------------------------------**/
-     /**--------------------------------------  bPlastic  TAMEX ----------------------------------------------   **/
-     //**----------------------------------------------------------------------------------------------**/
-
-//     void EventAnlProc::Make_Plastic_Tamex_Histos(){
-// 
-//          for (int i =1; i<4; i++)
-//             {
-//                 hbPlas_ToT_Sum[i] = MakeTH1('D', Form("bPlastic/ToT_Sum_Det.%2d",i), Form("bPlastic Sum ToT Det. %2d",i), 5000, 0, 3000000);
-// 
-//                  hbPlas_hit_pattern_det[i]= MakeTH1('D', Form("bPlastic/Stats/HitPattern_Det.%2d",i), Form("bPlastic Hit pattern Det. %2d",i), bPLASTIC_CHAN_PER_DET, 0, bPLASTIC_CHAN_PER_DET);
-// 
-//           for(int j=0; j<bPLASTIC_CHAN_PER_DET; j++){
-// 
-//              hbPlas_Lead_T[i][j] = MakeTH1('D', Form("bPlastic/Lead-/Lead T Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 2000);
-// 
-//               if(i<3){//Take only cards with bPlast channels
-// 
-//             hbPlas_Lead_dT_coinc[i][j] = MakeTH1('D', Form("bPlastic/Lead-LeadCoincidenceChan/Lead dT Plas Det. %2d Ch %d Ref Coincidence",i,j), Form("Lead dT Plas Det. %2d Ch %d Ref Coincidence",i,j),500,-200,200);
-//         }
-// 
-//             hbPlas_ToT_det[i][j] = MakeTH1('D', Form("bPlastic/ToT/ToT Plas Det. %2d Ch. %2d",  i,j), Form("ToT Det. %2d Ch. %2d", i,j),20000, 0., 200000.);
-// 
-//             hbPlas_Multiplicity_Chan[i][j] = MakeTH1('D', Form("bPlastic/Stats/Mulitplicity_per_Chan/bPlast Multiplicity Det. %2d Ch. %2d",  i,j), Form("ToT Det. %2d Ch. %2d", i,j),50, 0., 50.);
-// 
-//             hbPlas_lead_lead_ref_det[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. - Ch. %d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// 
-// //         hbPlas_lead_lead_ref_det2[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. %2d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// //         hbPlas_lead_lead_ref_det3[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Ref/Lead-Lead Plas Det. %2d RefCh. %2d", i,j), Form("Lead Ref Ch.0 - Lead Det.%2d Ch. %2d", i,j),2500, -50000., 50000.);
-// 
-//        // hbPlas_lead_lead_gated[i][j] = MakeTH1('D', Form("bPlastic/Lead-Lead_Egated/Lead-Lead Egated Plas Det. %2d Ch. %2d",  i,j), Form("Lead - Lead Energy gated Det. %2d Ch.  %2d", i,j),2500, -50000., 50000.);
-// 
-//        // hbPlas_SC41L_lead[i][j] = MakeTH1('D', Form("bPlastic/SC41-Lead_Plas/SC41_Lead Plas Det. %2d Ch.%02d", i,j), Form("SC41 Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4002, -100000., 100000.);
-//          hbPlas_fatimatamex_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/FatTamChan-Lead_bPlas/(bPlast)FatTamChan_Lead bPlas Det.%2d Ch.%02d", i,j), Form("FATIMA tamex channel in bPlast: Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_fatimavme_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/FatVMEChan-Lead_bPlas/(bPlast)FatVMEChan_Lead bPlas Det.%2d Ch.%02d", i,j), Form("FATIMA VME channel in bPlast: Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_fatimavme_dT[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/SC41R_Anal-Lead_bPlas/SC41R_Ana_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41R Analogue Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_SC41L_Digi_lead[i][j] = MakeTH1('D', Form("bPlastic/AdditionalChannels/SC41L_Digi-Lead_bPlas/SC41L_Digi_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41L Digital Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//          hbPlas_SC41R_Digi_lead[i][j] = MakeTH1('D', Form("bPlastic/SC41R_Digi-Lead_bPlas/SC41R_Digi_Lead bPlas Det. %2d Ch.%02d", i,j), Form("SC41R Digital Lead - bPlas Lead Det. %2d Lead Ch. %2d ", i,j), 4000, -100000., 100000.);
-// 
-//           }
-//   }
-// 
-//         // New histogram looking at correlation between Fibre implanted channels 1 and 9 (2 and 10 if A=1->4 etc). H.M.A (don't blame me though...)
-// 
-// //         hFIMP_ToT_Correlation_Comb1 = MakeTH2('D', "bPlastic/FIMP_ToT_Correlation_Comb1", "ToT vs ToT for 2 FIMP channels, combination 1",500,0,100000,500,0,100000);
-// //
-// //         hFIMP_ToT_Correlation_Comb2 = MakeTH2('D', "bPlastic/FIMP_ToT_Correlation_Comb2", "ToT vs ToT for 2 FIMP channels, combination 2",500,0,100000,500,0,100000);
-// 
-// //         hSC41_Analogue_Tamex = MakeTH1('D',"bPlastic/SC41/Analogue L-R","SC41 Analogue L - R",4002, -100000., 100000.);
-// //         hSC41_Digital_Tamex = MakeTH1('D',"bPlastic/SC41/Digital L-R","SC41 Analogue L - R",4002, -100000., 100000.);
-// 
-// 
-//         hbPlas_Multiplicity_Det1 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Det1","bPlastic Multiplicity Det 1",32,0,32);
-//         hbPlas_Multiplicity_Det2 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Det2","bPlastic Multiplicity Det 2",32,0,32);
-//        /* hbPlas_Multiplicity_Det3 = MakeTH1('D',"bPlastic/Stats/Multiplicity_Fibre","bPlastic Multiplicity Fibre",32,0,32); */
-// 
-// 
-// 
-//     }
-    ///////////////////////////////////////////////////
-    /*void EventAnlProc::Process_Plastic_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput){
-
-         fired_det1=false, fired_det2=false;
-         ZERO_ARRAY(bPlas_tot_hits);
-//          for(int i=1; i<4; i++){
-//              for(int j=0; j<16; j++){
-//              bPlas_tot_hits[i][j]=0;
-//              }
-//          }
-         bool Fibre=false;
-
-
-         for(int a=1; a<4; a++){
-                 for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++){
-                     for(int k=0; k<bPLASTIC_TAMEX_HITS; k++){
-                        lead_bplas[a][b][k]=0;
-                        ToT_bplas[a][b][k] = 0;
-                     }
-                 }
-         }
-
-
-
-
-     ///**---------------------------------------------LEAD -------------------------------------------------**/
-//          /*  ///Loop on channels First
-// 
-//               for(int i=1; i<4; i++){ ///Detector number
-//                  for (int j = 0; j < 16; j++){  ///Channel number
-// 
-//                 for(int k=0; k< bPLASTIC_TAMEX_HITS; k++){
-//                     //Fat_RefCh[j] = pInput->fFat_Lead_PMT[1][j];
-//                     bPlas_RefCh0_Det1[k] = pInput->fbPlas_Lead_PMT[1][0][k];
-//                     bPlas_RefCh0_Det2[k] = pInput->fbPlas_Lead_PMT[2][0][k];
-//                     bPlas_RefCh0_Det3[k] = pInput->fbPlas_Lead_PMT[3][0][k];
-// 
-//                         }
-//                     }
-//               }
-//             ////////////////////////////
-//               ///Loop over channels
-//               pOutput->pbPlasDetNum= pInput->fbPlasDetNum;
-//            // cout<<"pInput->fbPlasDetNum " <<pInput->fbPlasDetNum << endl;
-//               for(int a=1; a<4; a++){ ///Detector number
-//                     pOutput->pbPlasChan[a]= pInput->fbPlasChan[a];
-// 
-//                  for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++){  ///Channel number
-// 
-// 
-//  ///**---------------------------------------------Plastic Lead Time ----------------------------------**/
-// 
-//             if(pInput->fbPlas_PMT_Lead_N[a][b]<bPLASTIC_TAMEX_HITS){
-//                 pOutput->pbPlas_PMT_Lead_N[a][b] = pInput->fbPlas_PMT_Lead_N[a][b];
-// 
-//                for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ ///Hits
-//                    // if(j<20){
-// 
-//                     lead_bplas[a][b][j] = pInput->fbPlas_Lead_PMT[a][b][j];
-// 
-//                 if(lead_bplas[a][b][j]!=0){
-//                     hbPlas_Lead_T[a][b]->Fill(lead_bplas[a][b][j]);
-//                     hits_bplas_lead++;
-//                     pOutput->pbPlas_LeadT[a][b][j] = lead_bplas[a][b][j];
-//                     pOutput->pbPlas_LeadHits = hits_bplas_lead;
-//                     pOutput->pbPlas_LeadT_Avg = lead_bplas[a][b][j]/hits_bplas_lead;
-// 
-//     ///**---------------------------bPlast Channels - AND signal  ----------------------------------**/
-//         if(a==bPLASTIC_DOWNSTREAM_DET && pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_DOWN_COIN][0] !=0 && lead_bplas[bPLASTIC_DOWNSTREAM_DET][b][j]!=0){ // s452 a==1 is the downstream detector. Coincidence is in a=3, b=0.
-//         hbPlas_Lead_dT_coinc[bPLASTIC_DOWNSTREAM_DET][b]->Fill((lead_bplas[bPLASTIC_DOWNSTREAM_DET][b][j] - pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_DOWN_COIN][0])*5);
-//      }
-//    //  cout<<"a " << a << " b " << b << " j " << j << endl;
-//      if(a==bPLASTIC_UPSTREAM_DET && pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_UP_COIN][0] != 0&&  lead_bplas[bPLASTIC_UPSTREAM_DET][b][j]!=0){ // s452 a==2 is the upstream detector. Coincidence is in a=3, b=1.
-// 
-//         hbPlas_Lead_dT_coinc[bPLASTIC_UPSTREAM_DET][b]->Fill((lead_bplas[bPLASTIC_UPSTREAM_DET][b][j] - pInput->fbPlas_Lead_PMT[bPLASTIC_ADDITIONAL_CH_MOD][bPLASTIC_UP_COIN][0])*5);
-//      }
-//     }
-// 
-// 
-// //     ///**---------------------------------------------Plastic Lead Ref dT ----------------------------------**/
-// //
-// //                     if(i>15 && pInput->fbPlas_Lead_PMT[16][j]>0 && pInput->fbPlas_Lead_PMT[a][b][j]>0) {
-// 
-//         if(bPlas_RefCh0_Det1[j]>0 && lead_bplas[1][b][j]>0){
-//             lead_lead_bplas_Ref1[b][j] = (bPlas_RefCh0_Det1[j] -  lead_bplas[1][b][j])*CYCLE_TIME;
-// 
-//         }
-//         if(bPlas_RefCh0_Det2[j]>0 && lead_bplas[2][b][j]>0){
-//             lead_lead_bplas_Ref2[b][j] = (bPlas_RefCh0_Det2[j] -  lead_bplas[2][b][j])*CYCLE_TIME;
-//         }
-//               if(lead_lead_bplas_Ref1[b][j]!=0 && a==1) hbPlas_lead_lead_ref_det[1][b] ->Fill(lead_lead_bplas_Ref1[b][j]);
-// 
-//        // cout<<"ANL EVENT " << pInput->fevent_number << " a " << a << " b " << b << " j " << j << endl;
-//               if(lead_lead_bplas_Ref2[b][j]!=0 && a==2) hbPlas_lead_lead_ref_det[2][b] ->Fill(lead_lead_bplas_Ref2[b][j]);
-// 
-// //
-//               ///Reference signals
-//                 ///Fatima tamex OR in bplast tamex
-//                if(bPlas_TAM_FATTAM>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimatamex_dT[a][b][j] = (bPlas_TAM_FATTAM -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_fatimatamex_dT[a][b]->Fill(bPlas_fatimatamex_dT[a][b][j] );
-//                 }
-//                 ///Fatima VME OR in bplast tamex
-//                 if(bPlas_TAM_FATVME>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimavme_dT[a][b][j] = (bPlas_TAM_FATVME -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_fatimavme_dT[a][b]->Fill(bPlas_fatimavme_dT[a][b][j] );
-//                     }
-//                   ///SC41L in bplast tamex
-//                 if(bPlas_TAM_SC41L_DIG>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimatamex_dT[a][b][j] = (bPlas_TAM_SC41L_DIG -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_SC41L_Digi_lead[a][b]->Fill(SC41L_DIG_lead_bPlas[a][b][j] );
-//                     }
-//                     ///SC41R in bplast tamex
-//                 if(bPlas_TAM_SC41R_DIG>0 && lead_bplas[a][b][j]>0){
-//                     bPlas_fatimavme_dT[a][b][j] = (bPlas_TAM_SC41R_DIG -  lead_bplas[a][b][j])*CYCLE_TIME;
-//                     hbPlas_SC41R_Digi_lead[a][b]->Fill(SC41R_DIG_lead_bPlas[a][b][j] );
-//                     }
-// 
-//                 }
-// 
-//             ///AKM note: lead clear of malloc 29.04.21
-// //
-// //
-// //       ///**---------------------------------------------Plastic Trail ----------------------------------**/
-// //
-//                 pOutput->pbPlas_PMT_Trail_N[a][b] = pInput->fbPlas_PMT_Trail_N[a][b];
-//                 if(a<4 && b<bPLASTIC_CHAN_PER_DET){
-//                for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ ///Hits
-//                // if(j<20){
-// 
-//                    /* trail_bplas[a][b][j] = ; */
-// 
-//                     //hbPlas_Trail_T[a][b]->Fill(trail_bplas[a][b][j]);
-//                   if(pOutput->pbPlas_TrailT[a][b][j]!=0)  hits_bplas_trail++;
-//                     pOutput->pbPlas_TrailT[a][b][j] = pInput->fbPlas_Trail_PMT[a][b][j];
-//                         }
-//                     }
-//                     ///AKM note: trail clear of malloc 29.04.21
-// 
-// //
-// //    ///**--------------------Plastic ToT --------------------------------**/
-// //
-//               for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){
-// 
-//                   if(pInput->fbPlas_Trail_PMT[a][b][j] >0 && pInput->fbPlas_Lead_PMT[a][b][j]>0){
-// 
-//         ToT_bplas[a][b][j] = (pInput->fbPlas_Trail_PMT[a][b][j] - pInput->fbPlas_Lead_PMT[a][b][j]);
-// 
-//                 ///Correction for overflows
-//                 if(ABS(ToT_bplas[a][b][j]) >(double)(COARSE_CT_RANGE>>1)) {
-// 
-//                        ToT_bplas[a][b][j] = CYCLE_TIME*(ToT_bplas[a][b][j] + COARSE_CT_RANGE);
-//                       }
-//                  else{
-//                            ToT_bplas[a][b][j]= CYCLE_TIME*ToT_bplas[a][b][j];
-//                        }
-//                        ///Gain matching
-//                // pOutput-> pbPlas_ToTCalib[a][b][j] = fCal->Abplas_TAMEX_ZAoQ[i]* ToT_bplas[a][b][j] + fCal->Bbplas_TAMEX_ZAoQ[i];
-//                pOutput-> pbPlas_ToTCalib[a][b][j] =ToT_bplas[a][b][j];
-// 
-//                        if(ToT_bplas[a][b][j]>0) {
-//                         hbPlas_ToT_det[a][b] ->Fill(ToT_bplas[a][b][j]);
-//                         hbPlas_ToT_Sum[a]->Fill(ToT_bplas[a][b][j]);
-//                         hbPlas_hit_pattern_det[a]->Fill(b);
-//                           //bPlas_tot_hits++;
-//                           bPlas_tot_hits[a][b]++;
-// 
-//                           hbPlas_Multiplicity_Chan[a][b] ->Fill(bPlas_tot_hits[a][b]);
-// 
-//                          if(a==1) hbPlas_Multiplicity_Det1->Fill(bPlas_tot_hits[1][b]);
-//                          if(a==2) hbPlas_Multiplicity_Det2->Fill(bPlas_tot_hits[2][b]);
-//                       //   if(a==3) hbPlas_Multiplicity_Det3->Fill(bPlas_tot_hits);
-// 
-//                           }//ToT>0
-//                         }//Lead+Trail>0
-//                       }//hits
-//                     }//Limit hits loop
-//                  }  //Channel
-//               }  ///Detector
-//         }*/ ///Function*/
 
          /**----------------------------------------------------------------------------------------------**/   
      /**--------------------------------------  bPlastic TwinPeaks -----------------------------------**/
@@ -3194,6 +3134,12 @@ if(Fatmult > 0){
        // hGe_Time_Diff_vs_Energy[k] = MakeTH2('D',Form("Germanium/Germanium_dT_vs_Energy_Spectra/Germanium_dT_vs_E%2d",k), Form("Germanium Time Difference Vs Channel Energy Channel %2d",k),5000,0,5000,100,-1000,1000);
       //}
         }
+
+
+        
+
+
+
     ///-----------------------------------------------------------------------------------------------------------------------------------------------------------------------///
     void EventAnlProc::Process_Germanium_Histos(EventAnlStore* pOutput)
     {
@@ -3860,7 +3806,7 @@ void EventAnlProc::FRS_Gates(){
 ///-------------------------------------------------------------------------------------------------------
 
 void EventAnlProc::get_used_systems(){
-    for(int i = 0;i < 6;i++) Used_Systems[i] = false;
+    for(int i = 0;i < NUM_SUBSYS;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -3878,7 +3824,7 @@ void EventAnlProc::get_used_systems(){
     Used_Systems[i] = (id == 1);
     i++;
   }
-  string DET_NAME[7] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER"};
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","GERMANIUM","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
 
 }
@@ -3907,3 +3853,540 @@ void EventAnlProc::Fat_TimeCorrection(EventUnpackStore* pInput){
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
+
+
+void EventAnlProc::Make_BB7_TWINPEAKS_Histos()
+{   
+    // CEJ: i = 1 for plastic?
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        hBB7_TWINPEAKS_ToT_Slow_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/Tot_Sum_Slow_Side.%2d", i), Form("BB7 TwinPeaks Sum ToT Slow Side. %2d", i), 4000, 0, 4000000);
+        hBB7_TWINPEAKS_ToT_Fast_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/Tot_Sum_Fast_Side.%2d", i), Form("BB7 TwinPeaks Sum ToT Fast Side. %2d", i), 4000, 0, 4000000);
+        hBB7_TWINPEAKS_Hit_Pattern_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Stats/HitPattern_Side.%2d", i), Form("BB7 TwinPeaks Hit Pattern Side. %2d", i), BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE);
+
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_TWINPEAKS_Lead_T_Slow[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/Lead/Lead_T_Slow_Side.%2d_Strip.%2d", i, j), Form("Lead - Time Side %2d Strip %2d", i, j), 2500, 0, 2000);
+            hBB7_TWINPEAKS_Lead_T_Fast[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/Lead/Lead_T_Fast_Side.%2d_Strip.%2d", i, j), Form("Lead - Time Side %2d Strip %2d", i, j), 2500, 0, 2000);
+
+            // CEJ: do we need this? In bplast this is related to UPSTREAM and DOWNSTREAM
+            //hBB7_TWINPEAKS_Lead_dT_coinc[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Lead-LeadCoincidenceChan/Lead_dT_BB7_Side.%2d_Strip.%2d_Ref_Coincidence", i, j), Form("Lead dT BB7 Side. %2d Strip %2d Ref Coincidence", i, j), 500, -200, 200);
+
+
+            // CEJ: This name feels terrible?
+            hBB7_TWINPEAKS_ToT_Slow_Side_Strip[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Slow/ToT/ToT_Slow_Side.%2d_Strip.%2d", i, j), Form("ToT Slow Side %2d Strip %2d", i, j), 40000., 0, 4000000.);
+            hBB7_TWINPEAKS_ToT_Fast_Side_Strip[i][j] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Fast/ToT/Tot_Fast_Side.%2d_Strip.%2d", i, j), Form("ToT Fast Side %2d Strip %2d", i, j), 40000., 0, 4000000.);
+            
+            // CEJ: Lead-Lead reference channel?
+            // SC41L/R-Digi-Lead?
+
+        }
+
+        hBB7_TWINPEAKS_Multiplicity_Side[i] = MakeTH1('D', Form("BB7_Layer/TWINPEAKS/Stats/Multiplicity/BB7_Multiplicity_Side.%2d", i), Form("BB7 Multiplicity Side %2d", i), BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE);
+
+    }
+
+    hBB7_TWINPEAKS_Multiplicity = MakeTH1('D', "BB7_Layer/TWINPEAKS/Stats/Multiplicity/BB7_TWINPEAKS_Multiplicity", "BB7 Multiplicity", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES);
+    
+    // CEJ: this is still breaking something (14/11/23).... I don't know what.
+    hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7 = MakeTH2('D', "BB7_Layer/TWINPEAKS/BB7_TWINPEAKS_Fast_vs_Slow_Strip7", "BB7 Slow ToT vs Fast ToT - Side 0 Chan 7", 3000,0,3000000,1000,0,1000000);
+
+    // ---- implants/decays ... I'll keep lead/times and tots above like plastic for now //
+    double BB7_xmax = BB7_XLENGTH / 2; // in mm
+    double BB7_ymax = BB7_YLENGTH / 2;
+    
+    hBB7_TWINPEAKS_implants_strip_xy = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants/implants_strip_XY", "implant hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    //hBB7_TWINPEAKS_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_TWINPEAKS_implants_pos_xy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Implants/implants_pos_XY", "implant position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    //hBB7_TWINPEAKS_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/TWINPEAKS/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_TWINPEAKS_implants_e = MakeTH1('F', "BB7_Layer/TWINPEAKS/Implants/implants_energy", "implant energy", 2000, 0, 20000, "Implant Energy/MeV");
+    hBB7_TWINPEAKS_implants_e_xy = MakeTH2('F', "BB7_Layer/TWINPEAKS/Implants/implants_energy_XY", "implant front energy vs back energy", 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_TWINPEAKS_implants_time_delta  = MakeTH1('F', "BB7_Layer/TWINPEAKS/Implants/implants_time_delta", "implant front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_TWINPEAKS_implants_strip_1d_energy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Implants/implants_strip_1d_energy", "implants 1D strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_TWINPEAKS_implants_strip_1d  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Implants/implants_strip_1d", "implant 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_TWINPEAKS_implants_per_event  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Implants/implants_per_event", "implants per event", 100, 0, 100, "Number of implants");
+    hBB7_TWINPEAKS_implants_x_ex  = MakeTH2('F', "BB7_Layer/TWINPEAKS/Implants/implants_x_ex", "Ex vs X position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "X Strip", "X Energy");
+    hBB7_TWINPEAKS_implants_y_ey  = MakeTH2('F', "BB7_Layer/TWINPEAKS/Implants/implants_y_ey", "Ey vs Y position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "Y Strip", "Y Energy");
+
+    hBB7_TWINPEAKS_decays_strip_xy  = MakeTH2('I', "BB7_Layer/TWINPEAKS/Decays/decays_strip_XY", "decay hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_TWINPEAKS_decays_pos_xy  = MakeTH2('D', "BB7_Layer/TWINPEAKS/Decays/decays_pos_XY", "decay position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_TWINPEAKS_decays_e  = MakeTH1('F', "BB7_Layer/TWINPEAKS/Decays/decays_energy", "decay energy", 1000, 0, 20000, "Decay Energy/keV");
+    hBB7_TWINPEAKS_decays_e_xy  = MakeTH2('F', "BB7_Layer/TWINPEAKS/Decays/decays_energy_XY", "decay front energy vs back energy", 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_TWINPEAKS_decays_time_delta  = MakeTH1('F', "BB7_Layer/TWINPEAKS/Decays/decays_time_delta", "decay front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_TWINPEAKS_decays_strip_1d  = MakeTH1('I', "BB7_Layer/TWINPEAKS/Decays/decays_strip_1d", "BB7 TWINPEAKS decay 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_TWINPEAKS_decays_strip_1d_energy = MakeTH2('D', "BB7_Layer/TWINPEAKS/Decays/decays_strip_1d_energy", "BB7 TWINPEAKS decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_TWINPEAKS_decays_per_event = MakeTH1('I', "BB7_Layer/TWINPEAKS/Decays/decays_per_event", "BB7 TWINPEAKS decays per event", 100, 0, 100, "Numer of decays");
+    
+
+    
+
+
+}
+
+
+void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, EventAnlStore* pOutput)
+{
+    bool SideFired[BB7_SIDES]; for (int i = 0; i < BB7_SIDES; i++) SideFired[i] = false;
+    ZERO_ARRAY(BB7_TWINPEAKS_Total_Hits);
+    Hits_BB7_TWINPEAKS_Lead_Fast = 0; // CEJ: THIS IS A TEST
+
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+            {
+                Lead_BB7_TWINPEAKS_Fast[i][j][k] = 0;
+                ToT_BB7_TWINPEAKS_Slow[i][j][k] = 0;
+                ToT_BB7_TWINPEAKS_Fast[i][j][k] = 0;
+            }
+        }
+    }
+
+    // ------- Lead (Fast) --------- //
+
+    // I don't output this from event unpack... is it needed...
+   //  pOutput->pBB7_TWINPEAKS_Side_Fast = pInput->fBB7_TWINPEAKS_
+
+    BB7_TWINPEAKS_UnpackData BB7_TWINPEAKS_Unp;
+
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        
+        // It's not entirely clear to me what we're doing here
+        pOutput->pBB7_TWINPEAKS_FastStrip[i] = pInputMain->fBB7_TWINPEAKS_FastStrip[i];
+        pOutput->pBB7_TWINPEAKS_SlowStrip[i] = pInputMain->fBB7_TWINPEAKS_SlowStrip[i];
+
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {     
+            //BB7_TWINPEAKS_Event evt;
+
+            if (pInputMain->fBB7_TWINPEAKS_Fast_Lead_N[i][j] < BB7_TAMEX_ANL_HITS) // BB7_TAMEX_MAX_HITS
+            {
+                pOutput->pBB7_TWINPEAKS_Fast_Lead_N[i][j] = pInputMain->fBB7_TWINPEAKS_Fast_Lead_N[i][j];
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                {
+                    Lead_BB7_TWINPEAKS_Fast[i][j][k] = pInputMain->fBB7_TWINPEAKS_Fast_Lead[i][j][k];
+                    if (Lead_BB7_TWINPEAKS_Fast[i][j][k] != 0)
+                    {
+                        Hits_BB7_TWINPEAKS_Lead_Fast++;
+                        pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Fast[i][j][k];
+                        hBB7_TWINPEAKS_Lead_T_Fast[i][j]->Fill(Lead_BB7_TWINPEAKS_Fast[i][j][k]);
+                        pOutput->pBB7_TWINPEAKS_FastLeadHits = Hits_BB7_TWINPEAKS_Lead_Fast;
+                        
+                    }
+
+                    if (BB7_TWINPEAKS_RefStrip0_Side0[k] > 0 && Lead_BB7_TWINPEAKS_Fast[0][j][k] > 0)
+                    {
+                        Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] = (BB7_TWINPEAKS_RefStrip0_Side0[k] - Lead_BB7_TWINPEAKS_Fast[0][j][k]) * CYCLE_TIME;
+                    }
+                    if (BB7_TWINPEAKS_RefStrip0_Side1[k] > 0 && Lead_BB7_TWINPEAKS_Fast[1][j][k] > 0)
+                    {
+                        Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] = (BB7_TWINPEAKS_RefStrip0_Side1[k] - Lead_BB7_TWINPEAKS_Fast[1][j][k]) * CYCLE_TIME;
+                    }
+
+                    // these aren't even MADE.. ?
+                    //if (Lead_Lead_BB7_TWINPEAKS_Ref0[j][k] != 0 && i == 0) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[0][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref0[j][k]);
+                    //if (Lead_Lead_BB7_TWINPEAKS_Ref1[j][k] != 0 && i == 1) hBB7_TWINPEAKS_Lead_Lead_Ref_Det[1][j]->Fill(Lead_Lead_BB7_TWINPEAKS_Ref1[j][k]);
+
+                    // CEJ:SC41L/R stuff
+
+                } // loop over max hits
+
+                
+                pOutput->pBB7_TWINPEAKS_Fast_Trail_N[i][j] = pInputMain->fBB7_TWINPEAKS_Fast_Trail_N[i][j];
+                pOutput->pBB7_TWINPEAKS_Slow_Trail_N[i][j] = pInputMain->fBB7_TWINPEAKS_Slow_Trail_N[i][j];
+
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                {
+                    if(pInputMain->fBB7_TWINPEAKS_Fast_Trail[i][j][k] != 0) Hits_BB7_TWINPEAKS_Trail_Fast++;
+                    pOutput->pBB7_TWINPEAKS_Fast_TrailT[i][j][k] = pInputMain->fBB7_TWINPEAKS_Fast_Trail[i][j][k];  
+                    if(pInputMain->fBB7_TWINPEAKS_Slow_Trail[i][j][k] != 0) Hits_BB7_TWINPEAKS_Trail_Slow++;
+                    pOutput->pBB7_TWINPEAKS_Slow_TrailT[i][j][k] = pInputMain->fBB7_TWINPEAKS_Slow_Trail[i][j][k];  
+
+                } // loop over max hits
+
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                {
+                    if (pInputMain->fBB7_TWINPEAKS_Fast_Trail[i][j][k] > 0 && pInputMain->fBB7_TWINPEAKS_Fast_Lead[i][j][k] > 0)
+                    {
+                        ToT_BB7_TWINPEAKS_Fast[i][j][k] = (pInputMain->fBB7_TWINPEAKS_Fast_Trail[i][j][k] - pInputMain->fBB7_TWINPEAKS_Fast_Lead[i][j][k]);
+
+                        // CEJ: Correction for Overflows
+                        if(ABS(ToT_BB7_TWINPEAKS_Fast[i][j][k]) > (double)(COARSE_CT_RANGE >> 1)) 
+                        {
+                            ToT_BB7_TWINPEAKS_Fast[i][j][k] = CYCLE_TIME * (ToT_BB7_TWINPEAKS_Fast[i][j][k] + COARSE_CT_RANGE);    
+                        } 
+                        else
+                        {
+                            ToT_BB7_TWINPEAKS_Fast[i][j][k] = CYCLE_TIME * ToT_BB7_TWINPEAKS_Fast[i][j][k];                         
+                        } // concerned about this
+                        // CEJ: There is a note that says "gain matching" and then nothing happens except histogram filling...
+                        // should gain matching have occurred here?
+                        pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Fast[i][j][k];
+
+                        if (ToT_BB7_TWINPEAKS_Fast[i][j][k] > 0)
+                        {
+                            // do stuff
+                            hBB7_TWINPEAKS_ToT_Fast_Side_Strip[i][j]->Fill(ToT_BB7_TWINPEAKS_Fast[i][j][k]);
+                            hBB7_TWINPEAKS_ToT_Fast_Side[i]->Fill(ToT_BB7_TWINPEAKS_Fast[i][j][k]);
+                            hBB7_TWINPEAKS_Hit_Pattern_Side[i]->Fill(j);
+                            
+                            BB7_TWINPEAKS_Total_Hits[i]++;
+                            hBB7_TWINPEAKS_Multiplicity_Side[i]->Fill(BB7_TWINPEAKS_Total_Hits[i]);
+
+
+                        }
+                    }
+                } // loop over max hits
+
+
+            } // hit count check
+            
+            pOutput->pBB7_TWINPEAKS_Slow_Lead_N[i][j] = pInputMain->fBB7_TWINPEAKS_Slow_Lead_N[i][j];
+            if (pInputMain->fBB7_TWINPEAKS_Slow_Lead_N[i][j] < BB7_TAMEX_MAX_HITS) // TAMEX_MAX_ANL_HITS
+            {
+                // Slow Lead
+                for (int k = 0; k < BB7_TAMEX_ANL_HITS; k++)
+                {
+                    Lead_BB7_TWINPEAKS_Slow[i][j][k] = pInputMain->fBB7_TWINPEAKS_Slow_Lead[i][j][k];
+                    if (Lead_BB7_TWINPEAKS_Slow[i][j][k] != 0)
+                    {
+                        hBB7_TWINPEAKS_Lead_T_Slow[i][j]->Fill(Lead_BB7_TWINPEAKS_Slow[i][j][k]);
+                        Hits_BB7_TWINPEAKS_Lead_Slow++;
+                        pOutput->pBB7_TWINPEAKS_SlowLeadT[i][j][k] = Lead_BB7_TWINPEAKS_Slow[i][j][k];
+                        pOutput->pBB7_TWINPEAKS_SlowLeadHits = Hits_BB7_TWINPEAKS_Lead_Slow;
+                    }
+
+                    // Slow ToT
+                    if (pInputMain->fBB7_TWINPEAKS_Slow_Trail[i][j][k] > 0 && pInputMain->fBB7_TWINPEAKS_Slow_Lead[i][j][k] > 0)
+                    { 
+
+                        ToT_BB7_TWINPEAKS_Slow[i][j][k] = (pInputMain->fBB7_TWINPEAKS_Slow_Trail[i][j][k] - pInputMain->fBB7_TWINPEAKS_Slow_Lead[i][j][k]);
+
+                        // CEJ: Correction for Overflow
+                        if(ABS(ToT_BB7_TWINPEAKS_Slow[i][j][k]) > (double)(COARSE_CT_RANGE >> 1)) 
+                        {
+                            ToT_BB7_TWINPEAKS_Slow[i][j][k] = CYCLE_TIME * (ToT_BB7_TWINPEAKS_Slow[i][j][k] + COARSE_CT_RANGE);    
+                        } 
+                        else
+                        {
+                            ToT_BB7_TWINPEAKS_Slow[i][j][k] = CYCLE_TIME * ToT_BB7_TWINPEAKS_Slow[i][j][k];                         
+                        } // concerned about this
+
+                        // now some note about gain matching and a commented line
+                        pOutput->pBB7_TWINPEAKS_Slow_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Slow[i][j][k];
+
+
+                        if (ToT_BB7_TWINPEAKS_Slow[i][j][k] > 0)
+                        {
+                            hBB7_TWINPEAKS_ToT_Slow_Side_Strip[i][j]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
+                            hBB7_TWINPEAKS_ToT_Slow_Side[i]->Fill(ToT_BB7_TWINPEAKS_Slow[i][j][k]);
+                            if (pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k] > 0 && i == 0 && j == 7) hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7->Fill(ToT_BB7_TWINPEAKS_Slow[0][7][k], pOutput->pBB7_TWINPEAKS_Fast_ToTCalib[0][7][k]);                            
+
+                            // if we see this condition, now we find FAST LEAD time from same {k} hit
+                            BB7_TWINPEAKS_Event evt;
+                            evt.Side = i;                            
+                            evt.Strip = j;
+                            evt.Time = pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k];
+                            evt.Energy = ToT_BB7_TWINPEAKS_Slow[i][j][k];
+
+                            // CEJ just for compilation...no calibration to energy performed..
+                            if (evt.Energy > BB7_IMPLANT_E_THRESHOLD)
+                            {
+                                BB7_TWINPEAKS_Unp.Implants.push_back(evt);
+                                //std::cout << "implant!" << std::endl;
+                            }
+                            else
+                            {
+                                BB7_TWINPEAKS_Unp.Decays.push_back(evt);
+                                //std::cout << "decay!" << std::endl;
+                            }
+
+                        } // j'fine
+                    } // Slow ToT if condition
+                } // loop over max hits
+            } // hit count check
+        } // loop over strips
+    } // loop over sides
+
+    pOutput->pBB7_TWINPEAKS_Unp.push_back(BB7_TWINPEAKS_Unp);
+
+    // CEJ:
+    // in above loop feed ToTs as E, FAST LEAD times as Time
+    // into TWINPEAKS_AnlData
+    // discriminate Implants/Decays
+
+    for (BB7_TWINPEAKS_UnpackData & pInputD : pOutput->pBB7_TWINPEAKS_Unp)
+    {
+        BB7_TWINPEAKS_UnpackData *pInput = &pInputD;
+
+        BB7_TWINPEAKS_AnlData BB7_TWINPEAKS_Anl;
+
+        if (pInput->Implants.size() > 0)
+        { 
+            // do we need BB7_FEBEXvsTWINPEAKS?
+            std::vector<BB7_TWINPEAKS_Cluster> ImplantClusters = BB7_TWINPEAKS_EventsToClusters(pInput->Implants);
+
+            // front-back matching
+            std::vector<std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster>> hits;
+
+            for (auto & i : ImplantClusters)
+            {
+
+                {
+                    int offset = i.Side * BB7_STRIPS_PER_SIDE;
+                    hBB7_TWINPEAKS_implants_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+
+                if (i.Side != 0) continue;
+
+                for (auto & j : ImplantClusters)
+                { 
+                      
+                    if (j.Side != 1) continue;
+
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_IMPLANT) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j cluster
+            } // i cluster
+
+            for (auto & i : hits)
+            {
+                BB7_TWINPEAKS_Hit hit = BB7_TWINPEAKS_ClusterPairToHit(i);
+
+                BB7_TWINPEAKS_Anl.Implants.push_back(hit);
+                hBB7_TWINPEAKS_implants_strip_xy->Fill(hit.StripX, hit.StripY);
+                hBB7_TWINPEAKS_implants_pos_xy->Fill(hit.PosX, hit.PosY);
+                // FAST LEADS
+                hBB7_TWINPEAKS_implants_time_delta->Fill(hit.TimeFront - hit.TimeBack);
+                hBB7_TWINPEAKS_implants_e->Fill(hit.Energy);
+                hBB7_TWINPEAKS_implants_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                hBB7_TWINPEAKS_implants_x_ex->Fill(hit.StripX, hit.EnergyFront);
+                hBB7_TWINPEAKS_implants_y_ey->Fill(hit.StripY, hit.EnergyBack);
+                // fill both strips
+                hBB7_TWINPEAKS_implants_strip_1d->Fill(i.first.Strip);
+                hBB7_TWINPEAKS_implants_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+
+            } // hits
+
+            if (hits.size() > 0)
+            {
+                hBB7_TWINPEAKS_implants_per_event->Fill(hits.size());
+                // BB7_goodImplantEvents++;
+            }
+
+        } // implants
+        else if (pInput->Decays.size() > 1)
+        {   
+            //std::cout << "are we here? missing decay 1d strip E" << std::endl;
+            
+            std::vector<BB7_TWINPEAKS_Cluster> DecayClusters = BB7_TWINPEAKS_EventsToClusters(pInput->Decays);
+            std::vector<std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster>> hits;
+
+            for (auto & i : DecayClusters)
+            {
+                {
+                    int offset = i.Side * BB7_STRIPS_PER_SIDE;
+                   // if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    hBB7_TWINPEAKS_decays_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+                
+                if (i.Side != 0) continue;
+
+                for (auto & j : DecayClusters)
+                {
+                    if (j.Side != 1) continue;
+
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_DECAY) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j clusters
+            } // i clusters
+
+            for (auto & i : hits)
+            {
+                BB7_TWINPEAKS_Hit hit = BB7_TWINPEAKS_ClusterPairToHit(i);
+                
+                // CEJ: this is problematic
+                BB7_TWINPEAKS_Anl.Decays.push_back(hit);
+
+                hBB7_TWINPEAKS_decays_strip_xy->Fill(hit.StripX, hit.StripY);
+                hBB7_TWINPEAKS_decays_pos_xy->Fill(hit.PosX, hit.PosY);
+                hBB7_TWINPEAKS_decays_e->Fill(hit.Energy);
+                hBB7_TWINPEAKS_decays_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                // fill both strips
+                hBB7_TWINPEAKS_decays_strip_1d->Fill(i.first.Strip);
+                hBB7_TWINPEAKS_decays_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+            }
+
+            if (hits.size() > 0) // clusters.size?
+            {
+                hBB7_TWINPEAKS_decays_per_event->Fill(hits.size());
+            }
+
+        } // Decays
+
+        // pOutput->pBB7_TWINPEAKS_Anl.push_back(BB7_TWINPEAKS)
+
+    }
+
+}
+
+// we need a mix of germanium(febex) and aida analysis here I suppose
+void EventAnlProc::Make_BB7_FEBEX_Histos()
+{
+    // in mm
+    double BB7_xmax = BB7_XLENGTH / 2;
+    double BB7_ymax = BB7_YLENGTH / 2;
+    // ------ //
+    
+    hBB7_FEBEX_implants_strip_xy = MakeTH2('I', "BB7_Layer/FEBEX/Implants/implants_strip_XY", "implant hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    //hBB7_FEBEX_implants_strip_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_strip_XY","implant stopped hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_FEBEX_implants_pos_xy = MakeTH2('D', "BB7_Layer/FEBEX/Implants/implants_pos_XY", "implant position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    //hBB7_FEBEX_implants_pos_xy_stopped = MakeTH2('I', "BB7_Layer/FEBEX/Implants_Stopped/implants_stopped_pos_XY","implant stopped position hit pattern", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_FEBEX_implants_e = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_energy", "implant energy", 2000, 0, 20000, "Implant Energy/MeV");
+    hBB7_FEBEX_implants_e_xy = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_energy_XY", "implant front energy vs back energy", 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_FEBEX_implants_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Implants/implants_time_delta", "implant front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_FEBEX_implants_strip_1d_energy = MakeTH2('D', "BB7_Layer/FEBEX/Decays/implants_strip_1d_energy", "implants 1D strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_FEBEX_implants_strip_1d  = MakeTH1('I', "BB7_Layer/FEBEX/Implants/implants_strip_1d", "implant 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_FEBEX_implants_per_event  = MakeTH1('I', "BB7_Layer/FEBEX/Implants/implants_per_event", "implants per event", 100, 0, 100, "Number of implants");
+    hBB7_FEBEX_implants_x_ex  = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_x_ex", "Ex vs X position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "X Strip", "X Energy");
+    hBB7_FEBEX_implants_y_ey  = MakeTH2('F', "BB7_Layer/FEBEX/Implants/implants_y_ey", "Ey vs Y position", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, 2000, 0, 20000, "Y Strip", "Y Energy");
+
+    hBB7_FEBEX_decays_strip_xy  = MakeTH2('I', "BB7_Layer/FEBEX/Decays/decays_strip_XY", "decay hit pattern", BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, BB7_STRIPS_PER_SIDE, 0, BB7_STRIPS_PER_SIDE, "X strip", "Y strip");
+    hBB7_FEBEX_decays_pos_xy  = MakeTH2('D', "BB7_Layer/FEBEX/Decays/decays_pos_XY", "decay position", BB7_STRIPS_PER_SIDE, -BB7_xmax, BB7_xmax, BB7_STRIPS_PER_SIDE, -BB7_ymax, BB7_ymax, "X position/mm", "Y position/mm");
+    hBB7_FEBEX_decays_e  = MakeTH1('F', "BB7_Layer/FEBEX/Decays/decays_energy", "decay energy", 1000, 0, 20000, "Decay Energy/keV");
+    hBB7_FEBEX_decays_e_xy  = MakeTH2('F', "BB7_Layer/FEBEX/Decays/decays_energy_XY", "decay front energy vs back energy", 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
+    hBB7_FEBEX_decays_time_delta  = MakeTH1('F', "BB7_Layer/FEBEX/Decays/decays_time_delta", "decay front vs back time", 1000, -10000, 10000, "Time Difference/ns");
+    hBB7_FEBEX_decays_strip_1d  = MakeTH1('I', "BB7_Layer/FEBEX/Decays/decays_strip_1d", "BB7 FEBEX decay 1D hit pattern", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, "Strip number");
+    hBB7_FEBEX_decays_strip_1d_energy = MakeTH2('D', "BB7_Layer/FEBEX/Decays/decays_strip_1d_energy", "BB7 FEBEX decay 1d strip vs energy", BB7_STRIPS_PER_SIDE * BB7_SIDES, 0, BB7_STRIPS_PER_SIDE * BB7_SIDES, 1000, 0, 20000);
+    hBB7_FEBEX_decays_per_event = MakeTH1('I', "BB7_Layer/FEBEX/Decays/decays_per_event", "BB7 FEBEX decays per event", 100, 0, 100, "Numer of decays");
+    
+
+
+}
+
+
+void EventAnlProc::Process_BB7_FEBEX_Histos(EventUnpackStore* pInputMain, EventAnlStore* pOutput)
+{   
+    pOutput->pBB7_FEBEX_WR = pInputMain->fBB7_FEBEX_WR;
+
+    for (BB7_FEBEX_UnpackData & pInputD : pInputMain->fBB7_FEBEX)
+    {
+        BB7_FEBEX_UnpackData *pInput = &pInputD;
+
+        BB7_FEBEX_AnlData BB7_FEBEX;
+        if (pInput->Implants.size() > 0)
+        { 
+            // cluster events on adjacent strips
+            std::vector<BB7_FEBEX_Cluster> ImplantClusters = BB7_FEBEX_EventsToClusters(pInput->Implants);
+
+            // Front-Back matching
+            std::vector<std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster>> hits;
+
+            for (auto & i : ImplantClusters)
+            {   
+                {
+                    int offset = 0;
+                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    hBB7_FEBEX_implants_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+
+                if (i.Side != 0) continue;
+
+                for (auto & j : ImplantClusters)
+                {
+                    if (j.Side != 1) continue;
+                    
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_IMPLANT) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j cluster
+            } // i cluster
+            
+            for (auto & i : hits)
+            {
+                BB7_FEBEX_Hit hit = BB7_FEBEX_ClusterPairToHit(i);
+                
+                BB7_FEBEX.Implants.push_back(hit);
+                hBB7_FEBEX_implants_strip_xy->Fill(hit.StripX, hit.StripY);
+
+                hBB7_FEBEX_implants_pos_xy->Fill(hit.PosX, hit.PosY);
+                // time_delta uses fast_time w/ AIDA
+                hBB7_FEBEX_implants_time_delta->Fill(hit.TimeFront - hit.TimeBack);
+                hBB7_FEBEX_implants_e->Fill(hit.Energy);
+                hBB7_FEBEX_implants_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                hBB7_FEBEX_implants_x_ex->Fill(hit.StripX, hit.EnergyFront);
+                hBB7_FEBEX_implants_y_ey->Fill(hit.StripY, hit.EnergyBack);
+                // fill both strips from fb-matched hit
+                hBB7_FEBEX_implants_strip_1d->Fill(i.first.Strip);
+                hBB7_FEBEX_implants_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+
+            }
+
+            if (hits.size() > 0)
+            {
+                hBB7_FEBEX_implants_per_event->Fill(hits.size());
+                //BB7_goodImplantEvents++;
+            }
+        } // Implant loop
+        else if (pInput->Decays.size() > 1)
+        {
+            // CEJ: ignoring some pulser stuff from AIDA loop
+            std::vector<BB7_FEBEX_Cluster> DecayClusters = BB7_FEBEX_EventsToClusters(pInput->Decays);
+            std::vector<std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster>> hits;
+            // unordered_map for aida_hash?
+
+            for (auto & i : DecayClusters)
+            {
+                {
+                    int offset = 0;
+                    if (i.Side == 1) offset = BB7_STRIPS_PER_SIDE;
+                    hBB7_FEBEX_decays_strip_1d_energy->Fill(i.Strip + offset, i.Energy);
+                }
+
+                if (i.Side != 0) continue;
+
+                for (auto & j : DecayClusters)
+                {
+                    if (j.Side != 1) continue;
+
+                    if ((abs(i.Energy - j.Energy) < BB7_FRONT_BACK_E_GATE_DECAY) && (i.IsGoodTime(j, BB7_FRONT_BACK_T_GATE)))
+                    {
+                        hits.push_back({i, j});
+                    }
+                } // j clusters loop
+            } // i clusters loop
+
+            for (auto & i : hits)
+            {
+                BB7_FEBEX_Hit hit = BB7_FEBEX_ClusterPairToHit(i);
+
+                BB7_FEBEX.Decays.push_back(hit);
+
+                hBB7_FEBEX_decays_strip_xy->Fill(hit.StripX, hit.StripY);
+                hBB7_FEBEX_decays_pos_xy->Fill(hit.PosX, hit.PosY);
+                hBB7_FEBEX_decays_e->Fill(hit.Energy);
+                hBB7_FEBEX_decays_e_xy->Fill(hit.EnergyFront, hit.EnergyBack);
+                hBB7_FEBEX_decays_time_delta->Fill(hit.TimeFront - hit.TimeBack);
+                // Fill both strips
+                hBB7_FEBEX_decays_strip_1d->Fill(i.first.Strip);
+                hBB7_FEBEX_decays_strip_1d->Fill(i.second.Strip + BB7_STRIPS_PER_SIDE);
+            }
+
+            if (hits.size() > 0) // clusters.size()?
+            {
+                hBB7_FEBEX_decays_per_event->Fill(hits.size());
+            }
+
+        } // Decay loop
+
+        pOutput->pBB7_FEBEX.push_back(BB7_FEBEX);
+    }
+
+}

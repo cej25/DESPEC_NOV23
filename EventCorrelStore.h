@@ -3,7 +3,7 @@
 //       The GSI Online Offline Object Oriented (Go4) Project
 //         Experiment Data Processing at EE department, GSI
 //-----------------------------------------------------------------------
-// Copyright (C) 2000- GSI Helmholtzzentrum für Schwerionenforschung GmbH
+// Copyright (C) 2000- GSI Helmholtzzentrum fï¿½r Schwerionenforschung GmbH
 //                     Planckstr. 1, 64291 Darmstadt, Germany
 // Contact:            http://go4.gsi.de
 //-----------------------------------------------------------------------
@@ -58,7 +58,9 @@ class EventCorrelStore : public TGo4EventElement {
       Long64_t cGermanium_TimeMachine_dT;
       Long64_t cFatimaTAMEX_TimeMachine_dT[10];
       Long64_t cbPlast_TimeMachine_dT[10];
+      Long64_t cBB7_TWINPEAKS_TimeMachine_dT[10]; // only needs to be BB7_TAMEX_ANL_HITS
       Double_t cAIDA_TimeMachine_dT;
+      Double_t cBB7_FEBEX_TimeMachine_dT;
       int64_t cAIDA_TM_WR;
       
       Double_t cGalE;
@@ -72,6 +74,8 @@ class EventCorrelStore : public TGo4EventElement {
       Long64_t cFAT_WR;
       Long64_t cGe_WR;
       Long64_t cFRS_WR;
+      Long64_t cBB7_FEBEX_WR;
+      Long64_t cBB7_TWINPEAKS_WR;
       
       
    ClassDef(EventCorrelStore,1)

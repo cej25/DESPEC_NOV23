@@ -763,6 +763,7 @@ public:
     double  get_BB7_TWINPEAKS_TOT_added(int,int);
     int     get_BB7_TWINPEAKS_tamex_hits();
     double  get_BB7_TWINPEAKS_Lead_Lead(int,int);
+    int     get_BB7_TWINPEAKS_leading_arr(int,int);
 
     // BB7 FEBEX Getters
     int         get_BB7_FEBEX_Hits();

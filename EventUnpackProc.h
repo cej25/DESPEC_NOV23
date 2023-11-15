@@ -525,6 +525,9 @@ using namespace std;
             TH1* hBB7_FEBEX_Raw_E_Sum_Side[BB7_SIDES];
             TH1* hBB7_FEBEX_Raw_E_Sum_Total;
             TH1* hBB7_FEBEX_Hit_Pattern;
+
+            BB7_FEBEX_UnpackData BB7_FEBEX;
+
             // tamex??
             TH1* hBB7_MADC_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
             TH1* hBB7_MADC_Raw_E_Sum_Side[BB7_SIDES];
@@ -532,6 +535,13 @@ using namespace std;
             TH1* hBB7_MADC_Hit_Pattern;
 
 		private:
+
+            std::map<std::pair<int,int>, std::pair<int,int>> BB7_TWINPEAKS_Map;
+            int bb7_twinpeaks_mod;
+            int bb7_twinpeaks_chan;
+            int bb7_twinpeaks_side;
+            int bb7_twinpeaks_strip;
+
 
 
             int AIDA_Hits=0;
@@ -673,6 +683,7 @@ using namespace std;
             void load_FingerID_File();
             void load_FatTamex_Allocationfile();
             void load_bPlasticTamex_Allocationfile();
+            void load_BB7_TWINPEAKS_AllocationFile();
 			void load_PrcID_File();
 
 			void Make_FRS_Histos();

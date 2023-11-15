@@ -1,5 +1,7 @@
 #include "BB7_TWINPEAKS_Detector_System.h"
 
+#define DEBUG 0
+
 // using namespace std;
 
 BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
@@ -11,48 +13,48 @@ BB7_TWINPEAKS_Detector_System::BB7_TWINPEAKS_Detector_System()
 
     BB7_TAMEX_Calibration = new BB7_TAMEX_Calibrator(CALIBRATE);
 
-    iterator = new int[200];
-    for (int i = 0; i < 200; i++)
-    {
-        iterator[i] = 0;
-    }
+    iterator = new int[BB7_TAMEX_MODULES];
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++) iterator[i] = 0;
+
+    epoch_ch = new int*[BB7_TAMEX_MODULES];
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++) epoch_ch[i] = new int[BB7_TAMEX_CHANNELS * 2 + 1];
 
     tamex_iter = 0;
-    lead_arr = new int*[200];
-    leading_hits = new int*[200];
-    trailing_hits = new int*[200];
+    lead_arr = new int*[BB7_TAMEX_MODULES];
+    leading_hits = new int*[BB7_TAMEX_MODULES];
+    trailing_hits = new int*[BB7_TAMEX_MODULES];
 
-    coarse_T = new double[200];
-    fine_T = new double[200];
-    ch_ID = new unsigned int[200];
+    coarse_T = new double[BB7_TAMEX_MODULES];
+    fine_T = new double[BB7_TAMEX_MODULES];
+    ch_ID = new unsigned int[BB7_TAMEX_MODULES];
 
-    edge_coarse = new double*[200];
-    edge_fine = new double*[200];
-    ch_ID_edge = new unsigned int*[200];
+    edge_coarse = new double*[BB7_TAMEX_MODULES];
+    edge_fine = new double*[BB7_TAMEX_MODULES];
+    ch_ID_edge = new unsigned int*[BB7_TAMEX_MODULES];
 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
     {
-        edge_coarse[i] = new double[200];
-        edge_fine[i] = new double[200];
-        ch_ID_edge[i] = new unsigned int[200];
+        edge_coarse[i] = new double[BB7_TAMEX_MAX_HITS];
+        edge_fine[i] = new double[BB7_TAMEX_MAX_HITS];
+        ch_ID_edge[i] = new unsigned int[BB7_TAMEX_MAX_HITS];
 
-        lead_arr[i] = new int[200];
-        leading_hits[i] = new int[200];
-        trailing_hits[i] = new int[200];
+        lead_arr[i] = new int[BB7_TAMEX_MAX_HITS];
+        leading_hits[i] = new int[BB7_TAMEX_MAX_HITS];
+        trailing_hits[i] = new int[BB7_TAMEX_MAX_HITS];
     }
 }
 
 BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
 {
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < BB7_TAMEX_MAX_HITS; i++)
     {
         delete[] edge_coarse[i];
         delete[] edge_fine[i];
         delete[] ch_ID_edge[i];
 
-        delete lead_arr[i];
-        delete leading_hits[i];
-        delete trailing_hits[i];
+        delete[] lead_arr[i];
+        delete[] leading_hits[i];
+        delete[] trailing_hits[i];
     }
 
     delete[] edge_coarse;
@@ -68,7 +70,7 @@ BB7_TWINPEAKS_Detector_System::~BB7_TWINPEAKS_Detector_System()
 
 void BB7_TWINPEAKS_Detector_System::get_Event_data(Raw_Event* RAW)
 {
-    RAW->set_DATA_PLASTIC_TWINPEAKS(iterator, edge_coarse, edge_fine, ch_ID_edge, coarse_T, fine_T, tamex_iter, lead_arr);
+    RAW->set_DATA_BB7_TWINPEAKS(iterator, edge_coarse, edge_fine, ch_ID_edge, coarse_T, fine_T, tamex_iter, lead_arr);
 }
 
 void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
@@ -78,6 +80,7 @@ void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
     for (int i = 0; i < tamex_iter; i++) 
     {
         iterator[i] = 0;
+        for (int j = 0; j < BB7_TAMEX_CHANNELS * 2 + 1; j++) epoch_ch[i][j] = 0;
     }
     reset_edges();
     tamex_end = false;
@@ -86,21 +89,12 @@ void BB7_TWINPEAKS_Detector_System::Process_MBS(int* pdata)
     while(!tamex_end)
     {
         Process_TAMEX();
-        if (!tamex_end)
-        {
-            tamex_iter++;
-        }
+        if (!tamex_end) tamex_iter++;
         this->pdata++;
     }
-
-    if (CALIBRATE)
-    {
-        calibrate_ONLINE();
-    }
-    else
-    {
-        calibrate_OFFLINE();
-    }
+    
+    if (CALIBRATE) calibrate_ONLINE();
+    else calibrate_OFFLINE();
 }
 
 void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
@@ -165,22 +159,16 @@ void BB7_TWINPEAKS_Detector_System::Process_TAMEX()
     pdata++;
     
     get_trigger();
-    if (am_fired[tamex_iter] > 3)
-    {
-        get_edges();
-    }
-    else
-    {
-        no_edges[tamex_iter] = true;
-    }
-
+    if (am_fired[tamex_iter] > 3) get_edges();
+    else no_edges[tamex_iter] = true;
+    
     check_trailer();
 
 }
 
 void BB7_TWINPEAKS_Detector_System::skip_padding()
 {   
-    // CEJ: sorry but this is insane
+    // CEJ: strongly dislike the consistency here
     bool still_padding = true;
     while (still_padding)
     {
@@ -198,16 +186,20 @@ void BB7_TWINPEAKS_Detector_System::skip_padding()
 
 void BB7_TWINPEAKS_Detector_System::get_trigger()
 {
-    PLACE_HOLDER* Epoch_Counter = (PLACE_HOLDER*) pdata;
+    EPOCH* epoch = (EPOCH*) pdata;
 
-    // we should be doing something here...check Helena's scanner code.
+    if (epoch->six_eight == 0x6)
+    {   
+        if (DEBUG) std::cout << "Epoch Data! Trigger Epoch: " << epoch->epoch_count << std::endl;
+        epoch_ch[tamex_iter][0] = epoch->epoch_count;
+    }
 
     pdata++;
 
-    TAMEX_DATA* TDC_Data = (TAMEX_DATA*) pdata;
-    coarse_T[tamex_iter] = (double) TDC_Data->coarse_T;
-    fine_T[tamex_iter] = (double) TDC_Data->fine_T;
-    ch_ID[tamex_iter] = TDC_Data->ch_ID;
+    TAMEX_DATA* data = (TAMEX_DATA*) pdata;
+    coarse_T[tamex_iter] = (double) data->coarse_T;
+    fine_T[tamex_iter] = (double) data->fine_T;
+    ch_ID[tamex_iter] = data->ch_ID;
 
     pdata++;
 
@@ -217,7 +209,7 @@ void BB7_TWINPEAKS_Detector_System::reset_edges()
 {
     for (int i = 0; i < BB7_TAMEX_MODULES; i++)
     {
-        for (int j = 0; j < 200; j++)
+        for (int j = 0; j < BB7_TAMEX_MAX_HITS; j++)
         {
             leading_hits[i][j] = 0;
             trailing_hits[i][j] = 0;
@@ -229,54 +221,51 @@ void BB7_TWINPEAKS_Detector_System::reset_edges()
 }
 
 void BB7_TWINPEAKS_Detector_System::get_edges()
-{
+{   
+    // done with helenas fixes
     iterator[tamex_iter] = 0;
 
-    written = false; // CEJ: i have no honest to god idea what this is for
+    written = false;
+
+    int test_counter = 0;
+    int last_epoch = -1;
+    int first_epoch = 0; // seemingly unused
 
     while (no_error_reached())
     {
-        PLACE_HOLDER* TDC_Epoch_Check = (PLACE_HOLDER*) pdata;
+        EPOCH* epoch = (EPOCH*) pdata;
 
-        if (TDC_Epoch_Check->six_eight == 0x6)
+        if (epoch->six_eight == 0x6)
         {   
-            // this is an epoch...we need to do something here..
+            if (DEBUG) std::cout << "Epoch Data! Epoch: " << epoch->epoch_count << std::endl; // CEJ: presumably TAMEX.h can be adjusted
+            last_epoch = epoch->epoch_count;
             pdata++;
-            continue; 
+            continue;
         }
+        if (epoch->six_eight != 0x6) written = false;
 
-        if (TDC_Epoch_Check->six_eight != 0x6)
-        {
-            written = false;
-        }
+        TAMEX_DATA* data = (TAMEX_DATA*) pdata;
 
-        TAMEX_DATA* TDC_Data = (TAMEX_DATA*) pdata;
+        epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
 
-        if (TDC_Data->leading_E == 1)
-        {
-            leading_hit = TDC_Data->leading_E;
-            edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
-            edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
-            ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID;
-            lead_arr[tamex_iter][iterator[tamex_iter]] = (TDC_Data->ch_ID % 2); // is this fast and slow?
-        }
+        // From HMA:
+        // shift times relative to epoch for trigger for each channel
+        // coarse time in units of 10ns, 2048 clocks in 1 epoch
+        // subtract [(trigger epoch) - (channel epoch)] * 2048
+        // data->coarse_T = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID]) * 2048);
+        // CEJ: hmm.. helena makes the same correction twice...is this a mistake? we'll see. Commenting first out.
+        leading_hit = data->leading_E;
+        edge_coarse[tamex_iter][iterator[tamex_iter]] = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID]) * 2048);
+        edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
+        lead_arr[tamex_iter][iterator[tamex_iter]] = data->leading_E;
 
-        if (TDC_Data->leading_E == 0)
-        {
-            leading_hit = TDC_Data->leading_E;
-            edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->coarse_T;
-            edge_fine[tamex_iter][iterator[tamex_iter]] = (double) TDC_Data->fine_T;
-            ch_ID_edge[tamex_iter][iterator[tamex_iter]] = TDC_Data->ch_ID + MAX_CHA_INPUT;
-        }
-
+        if (data->leading_E == 1) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
+        if (data->leading_E == 0) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID + MAX_CHA_INPUT;
+        
         iterator[tamex_iter]++;
-        if (iterator[tamex_iter] > 100)
-        {
-            break;
-        }
-
         written = true;
         pdata++;
+
     }
 
 }
@@ -317,17 +306,79 @@ void BB7_TWINPEAKS_Detector_System::check_trailer()
 
 void BB7_TWINPEAKS_Detector_System::calibrate_ONLINE()
 {
-    // calibrate
+    BB7_TAMEX_Calibration->get_data(edge_fine, ch_ID_edge, tamex_iter, iterator);
+
+    double max_count = 1000000.;
+    cal_count++;
+
+    Calibration_Done = false;
+
+    if (cal_count > max_count)
+    {
+        BB7_TAMEX_Calibration->ONLINE_CALIBRATION();
+        Calibration_Done = true;
+    }
+
 }
 
 void BB7_TWINPEAKS_Detector_System::calibrate_OFFLINE()
 {
     // calibrate
+    int channel_ID_tmp = 0;
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
+    {
+        for (int j = 0; j < iterator[i]; j++)
+        {
+            channel_ID_tmp = (int) ch_ID_edge[i][j];
+            if (edge_coarse[i][j] != 131313) edge_fine[i][j] = BB7_TAMEX_Calibration->get_Calibration_val(edge_fine[i][j], i, channel_ID_tmp);
+            else edge_fine[i][j] = 131313;
+        }
+    }
+
 }
 
 void BB7_TWINPEAKS_Detector_System::get_calib_type()
 {
-    // read a file, do something else
+    // CEJ: maybe this can be removed with AIDA-style calibrations for new layer
+    std::ifstream file("Configuration_Files/BB7/BB7_TWINPEAKS_CALIB_FILE.txt");
+    if (file.fail())
+    {
+        std::cerr << "Could not find calibration type file for BB7 Layer" << std::endl;
+        exit(0);
+    }
+    string line; const char* format = "%s %d"; 
+    char s[100]; 
+    int val;
+    CALIBRATE = false;
+    bool FORCE = false;
+
+    while (file.good())
+    {
+        getline(file, line, '\n');
+        if (line[0] == '#') continue;
+        sscanf(line.c_str(), format, &s, &val);
+        if (string(s) == string("ONLINE")) CALIBRATE = (val == 1);
+        if (string(s) == string("FORCE")) FORCE = (val == 1);
+    }
+    file.close();
+
+    // only FORCE possible if ONLINE active
+    FORCE = (CALIBRATE) ? FORCE : false;
+
+    // rewrite CALIB_TYPE file if FORCE = false
+    if (!FORCE)
+    {
+        std::ofstream out("Configuration_Files/BB7/BB7_TWINPEAKS_CALIB_FILE.txt");
+        out << "#BB7 TWINPEAKS calibration type file" << std::endl;
+        out << "#This file is rewritten to OFFLINE after reading, if FORCE is not set to 1" << std::endl;
+        out << "ONLINE\t\t0" << std::endl;
+        out << "FORCE\t\t0" << std::endl;
+    }
+    else
+    {
+        std::cout << "ONLINE analysis in FORCED mode. Disable in BB7_TAMEX_CALIB_FILE.txt" << std::endl;
+    }
+
 }
 
 int* BB7_TWINPEAKS_Detector_System::get_pdata() { return pdata; }

@@ -414,7 +414,7 @@ void PLASTIC_TWINPEAKS_Detector_System::calibrate_ONLINE(){
 void PLASTIC_TWINPEAKS_Detector_System::calibrate_OFFLINE(){
 ;
     int channel_ID_tmp = 0;
-    for(int i = 0;i < 9;++i){
+    for(int i = 0;i < 9;++i){ // 9?
         for(int j = 0;j < iterator[i];++j){
             channel_ID_tmp = (int) ch_ID_edge[i][j];
             if(edge_coarse[i][j] != 131313) edge_fine[i][j] = PLASTIC_TAMEX_Calibration->get_Calibration_val(edge_fine[i][j],i,channel_ID_tmp);

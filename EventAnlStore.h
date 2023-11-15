@@ -19,12 +19,26 @@
 //#include "TSCNUnpackEvent.h"
 #include "EventUnpackStore.h"
 #include "AIDA_Event.h"
+#include "BB7_TWINPEAKS_Event_Store.h"
 #include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 
 struct AidaAnlData {
       std::vector<AidaHit> Implants;
       std::vector<AidaHit> Decays;
       };
+
+struct BB7_FEBEX_AnlData
+{
+      std::vector<BB7_FEBEX_Hit> Implants;
+      std::vector<BB7_FEBEX_Hit> Decays;
+};
+
+struct BB7_TWINPEAKS_AnlData
+{
+      std::vector<BB7_TWINPEAKS_Hit> Implants;
+      std::vector<BB7_TWINPEAKS_Hit> Decays;
+};
+
 class EventAnlStore : public TGo4EventElement {
    public:
       EventAnlStore() : TGo4EventElement() {}
@@ -46,6 +60,9 @@ class EventAnlStore : public TGo4EventElement {
       Long64_t pFAT_Tamex_WR;
       Long64_t pAIDA_WR;
       Long64_t pGe_WR;
+      Long64_t pBB7_FEBEX_WR;
+      Long64_t pBB7_TWINPEAKS_WR;
+      Long64_t pBB7_MADC_WR;
       ///FRS Outputs
 
       Float_t pFRS_AoQ;
@@ -108,6 +125,10 @@ class EventAnlStore : public TGo4EventElement {
       Float_t plastIMP_DSSD2_StripX = .0;
       Float_t plastIMP_DSSD3_StripX = .0;
 
+      
+      std::vector<BB7_FEBEX_AnlData> pBB7_FEBEX;
+      std::vector<BB7_TWINPEAKS_UnpackData> pBB7_TWINPEAKS_Unp;
+      std::vector<BB7_TWINPEAKS_AnlData> pBB7_TWINPEAKS;
 
      ///AIDA output
        //AidaAnlData pAida;
@@ -189,8 +210,23 @@ class EventAnlStore : public TGo4EventElement {
       Double_t pbPlas_Slow_TrailT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
       Double_t pbPlas_Fast_ToTCalib[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
       Double_t pbPlas_Slow_ToTCalib[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-      
-      
+
+      // BB7 output
+      Int_t pBB7_TWINPEAKS_FastStrip[BB7_SIDES];
+      Int_t pBB7_TWINPEAKS_SlowStrip[BB7_SIDES];
+      Int_t pBB7_TWINPEAKS_Fast_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+      Double_t pBB7_TWINPEAKS_FastLeadT[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Int_t pBB7_TWINPEAKS_FastLeadHits;
+      Int_t pBB7_TWINPEAKS_Fast_Trail_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+      Int_t pBB7_TWINPEAKS_Slow_Trail_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+      Double_t pBB7_TWINPEAKS_Fast_TrailT[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Double_t pBB7_TWINPEAKS_Slow_TrailT[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Double_t pBB7_TWINPEAKS_Fast_ToTCalib[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Double_t pBB7_TWINPEAKS_Slow_ToTCalib[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Int_t pBB7_TWINPEAKS_Slow_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+      Double_t pBB7_TWINPEAKS_SlowLeadT[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+      Int_t pBB7_TWINPEAKS_SlowLeadHits;
+
           ULong64_t pGe_Event_T[Germanium_MAX_DETS][Germanium_CRYSTALS];
           ULong64_t pGe_T[Germanium_MAX_DETS][Germanium_CRYSTALS];
           ULong64_t pGe_T_Aligned[Germanium_MAX_DETS][Germanium_CRYSTALS];

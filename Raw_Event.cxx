@@ -939,15 +939,73 @@ void Raw_Event::set_DATA_BB7_MADC(int Hits, int* Side, int* Strip, int* ADC_Data
 
 
 void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coarse_BB7_TWINPEAKS, double** Edge_Fine_BB7_TWINPEAKS, UInt** ch_ed_BB7_TWINPEAKS, double* Coarse_Trigger_BB7_TWINPEAKS, double* Fine_Trigger_BB7_TWINPEAKS, int amount_hit_BB7_TWINPEAKS, int** Lead_Arr_BB7_TWINPEAKS)
-{
+{   
     this->amount_hit_BB7_TWINPEAKS = amount_hit_BB7_TWINPEAKS;
 
-    // loop over TAMEX modules
+    // HELENA CODE
+    // first she resets everything... should we do this? why isn't it done anywhere else?
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
+    {   
+        // 100 is max iterator.. this needs clarifying
+        for (int j = 0; j < 100; j++)
+        {
+            leading_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            trailing_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            leading_array_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+        }
+    }
+
+
     for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
+    {
+        // no if check
+        iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
+        trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
+        trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
+        fired_tamex_BB7_TWINPEAKS[i] = (iterator_BB7_TWINPEAKS[i] > 0);
+        leading_hits_BB7_TWINPEAKS[i] = 0;
+        trailing_hits_BB7_TWINPEAKS[i] = 0;
+
+        for (int j = 0; j < iterator_BB7_TWINPEAKS[i]; j++)
+        {
+            ch_ID_BB7_TWINPEAKS[i][j] = ch_ed_BB7_TWINPEAKS[i][j];
+            leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 1)
+            {
+                coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]);
+                leading_hits_BB7_TWINPEAKS[i]++;
+                leading_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+            }
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] > 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 0)
+            {
+                coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                trailing_hits_BB7_TWINPEAKS[i]++;
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j] - 33);
+                if (phys_channel_BB7_TWINPEAKS[i][j] < 100)
+                {
+                    trailing_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+                }
+            }
+        }
+    }
+
+
+
+    // loop over TAMEX modules
+    /*for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
     {
         if (i < BB7_TAMEX_MODULES && it_BB7_TWINPEAKS[i] < 100)
         {   
-            // CEJ: what is the point of this???!?!?!?
+            
             iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
             trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
             trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
@@ -961,7 +1019,7 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
 
                 // CEJ: I think here there were issues with lead/trail when you get lead-lead or trail-trail
-                // hmm maybe not. Not sure 
+                // hmm maybe not. Not sure.
                 if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && j % 2 == 0)
                 {
                     coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
@@ -975,7 +1033,8 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 {
                     coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
                     fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
-
+                    
+                    // CEJ: this is because trails get adjusted by max_cha_input in TWINPEAKS_Detector_System
                     phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]) - 33;
                     trailing_hits_BB7_TWINPEAKS[i]++;
                     if (phys_channel_BB7_TWINPEAKS[i][j] < 100)
@@ -985,7 +1044,7 @@ void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coar
                 }
             }
         }
-    }
+    }*/
 }
 
 
@@ -1347,7 +1406,7 @@ double Raw_Event::get_BB7_TWINPEAKS_fine_trail(int i, int j) { return fine_T_edg
 double Raw_Event::get_BB7_TWINPEAKS_Lead_Lead(int i, int j)
 { 
     double T_lead_BB7_TWINPEAKS1 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]);
-    double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j+2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j+2]);
+    double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j + 2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j + 2]);
     return T_lead_BB7_TWINPEAKS1 - T_lead_BB7_TWINPEAKS2;
 }
 double Raw_Event::get_BB7_TWINPEAKS_TOT(int i,int j)
@@ -1361,6 +1420,7 @@ int Raw_Event::get_BB7_TWINPEAKS_lead_hits(int i) { return leading_hits_bPlastTw
 int Raw_Event::get_BB7_TWINPEAKS_physical_channel(int i, int j) { return phys_channel_BB7_TWINPEAKS[i][j]; }
 int Raw_Event::get_BB7_TWINPEAKS_physical_lead_hits(int i, int j) { return leading_hits_ch_BB7_TWINPEAKS[i][j]; }
 int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trailing_hits_ch_BB7_TWINPEAKS[i][j]; }
+int Raw_Event::get_BB7_TWINPEAKS_leading_arr(int i, int j) { return leading_array_BB7_TWINPEAKS[i][j]; }
 
 
 

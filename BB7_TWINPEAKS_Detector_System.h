@@ -9,7 +9,7 @@
 #include "Raw_Event.h"
 
 #include "TAMEX.h"
-#define MAX_CHA_INPUT 33 // is this correct? trigger + 1-32 for fast/slow?
+#define MAX_CHA_INPUT 33
 
 typedef unsigned long long ULong64_t;
 typedef unsigned long ULong;
@@ -31,11 +31,13 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         int unknown;
         int increase;
 
+        // i don't understand why these are 100
         int am_fired[100];
         int sfp_id[100];
         int trigger_type[100];
         int* iterator;
         int tamex_id[100];
+        int **epoch_ch;
 
         int tamex_iter;
         
@@ -88,8 +90,6 @@ class BB7_TWINPEAKS_Detector_System : public Detector_System
         void write() { return; }
         void set_Gain_Match_Filename(std::string) { return; }
         
-        unsigned int epoch_data; // hmm
-
         bool do_gain_matching(int ts_ns) { return 1; }
         unsigned long next_ts_for_update() { return 1; } 
 
