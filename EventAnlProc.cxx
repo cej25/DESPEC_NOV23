@@ -2001,8 +2001,6 @@ std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(
     {
         if (i.Side == -1 || i.Strip == -1) continue;
 
-        if (i.Side > 0) std::cout << "AND IN HERE SIDE IS > 0 TOOOOOOO" << std::endl;
-
         bool added = false;
         BB7_TWINPEAKS_Cluster* cluster;
         auto it = std::begin(clusters);
@@ -2012,6 +2010,7 @@ std::vector<BB7_TWINPEAKS_Cluster> EventAnlProc::BB7_TWINPEAKS_EventsToClusters(
             bool docluster = true;
             if (docluster && j.IsAdjacent(i) && j.IsGoodTime(i))
             {   
+                
                 if (!added)
                 {
                     j.AddEvent(i);
@@ -4087,9 +4086,7 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
 
                             // if we see this condition, now we find FAST LEAD time from same {k} hit
                             BB7_TWINPEAKS_Event evt;
-                            evt.Side = i;
-                            if (evt.Side > 0) std::cout << "SIDE IS NOT ZERO SEEEEE" << std::endl;
-                            
+                            evt.Side = i;                            
                             evt.Strip = j;
                             evt.Time = pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k];
                             evt.Energy = ToT_BB7_TWINPEAKS_Slow[i][j][k];
@@ -4136,7 +4133,6 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
 
             for (auto & i : ImplantClusters)
             {
-                if (i.Side > 0) std::cout << "Side is > 0" << std::endl;
 
                 {
                     int offset = i.Side * BB7_STRIPS_PER_SIDE;
