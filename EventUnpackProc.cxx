@@ -1377,8 +1377,8 @@ for (int i=0; i<10; i++){
               {   
                   hit.Side = RAW->get_BB7_FEBEX_Side(i);
                   hit.Strip = RAW->get_BB7_FEBEX_Strip(i);
-                  hit.Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
                   hit.Time = RAW->get_BB7_FEBEX_Chan_Time(i);
+                  //hit.Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
                  // hit.CF = RAW->get_BB7_FEBEX_Chan_CF(i);
                  // hit.Pileup = RAW->get_BB7_FEBEX_Pileup(i);
                  // hit.Overflow = RAW->get_BB7_FEBEX_Overflow(i);
@@ -1387,10 +1387,12 @@ for (int i=0; i<10; i++){
                   {
                       // event is implant
                       // push back a vector for each hit in the event
+                      hit.Energy = CalibrateImplantE_FEBEX(RAW->get_BB7_FEBEX_Chan_Energy(i), hit.Side, hit.Strip);
                       BB7_FEBEX.Implants.push_back(hit);
                   }
                   else
-                  {
+                  {   
+                      hit.Energy = CalibrateDecayE_FEBEX(RAW->get_BB7_FEBEX_Chan_Energy(i), hit.Side, hit.Strip);
                       BB7_FEBEX.Decays.push_back(hit);
                   }
 
@@ -3768,6 +3770,17 @@ const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
 
+double EventUnpackProc::CalibrateImplantE_FEBEX(double e, int i, int j)
+{
+    double Energy;
+    Energy = e - fCal->BB7_FEBEX_HighE_A[i][j];
+    return Energy;
+}
 
-// maybe some things in unpack need adjusting....
+double EventUnpackProc::CalibrateDecayE_FEBEX(double e, int i, int j)
+{
+    double Energy;
+    Energy = fCal->BB7_FEBEX_LowE_A[i][j] * e + fCal->BB7_FEBEX_LowE_B[i][j];
+    return Energy;
+}
 

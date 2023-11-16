@@ -4395,23 +4395,16 @@ void EventAnlProc::Process_BB7_FEBEX_Histos(EventUnpackStore* pInputMain, EventA
 
 }
 
-
 double EventAnlProc::CalibrateImplantToT(double& ToT, int i, int j)
 {   
     double Energy;
-    // alignment
-
     Energy = ToT - fCal->BB7_TWINPEAKS_HighE_A[i][j];
-
     return Energy;
 }
 
 double EventAnlProc::CalibrateDecayToT(double& ToT, int i, int j)
 {
     double Energy;
-
-    // linear calibration
     Energy = fCal->BB7_TWINPEAKS_LowE_A[i][j] * ToT + fCal->BB7_TWINPEAKS_LowE_B[i][j];
-
     return Energy;
 }
