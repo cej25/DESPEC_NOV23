@@ -509,7 +509,8 @@ class EventAnlProc : public TGo4EventProcessor {
             AidaHit ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const&);
             BB7_FEBEX_Hit BB7_FEBEX_ClusterPairToHit(std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster> const&);
             BB7_TWINPEAKS_Hit BB7_TWINPEAKS_ClusterPairToHit(std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster> const&);
-
+            double CalibrateImplantToT(double&, int, int);
+            double CalibrateDecayToT(double&, int, int);
 
             int      IsData(std::ifstream &f);
 
