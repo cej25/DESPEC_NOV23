@@ -51,6 +51,10 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "Germanium_Detector_System.h"
 #include "FRS_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_FEBEX_Event_Store.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 
 #include "TAidaConfiguration.h"
 
@@ -61,6 +65,7 @@
 
 #include <string>
 
+#define DEBUG 0
 
 using namespace std;
 
@@ -92,6 +97,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   ///get_WR_Config();
 
 
+
    /// checkTAMEXorVME();
   //create White Rabbit obj
   WR = new White_Rabbit();
@@ -102,13 +108,14 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
    DESPECAnalysis* an = dynamic_cast<DESPECAnalysis*> (TGo4Analysis::Instance());
    
  //create Detector Systems
-  Detector_Systems = new Detector_System*[8];
+  Detector_Systems = new Detector_System*[NUM_SUBSYS];
 
   // all non used systems intialized as NULL
   //-> calling uninitialized system will cause an error !
 
   Detector_Systems[0] = !Used_Systems[0] ? nullptr : new FRS_Detector_System();
   Detector_Systems[1] = !Used_Systems[1] ? nullptr : new AIDA_Detector_System();
+  // CEJ: do we need this switch for BB7?
   if(bPLASTIC_TWINPEAKS==0) Detector_Systems[2] = !Used_Systems[2] ? nullptr : new PLASTIC_TAMEX_Detector_System();
   if(bPLASTIC_TWINPEAKS==1) Detector_Systems[2] = !Used_Systems[2] ? nullptr : new PLASTIC_TWINPEAKS_Detector_System();
   Detector_Systems[3] = !Used_Systems[3] ? nullptr : new FATIMA_Detector_System();
@@ -116,6 +123,9 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   Detector_Systems[5] = !Used_Systems[5] ? nullptr : new Germanium_Detector_System();
   Detector_Systems[6] = !Used_Systems[6] ? nullptr : new FINGER_Detector_System();
   Detector_Systems[7] = !Used_Systems[7] ? nullptr : new Beam_Monitor_Detector_System();
+  Detector_Systems[8] = !Used_Systems[8] ? nullptr : new BB7_FEBEX_Detector_System();
+  Detector_Systems[9] = !Used_Systems[9] ? nullptr : new BB7_TWINPEAKS_Detector_System();
+  Detector_Systems[10] = !Used_Systems[10] ? nullptr : new BB7_MADC_Detector_System();
   
    frs_id = dynamic_cast<TIDParameter*> (an->GetParameter("IDPar"));
 
@@ -123,6 +133,8 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   if(Used_Systems[0]) Make_FRS_Histos();
 
   if(Used_Systems[1]) Make_AIDA_Histos();
+
+  // if (Used_Systems[2]) Make_bPlast_TWINPEAKS_Histos();//?
 
   if(Used_Systems[3])  Make_FATIMA_Histos();
 
@@ -132,6 +144,12 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   
   if(Used_Systems[7]) Make_BeamMonitor_Histos();
 
+  if (Used_Systems[8]) Make_BB7_FEBEX_Histos();
+
+  if (Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+
+  if (Used_Systems[10]) Make_BB7_MADC_Histos();
+
   RAW = new Raw_Event();
 
   load_PrcID_File();
@@ -139,6 +157,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
   load_FingerID_File();
   load_FatTamex_Allocationfile();
   load_bPlasticTamex_Allocationfile();
+  load_BB7_TWINPEAKS_AllocationFile();
   PrintDespecParameters();
 
     WR_count = 0;
@@ -235,7 +254,14 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
     TGo4Log::Info("AIDA: Loaded DSSD Strip Thresholds");
   }
 
+
+  for (int i = 0; i < NUM_SUBSYS; i++)
+  {
+      std::cout << "USED...: " << Used_Systems[i] << std::endl; 
+  }
+
 }
+
 
 void EventUnpackProc::UserPostLoop()
 {
@@ -364,6 +390,13 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
 
         fOutput -> fProcID[PrcID_Conv] = PrcID_Conv;
         
+      // CEJ: some weird stuff here
+       /*  if (Used_Systems[9])
+  {
+      std::cout << PrcID << std::endl;
+      std::cout << PrcID_Conv << std::endl;
+  }*/
+
       //  if(PrcID_Conv==5) cout<<fOutput->fTrigger;
 
         sub_evt_length  = (psubevt->GetDlen() - 2) / 2;
@@ -375,7 +408,7 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
             //Pulls it straight from White_Rabbit class
             WR_tmp = WR->get_White_Rabbit(pdata);
             WR_d = WR->get_Detector_id();
-            pdata = WR->get_pdata();
+            pdata = WR->get_pdata(); // CEJ: perhaps the issue stems from here after reading whiterabbit?
 
             ///Temp WR Skip fix
            if(PrcID ==10|| PrcID == 30 || PrcID==20 || PrcID == 25 || PrcID==41)WR_d=0;
@@ -387,7 +420,10 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
            if(WR_d==4) fOutput->fFat_Tamex_WR = WR_tmp; //Fatima (TAMEX)
            if(WR_d==5) fOutput->fGe_WR = WR_tmp; //Geileo
            if(WR_d==6) fOutput->fFinger_WR = WR_tmp; //FINGER
-
+           if(WR_d==7) fOutput->fBM_WR = WR_tmp; // BeamMonitor 
+           if(WR_d==8) fOutput->fBB7_FEBEX_WR = WR_tmp; // BB7 FEBEX option
+           if(WR_d==9) fOutput->fBB7_TWINPEAKS_WR = WR_tmp; // BB7 TWINPEAKS option
+           if(WR_d==10) fOutput->fBB7_MADC_WR = WR_tmp; // BB7 MADC option
             WR_main = WR_tmp;
 
         }
@@ -434,10 +470,10 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                         }
                     
         
-       if(PrcID_Conv!=7){
+       if(PrcID_Conv!=7){ // CEJ add trigger here if in doubt
            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
             Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
+            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now for BB7_FEBEX
 
         ///get mbs stream data from unpacker (pointer copy solution)
             pdata = Detector_Systems[PrcID_Conv]->get_pdata();
@@ -614,6 +650,9 @@ for (int i=0; i<10; i++){
          ///--------------------------------------------------------------------------------------------///
                                             /** Output AIDA **/
         ///--------------------------------------------------------------------------------------------///
+        
+
+
 
         if (Used_Systems[1] && PrcID_Conv==1){
           TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
@@ -866,8 +905,8 @@ for (int i=0; i<10; i++){
                     if(chan_bPlast_fast_lead>-1 && chan_bPlast_fast_lead<bPLASTIC_CHAN_PER_DET) {
   
                         int N1_fast = fOutput->fbPlast_Fast_Lead_N[bPlasdetnum_fast][chan_bPlast_fast_lead]++;
-          
                         fOutput->fbPlast_Fast_Lead[bPlasdetnum_fast][chan_bPlast_fast_lead][N1_fast] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
+
                            }
                         }
                       }
@@ -889,6 +928,7 @@ for (int i=0; i<10; i++){
           
                     fOutput->fbPlast_Slow_Lead[bPlasdetnum_fast][chan_bPlast_slow_lead][N1_slow] = RAW->get_bPLAST_TWINPEAKS_lead_T(i,j);
                     
+
                             }
                     }
               }///End of lead hits
@@ -934,67 +974,11 @@ for (int i=0; i<10; i++){
                 } ///end tamex hits loop
             } ///End proc ID 2
        // }
-        ///--------------------------------------------------------------------------------------------///
-                                                /**Output bPLASTIC TAMEX  **/
-        ///--------------------------------------------------------------------------------------------///
-//            if(bPLASTIC_TWINPEAKS==0){
-//             int bPlasfired[3];
-//             int Phys_Channel_Lead_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int Phys_Channel_Trail_bPlas[3][bPLASTIC_CHAN_PER_DET];
-//             int N1 =0;
-//             int bPlasdetnum=-1;
-// 
-//         if (Used_Systems[2]&& PrcID_Conv==2){
-//       // cout<<"Event " << event_number<<endl;
-//        for (int i=0; i<RAW->get_PLASTIC_tamex_hits(); i++){///Loop over tamex ID's
-// 
-//             int chan=-1;
-// 
-//            //fOutput->fbPlas_TAMEX_ID = i;
-//             bPlasfired[i] = RAW->get_PLASTIC_am_Fired(i); ///Iterator
-// 
-// 
-//             //TAMEX_bPlast_Det[bPlastTamID][bPlastTamCh]
-// 
-// 
-//             for(int j = 0;j < bPlasfired[i];j++){
-// 
-//               if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 1){ //Lead odd j
-//                   //Phys_Channel_Lead_bPlas[TAMID][Hit]
-//                 Phys_Channel_Lead_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Lead_bPlas[i][j]);
-//                 if(chan>-1){
-//                 /// PMT allocation succeeded
-//                 bPlasdetnum=TAMEX_bPlast_Det[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 fOutput->fbPlasDetNum = bPlasdetnum;
-//                 fOutput->fbPlasChan[bPlasdetnum]=  chan;
-//                 N1 = fOutput->fbPlas_PMT_Lead_N[bPlasdetnum][chan]++;
-// 
-// 
-//             if(N1>-1 && N1<bPLASTIC_TAMEX_HITS){
-// 
-//                fOutput->fbPlas_Lead_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_lead_T(i,j);
-//                   }
-//                 }
-//               }
-//                if(RAW->get_PLASTIC_CH_ID(i,j) % 2 == 0){ //Trail even j
-// 
-//                 Phys_Channel_Trail_bPlas[i][j] = TAMEX_bPlast_Chan[i][RAW->get_PLASTIC_physical_channel(i, j)];
-//                 chan = (Phys_Channel_Trail_bPlas[i][j]);
-// 
-//                if(chan>-1){
-// 
-//                 /// PMT allocation succeeded
-//                  N1 = fOutput->fbPlas_PMT_Trail_N[bPlasdetnum][chan]++;
-//                 if(N1>-1&& N1<bPLASTIC_TAMEX_HITS){
-//              fOutput->fbPlas_Trail_PMT[bPlasdetnum][chan][N1] = RAW->get_PLASTIC_trail_T(i,j);
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      }
+        
+
+
+
+
 
          ///--------------------------------------------------------------------------------------------///
                                                 /**Output FATIMA VME **/
@@ -1339,7 +1323,9 @@ for (int i=0; i<10; i++){
         ///--------------------------------------------------------------------------------------------///
                                             /**Output Germanium **/
         ///--------------------------------------------------------------------------------------------///
+        
         if (Used_Systems[5]&& PrcID_Conv==5){
+
          for (int i=fOutput->fGe_fired; i<RAW->get_Germanium_am_Fired() && i < Germanium_MAX_HITS; i++){
                 fOutput->fGe_Detector[i] =  RAW->get_Germanium_Det_id(i);
                 fOutput->fGe_Crystal[i] =  RAW->get_Germanium_Crystal_id(i);
@@ -1363,98 +1349,10 @@ for (int i=0; i<10; i++){
         }
         ///--------------------------------------------------------------------------------------------///
                                         /** Output FINGER **/
-  ///--------------------------------------------------------------------------------------------///
-      if (Used_Systems[6]&& PrcID_Conv==6){
 
-          int Phys_Channel_Lead[FINGER_TAMEX_MODULES][FINGER_TAMEX_HITS] = {0,0};
-          int Phys_Channel_Trail[FINGER_TAMEX_MODULES][FINGER_TAMEX_HITS] = {0,0};
-
-          int fingfired[FINGER_TAMEX_MODULES] = {0};
-
-          for (int i=0; i<RAW->get_FINGER_tamex_hits(); i++){
-            fingfired[i] = RAW->get_FINGER_am_Fired(i);
-
-            for(int j = 0;j < fingfired[i];j++){
-
-              if(RAW->get_FINGER_CH_ID(i,j) % 2 == 1){ //Lead odd j
-                Phys_Channel_Lead[i][j] = fingID[i][RAW->get_FINGER_physical_channel(i, j)]; //From allocation file
-                int chan = Phys_Channel_Lead[i][j];
-
-                if (chan < 0)
-                  continue;
-
-                // PMT allocation succeeded
-                int N1 = fOutput->fFing_PMT_Lead_N[chan]++;
-                fOutput->fFing_Lead_PMT[chan][N1] = RAW->get_FINGER_lead_T(i,j);
-
-                // PMT "0" is the trigger
-                if (chan == 0 || chan == 1){
-                    fOutput->fFing_SC41_lead[chan][N1] = RAW->get_FINGER_lead_T(i,j);
-                  continue;
-                }
-                // chan = "PMT" number
-                // this maps to two strips to fill in
-                if (chan % 2 == 0) // even PMT = up pmts
-                {
-                  int strip1 = chan;
-                  int strip2 = chan + 1;
-                  int N1 = fOutput->fFing_Strip_N_LU[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_LU[strip2]++;
-                  fOutput->fFing_Lead_Up[strip1][N1] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Lead_Up[strip2][N2] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Strip_N[strip1]++;
-                  fOutput->fFing_Strip_N[strip2]++;
-                                }
-                else // odd = lower PMT
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_LD[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_LD[strip2]++;
-                  fOutput->fFing_Lead_Down[strip1][N1] = RAW->get_FINGER_lead_T(i,j);
-                  fOutput->fFing_Lead_Down[strip2][N2] = RAW->get_FINGER_lead_T(i,j);
-                      }
-              }
-              else{ //Trail even j
-                Phys_Channel_Trail[i][j] = fingID[i][RAW->get_FINGER_physical_channel(i,j)];
-
-                int chan = Phys_Channel_Trail[i][j];
-                if (chan < 0)
-                  continue;
-
-                // PMT allocation succeeded
-                int N1 = fOutput->fFing_PMT_Trail_N[chan]++;
-                fOutput->fFing_Trail_PMT[chan][N1] = RAW->get_FINGER_trail_T(i,j);
-                 // PMT "0" is the trigger
-                if (chan == 0 || chan == 1){
-                    fOutput->fFing_SC41_trail[chan][N1] = RAW->get_FINGER_trail_T(i,j);
-
-                  continue;
-                }
-                if (chan % 2 == 0) // even PMT = up pmts
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_TU[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_TU[strip2]++;
-                  fOutput->fFing_Trail_Up[strip1][N1] = RAW->get_FINGER_trail_T(i,j);
-                  fOutput->fFing_Trail_Up[strip2][N2] = RAW->get_FINGER_trail_T(i,j);
-                 }
-                else // odd = lower PMT
-                {
-                  int strip1 = chan + 1;
-                  int strip2 = chan;
-                  int N1 = fOutput->fFing_Strip_N_TD[strip1]++;
-                  int N2 = fOutput->fFing_Strip_N_TD[strip2]++;
-                  fOutput->fFing_Trail_Down[strip1][N1] = RAW->get_FINGER_trail_T(i,j);
-                  fOutput->fFing_Trail_Down[strip2][N2] = RAW->get_FINGER_trail_T(i,j);
-                }
-              }
-            }
-          }
-        }
-         ///--------------------------------------------------------------------------------------------///
-         if (Used_Systems[7] && PrcID_Conv==7){
+         
+         if (Used_Systems[7] && PrcID_Conv==7)
+         {
              
              BM_Hits_S2 = RAW->get_BM_Hits_S2();
              BM_Hits_S4 = RAW->get_BM_Hits_S4();
@@ -1467,12 +1365,191 @@ for (int i=0; i<10; i++){
                 BM_L_diff_S4[i] = RAW->get_BM_LDiff_S4(i);  
           //       cout<<"BM_L_diff_S4[i] " <<BM_L_diff_S4[i] << " BM_Hits_S4 " <<BM_Hits_S4  <<" i " << i << endl;
              }
+
              
- 
-             
+         } // BM output
+
+          if (Used_Systems[8] && PrcID_Conv == 8)
+          {   
+              BB7_FEBEX_Event hit;
+
+              for (int i = fOutput->fBB7_FEBEX_Hits; i < RAW->get_BB7_FEBEX_Hits() && i < BB7_FEBEX_MAX_HITS; i++)
+              {   
+                  hit.Side = RAW->get_BB7_FEBEX_Side(i);
+                  hit.Strip = RAW->get_BB7_FEBEX_Strip(i);
+                  hit.Time = RAW->get_BB7_FEBEX_Chan_Time(i);
+                  //hit.Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+                 // hit.CF = RAW->get_BB7_FEBEX_Chan_CF(i);
+                 // hit.Pileup = RAW->get_BB7_FEBEX_Pileup(i);
+                 // hit.Overflow = RAW->get_BB7_FEBEX_Overflow(i);
+
+                  fOutput->fBB7_FEBEX_Pileup[i] = RAW->get_BB7_FEBEX_Pileup(i);
+                  fOutput->fBB7_FEBEX_Overflow[i] = RAW->get_BB7_FEBEX_Overflow(i);
+                  fOutput->fBB7_FEBEX_Chan_CF[i] = RAW->get_BB7_FEBEX_Chan_CF(i);
+
+                  if (hit.Energy > BB7_IMPLANT_E_THRESHOLD)
+                  {
+                      // event is implant
+                      // push back a vector for each hit in the event
+                      hit.Energy = CalibrateImplantE_FEBEX(RAW->get_BB7_FEBEX_Chan_Energy(i), hit.Side, hit.Strip);
+                      BB7_FEBEX.Implants.push_back(hit);
+                  }
+                  else
+                  {   
+                      hit.Energy = CalibrateDecayE_FEBEX(RAW->get_BB7_FEBEX_Chan_Energy(i), hit.Side, hit.Strip);
+                      BB7_FEBEX.Decays.push_back(hit);
+                  }
+
+                  fOutput->fBB7_FEBEX_Event_Time[i] = RAW->get_BB7_FEBEX_Sum_Time(i);
+                  fOutput->fBB7_FEBEX_Hits++;
+
+              }
+
+              fOutput->fBB7_FEBEX.push_back(BB7_FEBEX);
+
+
+          } // output BB7 FEBEX
+
+
+        // --- CEJ:  BB7 twinpeaks output ---  //
+        // bPlast currently just a series of detectors, mapped in Raw_Event
+        // we need to map to a Side and Strip and fOutput this
+        // so discrimination is fast/slow - lead/trail - side - strip
+        // important: mapping uses a map not a 2D array.
+
+        // CEJ: can go in header
+        int BB7_TWINPEAKS_Fired[BB7_TAMEX_MODULES];
+        int BB7_TWINPEAKS_Side = -1;
+        int BB7_TWINPEAKS_Strip = -1;
+        int BB7_TWINPEAKS_Channel_ID = -1;
+        int BB7_TWINPEAKS_Physical_Channel = -1;
+
+        if (Used_Systems[9] == 1 && PrcID_Conv == 9)
+        {
             
-             
-         }
+            //BB7_TWINPEAKS_Event hit;
+
+            // loop over TAMEX modules
+            for (int i = 0; i < RAW->get_BB7_TWINPEAKS_tamex_hits(); i++)
+            {   
+                // loop over hits per board
+                // Helena has a condition to check hits < 640 in scanner code....do we need a similar check?
+                BB7_TWINPEAKS_Fired[i] = RAW->get_BB7_TWINPEAKS_am_Fired(i);
+                for (int j = 0; j < BB7_TWINPEAKS_Fired[i]; j++)
+                {
+                    
+                    BB7_TWINPEAKS_Channel_ID = RAW->get_BB7_TWINPEAKS_CH_ID(i, j);
+                    // now use _Channel_ID to get _physical_strip or something
+   
+
+                    // this is where the issue is coming from i think
+                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1;
+                    auto idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                    BB7_TWINPEAKS_Side = BB7_TWINPEAKS_Map[idx].first;
+                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+                    // adding 1, dividing by 2, minusing 1: maps physical channel to fast with 0 based index?
+                    //BB7_TWINPEAKS_detnum = BB7_TWINPEAKS_Side[i][((RAW->get_BB7_TWINPEAKS_physical_channel(i, j) + 1) / 2) - 1]; // get detector for each hit
+
+                    // CEJ: i have taken corrections from Helena
+                    // Now i'm making changes based on BB7 layer
+                    // (in case it breaks) -- yup, i think it did break
+                    if (BB7_TWINPEAKS_Side > -1 && BB7_TWINPEAKS_Side < BB7_SIDES && BB7_TWINPEAKS_Strip > -1 && BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // check det num
+                    {   
+                        // NOW define Fast and Slow
+                        if (BB7_TWINPEAKS_Channel_ID > 0 && BB7_TWINPEAKS_Channel_ID < 66)
+                        {
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 1 && RAW->get_BB7_TWINPEAKS_lead_T(i, j) > 0)
+                            {
+                                // LEADS
+
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
+                                {
+                                    // these are fast leads
+                                    // CEJ: below can be strip - scanner: find TAMEX_bPlast_Chan[i]
+                                    //int chan_BB7_TWINPEAKS_fast_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2) - 1];
+                                    fOutput->fBB7_TWINPEAKS_FastStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // Helena says: no clue what this is supposed to be?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE) // can this ever be false?
+                                    {
+                                        int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // fast leads
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // these are slow leads
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+
+
+                                    //int chan_BB7_TWINPEAKS_slow_lead = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, 2) / 2) -1];
+                                    fOutput->fBB7_TWINPEAKS_SlowStrip[BB7_TWINPEAKS_Side] = BB7_TWINPEAKS_Strip; // HMA - again what is this for?
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        int N1_slow_bb7 = fOutput->fBB7_TWINPEAKS_Slow_Lead_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow_bb7] = RAW->get_BB7_TWINPEAKS_lead_T(i, j);
+                                    }
+                                } // slow leads
+                            } // lead hits
+
+                            if (RAW->get_BB7_TWINPEAKS_leading_arr(i, j) == 0 && RAW->get_BB7_TWINPEAKS_trail_T(i, j) > 0)
+                            {
+                                // TRAILS
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 1) || (BB7_TWINPEAKS_Channel_ID  > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 1))
+                                {     
+
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+                                    // fast trails
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        /*if (fOutput->fBB7_TWINPEAKS_Fast_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a fast trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }*/
+                                        int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        
+                                    }
+                                } // fast trails
+                                if ((BB7_TWINPEAKS_Channel_ID < 33 && BB7_TWINPEAKS_Channel_ID % 2 == 0) || (BB7_TWINPEAKS_Channel_ID > 33 && (BB7_TWINPEAKS_Channel_ID - 33) % 2 == 0))
+                                {
+                                    // slow trails
+                                    /// CEJ CHANGES TO PHYSICAL CHANNEL HERE
+                                    BB7_TWINPEAKS_Physical_Channel = ((RAW->get_BB7_TWINPEAKS_physical_channel(i, j)) / 2) - 1;
+                                    idx = std::make_pair(i, BB7_TWINPEAKS_Physical_Channel);
+                                    BB7_TWINPEAKS_Strip = BB7_TWINPEAKS_Map[idx].second;
+
+                                    
+                                    //int chan_BB7_TWINPEAKS_slow_trail = BB7_TWINPEAKS_Chan[i][(RAW->get_BB7_TWINPEAKS_physical_channel(i, j) / 2)];
+                                    if (BB7_TWINPEAKS_Strip < BB7_STRIPS_PER_SIDE)
+                                    {
+                                        /*if (fOutput->fBB7_TWINPEAKS_Slow_Lead[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow] == 0)
+                                        {
+                                            if (DEBUG) std::cout << "Found a slow trail first, no matching lead!" << std::endl;
+                                            continue;
+                                        }*/
+                                        int N1_slow_bb7 = fOutput->fBB7_TWINPEAKS_Slow_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
+                                        fOutput->fBB7_TWINPEAKS_Slow_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_slow_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        
+                                    }
+
+                                } // slow trails
+                            } // trails
+                        } // chans between 0 and 66
+                    } // check Side and Strip
+                } // loop over hits
+            } // loop over tamex modules
+
+       
+            
+        } // proc id 9
+       
+      
         ///--------------------------------------------------------------------------------------------///
 
       } //End of subevent loop
@@ -1506,6 +1583,12 @@ void EventUnpackProc::FILL_HISTOGRAMS(int PrcID_Conv, int PrcID, int SubType,Eve
   
     ///Beam_Monitor is PrcID_Conv 7 && Used_Systems 7
   if(PrcID_Conv==7 && Used_Systems[7]) Fill_BeamMonitor_Histos();
+
+  if (PrcID_Conv==8 && Used_Systems[8]) Fill_BB7_FEBEX_Histos();
+
+  // bb7 tamex
+
+  if (PrcID_Conv==10 && Used_Systems[10]) Fill_BB7_MADC_Histos();
 }
 
 
@@ -1544,12 +1627,13 @@ void EventUnpackProc::CorrectTimeForMultiplexer(AidaEvent &evt)
 
 
 void EventUnpackProc::load_PrcID_File(){
-  ifstream data("Configuration_Files/DESPEC_General_Setup/PrcID_to_Det_Sys.txt");
+  std::ifstream data("Configuration_Files/DESPEC_General_Setup/PrcID_to_Det_Sys.txt");
   if(data.fail()){
     cerr << "Could not find PrcID config file!" << endl;
     exit(0);
   }
-  int id[9] = {0,0,0,0,0,0,0,0,0};
+  // num_frs_ID ? 
+  int id[8] = {0,0,0,0,0,0,0,0};
   int i = 0;
   string line;
   char s_tmp[100];
@@ -1557,6 +1641,7 @@ void EventUnpackProc::load_PrcID_File(){
     getline(data,line,'\n');
     if(line[0] == '#') continue;
     sscanf(line.c_str(),"%s %d %d %d %d %d %d %d %d %d",s_tmp,&id[0],&id[1],&id[2],&id[3],&id[4],&id[5],&id[6],&id[7],&id[8]);
+    // num frs_ID?
     for(int j = 0; j < 8; ++j){ PrcID_Array[i][j] = id[j];
 
     }
@@ -1568,7 +1653,7 @@ void EventUnpackProc::load_PrcID_File(){
 void EventUnpackProc::load_FatTamex_Allocationfile(){
 
   const char* format = "%d %d %d";
-  ifstream data("Configuration_Files/FATIMA/Fatima_TAMEX_allocation.txt");
+  std::ifstream data("Configuration_Files/FATIMA/Fatima_TAMEX_allocation.txt");
   if(data.fail()){
     cerr << "Could not find Fatima_TAMEX_allocation config file!" << endl;
     exit(0);
@@ -1631,6 +1716,46 @@ void EventUnpackProc::load_bPlasticTamex_Allocationfile(){
    // cout<<"TAMEX_bPlast_Det " <<TAMEX_bPlast_Det[bPlastTamID] <<" TAMEX_bPlast_Chan "<<TAMEX_bPlast_Chan[bPlastTamID][bPlastTamCh]<<" bPlast_det " <<bPlast_det << " bPlastTamID " << bPlastTamID <<" bPlastTamCh " << bPlastTamCh<<" bPlast_ch" <<bPlast_ch << endl;
   }
 }
+
+// ------------ CEJ: LOAD TAMEX ALLOCATION FOR BB7 --------  //
+
+void EventUnpackProc::load_BB7_TWINPEAKS_AllocationFile()
+{
+    std::ifstream file("Configuration_Files/BB7/BB7_TWINPEAKS_allocation.txt");
+    std::cout << "Loading BB7 TWINPEAKS Detector Map" << std::endl;
+    if (file.fail())
+    {
+        std::cerr << "Could not find BB7 TWINPEAKS allocation file!" << std::endl;
+        exit(0);
+    }
+
+    // CEJ: make a map like Germanium? This is less confusing to me
+    constexpr auto ignore = std::numeric_limits<std::streamsize>::max();
+
+    while (file.good())
+    {
+        if (file.peek() == '#')
+        {
+            file.ignore(ignore, '\n');
+            continue;
+        }
+
+        // #TAMEXID | TAMEXCH | SIDE | STRIP      
+        file >> bb7_twinpeaks_mod >> bb7_twinpeaks_chan >> bb7_twinpeaks_side >> bb7_twinpeaks_strip;
+
+        file.ignore(ignore, '\n');
+
+        BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)] = std::make_pair(bb7_twinpeaks_side, bb7_twinpeaks_strip);
+
+        std::cout << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].first << " | " << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].second << std::endl;
+
+    }
+}
+
+
+
+
+
 //---------------------------------------------------------------------------------------------------
 void EventUnpackProc::load_FingerID_File(){
 
@@ -1659,7 +1784,7 @@ void EventUnpackProc::load_FingerID_File(){
 //-----------------------------------------------------------------------------------------------------------------------------//
 Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 
-  for(int i = 0;i < 8;++i){
+  for(int i = 0;i < NUM_SUBSYS;++i){
     for(int j = 0;j < 8;++j){
         ///Fix for FRS
           if (PrcID==100) return -1;
@@ -1671,7 +1796,8 @@ Int_t EventUnpackProc::get_Conversion(Int_t PrcID){
 }
 
 void EventUnpackProc::get_used_systems(){
-    for(int i = 0;i < 8;i++) Used_Systems[i] = false;
+    // CEJ: changing here to use num subsys variable
+    for(int i = 0;i < NUM_SUBSYS;i++) Used_Systems[i] = false;
 
   ifstream data("Configuration_Files/DESPEC_General_Setup/Used_Systems.txt");
   if(data.fail()){
@@ -1688,14 +1814,15 @@ void EventUnpackProc::get_used_systems(){
     sscanf(line.c_str(),"%s %d",s_tmp,&id);
     Used_Systems[i] = (id == 1);
     i++;
-  }
-  string DET_NAME[8] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","Germanium","FINGER","Beam_Monitor"};
+  } 
+  // CEJ: this is defined in multiple places...surely can be done better
+  string DET_NAME[NUM_SUBSYS] = {"FRS","AIDA","PLASTIC","FATIMA_VME","FATIMA_TAMEX","GERMANIUM","FINGER","Beam_Monitor", "BB7_FEBEX", "BB7_TWINPEAKS", "BB7_MADC"};
 
     cout << "\n=====================================================" << endl;
     cout << "\tUSED SYSTEMS" << endl;
     cout << "-----------------------------------------------------" << endl;
-    for(int j = 0;j < 8;++j){
-        if(Used_Systems[j]) cout <<"\t"<< DET_NAME[j] << endl;
+    for(int j = 0;j < NUM_SUBSYS;++j){
+        if(Used_Systems[j]) std::cout <<"\t"<< DET_NAME[j] << std::endl;
     }
     cout << "=====================================================" << endl;
 
@@ -1799,10 +1926,6 @@ void EventUnpackProc::get_used_systems(){
         case 5: index = 10; break;
         case 6: index = 8; break;
     }
-//       sprintf(fname,"FRS/SCI/SCI%s/SCI%s",fext1[index],fext2[index]);
-//       sprintf(name, "SCI%s_L", count_title1[index]);
-//       sprintf(title, "Sc%s L dE [ch]", count_title1[index]);
-//       hSCI_L[index] = MakeH1I(fname,name,4096,0,4096,title,2,3);
 
       hSCI_L[index] = MakeTH1('D', Form("FRS/SCI/SCI%s/SCI%s/SCI%s_L",fext1[index],fext2    [index],count_title1[index]), Form("SCI%s_L", count_title1[index]),4096,0,4096,"Sc%s L dE [ch]", count_title1[index]);
 
@@ -1855,37 +1978,6 @@ void EventUnpackProc::get_used_systems(){
 
         hSCI_Tof5_calib = MakeTH1('D', "FRS/SCI/TOF/TOF(5)/SCI_22_41_Tof5_calib","SCI_22_41_Tof3_calib",40000,0,400000,"TAC SC41-SC22 [pos.corr.]");
 
-
-//         hSCIdE41_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41_TPC42X", 1024,0,4096, 400,-100.,100, "SC41 dE", "TPC42 X[mm]", 2);
-//         hSCIdE41L_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41L_TPC42X", 1024,0,4096, 400,-100.,100, "SC41L dE", "TPC42 X[mm]", 2);
-//         hSCIdE41L_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE41L_TPC41X", 1024,0,4096, 400,-100.,100, "SC41L dE", "TPC41 X[mm]", 2);
-//         hSCIdE41R_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE41R_TPC42X", 1024,0,4096, 400,-100.,100, "SC41R dE", "TPC42 X[mm]", 2);
-//         hSCIdE41R_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE41R_TPC41X", 1024,0,4096, 400,-100.,100, "SC41R dE", "TPC41 X[mm]", 2);
-//
-//         hSCIdE21_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21_TPC42X", 1024,0,4096, 400,-100.,100, "SC41 dE", "TPC42 X[mm]", 2);
-//         hSCIdE21L_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21L_TPC42X", 1024,0,4096, 400,-100.,100, "SC21L dE", "TPC42 X[mm]", 2);
-//         hSCIdE21L_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE21L_TPC41X", 1024,0,4096, 400,-100.,100, "SC21L dE", "TPC41 X[mm]", 2);
-//         hSCIdE21R_TPC42X= MakeH2I("FRS/SCI_TPC/","SCIdE21R_TPC42X", 1024,0,4096, 400,-100.,100, "SC21R dE", "TPC42 X[mm]", 2);
-//         hSCIdE21R_TPC41X= MakeH2I("FRS/SCI_TPC/","SCIdE21R_TPC41X", 1024,0,4096, 400,-100.,100, "SC21R dE", "TPC41 X[mm]", 2);
-
-//         // ToF SC21-SC42 changed on 03.07.2018 SB
-//         sprintf(fname,"FRS/SCI/TOF/TOF(%d)",3);
-//         sprintf(name,"SCI_21_42_TofLL");
-//         hSCI_TofLL3 = MakeH1I(fname,name,1500,0,62000,"TAC SC42L-SC21L [ps]",2,3);
-//
-//         sprintf(name,"SCI_21_42_TofRR");
-//         hSCI_TofRR3 = MakeH1I(fname,name,1500,0,62000,"TAC SC42R-SC21R [ps]",2,3);
-//
-//         sprintf(name,"SCI_21_42_Tof3");
-//         hSCI_Tof3 = MakeH1I(fname,name,1000,0,62000,"TAC SC42-SC21 [ps] (pos.corr.)",2,3);
-
-
-    /*hSCI_dT_21l_41l = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21l_41l","hSCI_dT_21l_41l",5001,0,5000); //from Multihit TDCS
-    hSCI_dT_21r_41r = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21r_41r","hSCI_dT_21r_41r",5001,0,5000);
-
-    hSCI_dT_21l_42l = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21l_42l","hSCI_dT_21l_42l",5001,0,5000);
-    hSCI_dT_21r_42r = MakeTH1('D',"FRS/SCI/dT/SCI_dt_21r_42r","hSCI_dT_21r_42r",5001,0,5000);*/
-
     //ID
 //     cout<<"frs_id->min_aoq_plot " <<frs_id->min_aoq_plot << endl;
     hID_AoQ = MakeTH1('D',"FRS/ID/ID_AoQ","ID_AoQ",1000,2,3,"A/Q S2-S4");
@@ -1895,13 +1987,6 @@ void EventUnpackProc::get_used_systems(){
 
     hID_AoQ_mhtdc = MakeTH1('D',"FRS/MHTDC/ID/ID_AoQ_mhtdc","ID_AoQ",1000,2,3,"A/Q S2-S4");
     hID_AoQ_corr_mhtdc = MakeTH1('D',"FRS/MHTDC/ID/ID_AoQ_corr_mhtdc","ID_AoQ_corr",1000,2,3,"A/Q S2-S4");
-
-
-//     hID_Z_AoQ_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z1_AoQ_mhtdc", "Z1 vs A/Q",1500,frs_id->min_aoq_plot,frs_id->max_aoq_plot, 1500,frs_id->min_z_plot,frs_id->max_z_plot,"A/Q s2-s4", "Z1 s2-s4");
-// 
-//     hID_Z_AoQ_corr_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z_AoQ_corr_mhtdc", "Z1 vs A/Q",1500,frs_id->min_aoq_plot,frs_id->max_aoq_plot, 1000,frs_id->min_z_plot,frs_id->max_z_plot,"A/Q s2-s4", "Z1 s2-s4");
-
-  //  hID_Z_Z2_mhtdc = MakeTH2('D',"FRS/MHTDC/ID/ID_Z1_Z2_mhtdc","Z1 vs. Z2", 1000,frs_id->min_z_plot,frs_id->max_z_plot, 1000,frs_id->min_z_plot,frs_id->max_z_plot,"Z1", "Z2");
 
   //   hID_Z = MakeH1I("ID",Form("ID_Z, gain=%f",music->e1_gain[0]),1000,10,93,"Z s2-s4",2,6);
     hID_Z = MakeTH1('D',"FRS/ID/ID_Z1","ID_Z1",1000,70,90,"Z1 s2-s4");
@@ -1962,16 +2047,6 @@ for(int i=0;i<7;i++)
 
        hTPC_LTRT[i] = MakeTH2('D',Form("FRS/TPC/%s/%s_LTRT",tpc_folder_ext1[i],tpc_folder_ext1[i]), Form("%s_LTRT" ,tpc_folder_ext1[i]), 2048,0,4095, 2048,0,4095,"LT [ch]","RT[ch] ");
 
-//          hID_dEdeg_Z1_Z1AoQgate[i] = MakeTH2('D',"FRS/ID_Gated/ID_dEdeg_Z1/dEdeg_Z1_Z1AoQgated",  name,  1000,frs_id->min_z_plot,frs_id->max_z_plot, 1000, 10.,50., "Z1 from MUSIC41", "dE(S2deg) [a.u.]");
-
-//
-//       sprintf(name,"%s%s",tpc_name_ext1[i],"LTRT");
-//       hTPC_LTRT[i]=MakeTH2('D',fname,name, 2048,0,4095, 2048,0,4095,"LT [ch]","RT[ch] ");
-
-      //hTPC_DELTAX[i]=MakeTH1(fname,"x0-x1",i,100,-10.,10.,
-              //   "x0-x1[mm]",2,3);
-
-       // hTPC_DELTAX[i]=MakeTH1('D',fname,"x0-x1",i,100,-10.,10.,"x0-x1[mm]");
 
     }
     //TPCs at S2 focus (23 24)
@@ -2141,10 +2216,6 @@ for(int i=0;i<7;i++)
    
    // end KW
 
-    
-//     htimestamp = MakeTH1('D',"FRS/timestamp","timestamp",30,0.,300.);
-//     hts = MakeTH1('D',"FRS/ts","ts",30,0.,300.);
-//     hts2 = MakeTH1('D',"FRS/ts2","ts2",30,0.,300.);
 
 
   }
@@ -2540,24 +2611,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
   if(sci_x[5]!=0 && TPC_X_sc41!=-999) hSCI_X_XTPC[5]->Fill(sci_x[5],TPC_X_sc41);
   if(sci_x[6]!=0 && TPC_X_sc42!=-999) hSCI_X_XTPC[6]->Fill(sci_x[6],TPC_X_sc42);
 
-  //      if(sci_e[5]!=0 && TPC_X[5]!=0) hSCIdE41_TPC42X->Fill(sci_e[5],TPC_X[5]); //dE_SCI_41 vs TPC_42X
-  //      if(sci_l[5]!=0 &&TPC_X[5]!=0) hSCIdE41L_TPC42X->Fill(sci_l[5],TPC_X[5]); //dE_SCI_41L vs TPC_42X
-  //      if(sci_l[5]!=0 &&TPC_X[4]!=0) hSCIdE41L_TPC41X->Fill(sci_l[5],TPC_X[4]); //dE_SCI_41L vs TPC_41X
-  //      if(sci_r[5]!=0 &&TPC_X[5]!=0) hSCIdE41R_TPC42X->Fill(sci_r[5],TPC_X[5]); //dE_SCI_41R vs TPC_42X
-  //      if(sci_r[5]!=0 &&TPC_X[4]!=0) hSCIdE41R_TPC41X->Fill(sci_r[5],TPC_X[4]); //dE_SCI_41R vs TPC_41X
-  //       //cout<<"sci_e[0] " << sci_e[0] <<endl;
-  //      if(sci_e[0]!=0 &&TPC_X[5]!=0) hSCIdE21_TPC42X->Fill(sci_e[0],TPC_X[5]); //dE_SCI_21 vs TPC_42X
-  //      if(sci_l[0]!=0 &&TPC_X[5]!=0) hSCIdE21L_TPC42X->Fill(sci_l[0],TPC_X[5]); //dE_SCI_21L vs TPC_42X
-  //      if(sci_l[0]!=0 &&TPC_X[4]!=0) hSCIdE21L_TPC41X->Fill(sci_l[0],TPC_X[4]); //dE_SCI_21L vs TPC_41X
-  //      if(sci_l[0]!=0 &&TPC_X[4]!=0) hSCIdE21R_TPC42X->Fill(sci_l[0],TPC_X[4]); //dE_SCI_21R vs TPC_42X
-  //      if(sci_r[0]!=0 &&TPC_X[4]!=0) hSCIdE21R_TPC41X->Fill(sci_r[0],TPC_X[4]); //dE_SCI_21R vs TPC_41X
-
-  //  TPC_X_s2_foc_23_24 = RAW->get_FRS_tpc_x_s2_foc_23_24();
-  // TPC_Y_s2_foc_23_24 = RAW->get_FRS_tpc_y_s2_foc_23_24();
-  // TPC_X_angle_s2_foc_23_24 = RAW->get_FRS_tpc_x_angle_s2_foc_23_24();
-  // TPC_Y_angle_s2_foc_23_24 = RAW->get_FRS_tpc_y_angle_s2_foc_23_24();
-
-
 
   if(TPC_X_s2_foc_23_24!=-999)hTPC_X_S2_TPC_23_24->Fill(TPC_X_s2_foc_23_24);
   if(TPC_Y_s2_foc_23_24!=-999)hTPC_Y_S2_TPC_23_24->Fill(TPC_Y_s2_foc_23_24);
@@ -2637,30 +2690,10 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     }
   }
 
-  //     htpc_X2->Fill(TPC_X[2]);
-  //     htpc_Y2->Fill(TPC_Y[2]);
-  //     htpc_X4->Fill(TPC_X[4]);
-  //     htpc_Y4->Fill(TPC_Y[4]);
   for(int i=0;i<2;i++){
     if(ID_brho[i]!=0)hID_BRho[i]->Fill(ID_brho[i]);
   }
 
-  //SCI tx
-  //if(sci_dt_21l_21r) hSCI_dT_21l_21r->Fill(sci_dt_21l_21r);
-  //     if(sci_dt_41l_41r) hSCI_dT_41l_41r->Fill(sci_dt_41l_41r);
-  //     if(sci_dt_42l_42r) hSCI_dT_42l_42r->Fill(sci_dt_42l_42r);
-
-  //    if(sci_dt_21l_41l!=0) hSCI_dT_21l_41l->Fill(sci_dt_21l_41l);
-  //     if(sci_dt_21r_41r!=0) hSCI_dT_21r_41r->Fill(sci_dt_21r_41r);
-  //
-  //     if(sci_dt_21l_42l!=0) hSCI_dT_21l_42l->Fill(sci_dt_21l_42l);
-  //     if(sci_dt_21r_42r!=0) hSCI_dT_21r_42r->Fill(sci_dt_21r_42r);
-
-  ///For TAC
-  // if(beta!=0)cout<<"beta " << beta*1000<<endl;
-  //     if(beta!=0) hID_beta->Fill(beta*1000);
-  // if(beta3) hbeta3->Fill(beta3);
-  //}
 
 
   if(PrcID==20){
@@ -2674,31 +2707,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     /****  S4  (MUSIC 2)   */
     if(ID_z2!=0) hID_Z2->Fill(ID_z2);
     /****  S4  (MUSIC OLD)   */
-    //hID_Z3->Fill(ID_z3);
-
-    //      hID_Z_Z2->Fill(ID_z,ID_z2);
-    //      if(ID_z!=0 && Music_dE[1]!=0)hID_Z_dE2->Fill(ID_z,Music_dE[1]);
-    // hID_Z_Z3->Fill(ID_z,ID_z3);
-    //if(ID_z!=0 && sci_l[2]!=0 && sci_r[2]!=0)hID_Z_Sc21E->Fill(ID_z, sqrt(sci_l[2]*sci_r[2]));
-
-    //      if(ID_x2!=0&&ID_x4!=0 ) hID_x2x4->Fill(ID_x2, ID_x4);
-    //      if(AoQ!=0 && sci_e[5]!=0) hID_SC41dE_AoQ->Fill(AoQ, sci_e[5]);
-    // 
-    //      if(sci_tof2!=0 && Music_dE[0]!=0) hID_dEToF->Fill(sci_tof2, Music_dE[0]);
-    // 
-    //      if(ID_z!=0 && ID_x2!=0) hID_x2z->Fill(ID_z, ID_x2);// MUSIC1
-    //      if(ID_z!=0 && ID_x4!=0) hID_x4z->Fill(ID_z, ID_x4);// MUSIC1
-    // 
-    //      if(ID_x4!=0 && Music_dE[0]!=0) hID_E_Xs4->Fill(ID_x4,Music_dE[0]);
-    //      if(ID_x4!=0 && Music_dE[0]!=0)hID_E_Xs2->Fill(ID_x2,Music_dE[0]);
-    // 
-    //      if(ID_x2!=0 && ID_a2!=0)hID_x2a2->Fill(ID_x2,ID_a2);
-    //      if(ID_y2!=0 && ID_b2!=0)hID_y2b2->Fill(ID_y2,ID_b2);
-    //      if(ID_x4!=0 && ID_a4!=0)hID_x4a4->Fill(ID_x4,ID_a4);
-    //      if(ID_x4!=0 && ID_b4!=0) hID_y4b4->Fill(ID_y4,ID_b4);
-    //      
-    //      if(AoQ_corr!=0 && ID_a2!=0)hID_AoQa2->Fill(AoQ_corr,ID_a2);
-    //      if(AoQ_corr!=0 && ID_a4!=0)hID_AoQa4->Fill(AoQ_corr,ID_a4);
 
 
     ///MHTDC
@@ -2712,12 +2720,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
 	if(ID_tof4121_mhtdc[i]!=0) hMultiHitTDC_TOF_41_21->Fill(ID_tof4121_mhtdc[i]);
 	if(ID_tof4122_mhtdc[i]!=0) hMultiHitTDC_TOF_41_22->Fill(ID_tof4122_mhtdc[i]);
 
-	//if(ID_tof4121_mhtdc[i]!=0 && i==0) hMultiHitTDC_TOF_41_21_first_hit->Fill(ID_tof4121_mhtdc[i]);
-
-	//  if(ID_tof4121_mhtdc[i]!=0 && i>0) hMultiHitTDC_TOF_41_21_excl_first_hit->Fill(ID_tof4121_mhtdc[i]);
-
-
-	//  if(ID_tof4121_mhtdc>147.3 && ID_tof4121_mhtdc<147.73)
 
       }
 
@@ -2869,48 +2871,6 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
       // h1_VFTX_TOF_42_21->Fill(ToF_vftx_2142_calib[i]);
       
       
-      
-      // cout<<" TRaw_vftx_41l "<<TRaw_vftx_41l << " TRaw_vftx_41r "<<TRaw_vftx_41r <<" TRaw_vftx_21l "<<TRaw_vftx_21l <<" TRaw_vftx_21r " <<TRaw_vftx_21r  << "TOF " <<(0.5*((TRaw_vftx_41l+TRaw_vftx_41r)-(TRaw_vftx_21l+TRaw_vftx_21r)))<< endl;
-      //    ///SCI41 -SCI21 ToF
-      //   if(TRaw_vftx_41l[i]!=0.&&TRaw_vftx_41r[i]!=0.&&TRaw_vftx_21l[i]!=0.&&TRaw_vftx_21r[i]!=0.){
-      //    hvftx_ToFraw_2141->Fill((0.5*((TRaw_vftx_41l[i]+TRaw_vftx_41r)-(TRaw_vftx_21l+TRaw_vftx_21r))));//ps
-      // 
-      //     }
-      //     ///SCI41 -SCI21 LL
-      //   if(TRaw_vftx_41l!=0.&&TRaw_vftx_21l!=0.){
-      //    hvftx_ToFraw_2141LL->Fill((TRaw_vftx_41l-TRaw_vftx_21l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI22 LL
-      //   if(TRaw_vftx_41l!=0.&&TRaw_vftx_21l!=0.){
-      //    hvftx_ToFraw_2241LL->Fill((TRaw_vftx_41l-TRaw_vftx_22l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI21 RR
-      //   if(TRaw_vftx_41r!=0.&& TRaw_vftx_21r!=0.){
-      //    hvftx_ToFraw_2241RR->Fill((TRaw_vftx_41r-TRaw_vftx_22r));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI41 -SCI22 RR
-      //   if(TRaw_vftx_41r!=0.&& TRaw_vftx_21r!=0.){
-      //    hvftx_ToFraw_2141RR->Fill((TRaw_vftx_41r-TRaw_vftx_21r));//ps
-      // 
-      //     }
-      //     
-      //      ///SCI42 -SCI21 LL
-      //   if(TRaw_vftx_42l!= 0 &&TRaw_vftx_21l!= 0){
-      //    hvftx_ToFraw_2142LL->Fill((TRaw_vftx_42l-TRaw_vftx_21l));//ps
-      // 
-      //     }
-      //     
-      //     ///SCI42 -SCI21 RR
-      //   if(TRaw_vftx_42r!=0 && TRaw_vftx_21r!=0){
-      //    hvftx_ToFraw_2141RR->Fill((TRaw_vftx_42r-TRaw_vftx_21r));//ps
-      // 
-      //         }
       // KW add all hits
       if(TRaw_vftx_21l[i]!=0.&&TRaw_vftx_21r[i]!=0.)
 	h1_VFTX_deltaT_S21->Fill(TRaw_vftx_21l[i]-TRaw_vftx_21r[i]);
@@ -3163,82 +3123,8 @@ void EventUnpackProc::Fill_AIDA_Histos() {
   }
 }
 
-/**----------------------------------------------------------------------------------------------**/
-/**-----------------------------------------  FATIMA TAMEX  ------------------------------------------**/
-/**----------------------------------------------------------------------------------------------**/
-///This can be enabled for testing purposes, otherwise not needed
-//  void EventUnpackProc::Make_FATIMA_TAMEX_Histos(){
-//
-//
-// //         for(int i=0; i<FATIMA_TAMEX_CHANNELS; i++){
-// //              hFATlead_Coarse[i]= MakeTH1('D', Form("FATIMA_TAMEX/Lead_Coarse/Lead-CoarseCh.%02d", i), Form("Lead Coarse %2d", i), 5000, -5000., 5000.);
-// //              hFATlead_Fine[i]= MakeTH1('D', Form("FATIMA_TAMEX/Lead_Fine/Lead-FineCh.%02d", i), Form("Lead Fine %2d", i), 600, -1., 2.);
-// // //              hFATtrail_Coarse[i]= MakeTH1('D', Form("FATIMA_TAMEX/Trail_Coarse/Trail-CoarseCh.%02d", i), Form("Trail Coarse %2d", i), 5000, -5000., 5000.);
-// // //              hFATtrail_Fine[i]= MakeTH1('D', Form("FATIMA_TAMEX/Trail_Fine/Trail-FineCh.%02d", i), Form("Trail Fine %2d", i), 600, -1., 2.);
-// //
-// //
-// //             }
-//         }
-  //-----------------------------------------------------------------------------------------------------------------------------//
 
-//   void EventUnpackProc::Fill_FATIMA_TAMEX_Histos(){
-//
-//       ///TAMEX
-// //     //get amount of fired Tamex modules
-// //     int TamexHits_Fatima = RAW->get_FATIMA_tamex_hits();
-// //
-// //     int Lead_Fatima_Coarse[4][32];
-// //     double Lead_Fatima_Fine[4][32];
-// //     int Trail_Fatima_Coarse[4][32];
-// //     double Trail_Fatima_Fine[4][32];
-// //     int Phys_Channel_Fatima[32];
-// //     int leadHits_Fatima = 0,leadHitsCh_Fatima = 0;
-// //     int trailHits_Fatima = 0,trailHitsCh_Fatima = 0;
-// //
-// //
-// //     for(int i=0; i<32; i++){
-// //      Phys_Channel_Fatima[i] = 0;
-// //     }
-// //
-// //     for(int i =0; i<4; i++){
-// //         for(int j=0; j<32;j++){
-// //      Lead_Fatima_Coarse[i][j] = 0;
-// //      Lead_Fatima_Fine[i][j] = 0;
-// //      Trail_Fatima_Coarse[i][j] = 0;
-// //      Trail_Fatima_Fine[i][j] = 0;
-// //         }
-// //
-// //     for(int i = 0;i < TamexHits_Fatima;++i){
-// //
-// //       leadHits_Fatima = RAW->get_FATIMA_lead_hits(i);
-// //       trailHits_Fatima = RAW->get_FATIMA_trail_hits(i);
-// //
-// //
-// //         //Box diagrams for leading and trailing
-// //       for(int j = 0;j < RAW->get_FATIMA_am_Fired(i);j++){
-// //          if(RAW->get_FATIMA_CH_ID(i,j) % 2 == 1){
-// //             Phys_Channel_Fatima[j] =TAMEX_Fat_ID[i][RAW->get_FATIMA_physical_channel(i, j)];
-// //           //  Lead_Fatima[i][j] = RAW->get_FATIMA_lead_T(i,j);
-// //             Lead_Fatima_Coarse[i][j] = RAW->get_FATIMA_coarse_lead(i,j);
-// //             Lead_Fatima_Fine[i][j] = RAW->get_FATIMA_fine_lead(i,j);
-// //
-// // //             hFATlead_Coarse[Phys_Channel_Fatima[j]]->Fill(Lead_Fatima_Coarse[i][j]);
-// // //             hFATlead_Fine[Phys_Channel_Fatima[j]]->Fill(Lead_Fatima_Fine[i][j]);
-// //
-// //         }
-// //          if(RAW->get_FATIMA_CH_ID(i,j) % 2 == 0){
-// //             Phys_Channel_Fatima[j] = RAW->get_FATIMA_physical_channel(i,j);
-// //           //  Trail_Fatima[Phys_Channel_Fatima[j]] = RAW->get_FATIMA_trail_T(i,j);
-// //             Trail_Fatima_Coarse[i][j] = RAW->get_FATIMA_coarse_trail(i,j);
-// //             Trail_Fatima_Fine[i][j] = RAW->get_FATIMA_fine_trail(i,j);
-// // //          hFATtrail_Coarse[Phys_Channel_Fatima[j]]->Fill(Trail_Fatima_Coarse[i][j]);
-// //       //    hFATtrail_Fine[Phys_Channel_Fatima[j]]->Fill(Trail_Fatima_Fine[i][j]);
-// //                 }
-// //             }
-// //         }
-// //     }
-//
-//   }
+
   /**----------------------------------------------------------------------------------------------**/
 /**-----------------------------------------  FATIMA VME  ------------------------------------------**/
 /**----------------------------------------------------------------------------------------------**/
@@ -3305,7 +3191,6 @@ void EventUnpackProc::Fill_FATIMA_Histos(EventUnpackStore* fOutput){
 /**----------------------------------------   Germanium   -----------------------------------------**/
 /**----------------------------------------------------------------------------------------------**/
 
-
 void EventUnpackProc::Make_Germanium_Histos(){
     Text_t chis[256];
     Text_t chead[256];
@@ -3320,11 +3205,7 @@ void EventUnpackProc::Make_Germanium_Histos(){
                     
         }
     }
-//   for (int j; j<Germanium_MAX_HITS; j++){
-//       
-//
-//                     }
-//     hFebTime  = MakeTH1('D',"SysTime/FebexClock","Febex clock",200000,0,200000);
+
                 }
 /**----------------------------------------------------------------------------------------------**/                
 void EventUnpackProc::Fill_Germanium_Histos(){
@@ -3332,7 +3213,6 @@ void EventUnpackProc::Fill_Germanium_Histos(){
     //double tmpGe[32];
     int  Germanium_hits;
     //GeID;
-
      /**------------------Germanium Raw Energy -----------------------------------------**/
       Germanium_hits = RAW->get_Germanium_am_Fired();
       
@@ -3350,6 +3230,88 @@ void EventUnpackProc::Fill_Germanium_Histos(){
         }
      }
    }
+
+void EventUnpackProc::Make_BB7_FEBEX_Histos()
+{ 
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_FEBEX_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 2000000.);
+        }
+        hBB7_FEBEX_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 2000000.);
+    }
+    hBB7_FEBEX_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/FEBEX/Raw/BB7_FEBEX_Energy_Spectra/BB7_FEBEX_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 2000000.);
+
+    hBB7_FEBEX_Hit_Pattern = MakeTH1('I', "BB7_Layer/FEBEX/Raw/BB7_FEBEX_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+}
+
+void EventUnpackProc::Fill_BB7_FEBEX_Histos()
+{ 
+    
+    int Hits = RAW->get_BB7_FEBEX_Hits();
+    for (int i = 0; i < Hits; i++)
+    {   
+        int Side = RAW->get_BB7_FEBEX_Side(i);
+        int Strip = RAW->get_BB7_FEBEX_Strip(i);
+        if (Side > -1 && Strip > -1)
+        { 
+            double Energy = RAW->get_BB7_FEBEX_Chan_Energy(i);
+            hBB7_FEBEX_Raw_E[Side][Strip]->Fill(Energy);
+            hBB7_FEBEX_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+            hBB7_FEBEX_Raw_E_Sum_Total->Fill(Energy);
+            // CEJ: currently 1-64, could be per side or febex module
+            hBB7_FEBEX_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        }
+
+        
+    }
+
+}
+
+
+
+void EventUnpackProc::Make_BB7_MADC_Histos()
+{
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            hBB7_MADC_Raw_E[i][j] = MakeTH1('D', Form("BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d_Strip:%2d", i, j), Form("BB7 Energy Raw - Side: %2d, Strip: %2d", i, j), 20000, 0., 2000000.);
+        }
+        hBB7_MADC_Raw_E_Sum_Side[i] = MakeTH1('D', Form("BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Side:%2d", i), Form("BB7 Energry Raw - Side: %2d", i), 20000, 0., 2000000.);
+    }
+    hBB7_MADC_Raw_E_Sum_Total = MakeTH1('D', "BB7_Layer/MADC/Raw/BB7_MADC_Energy_Spectra/BB7_MADC_Raw_E_Total", Form("BB7 Energy Raw (Total)"), 20000, 0., 2000000.);
+
+    // should this be 1-64 or 2 x 1-32? or 4 x 1-16?
+    hBB7_MADC_Hit_Pattern = MakeTH1('I', "BB7_Layer/MADC/Raw/BB7_MADC_Hit_Pattern", "BB7 Hit Pattern", 64, 0, 64);
+
+}
+
+
+void EventUnpackProc::Fill_BB7_MADC_Histos()
+{
+    int Hits = RAW->get_BB7_MADC_Hits();
+    for (int i = 0; i < Hits; i++)
+    {   
+        int Side = RAW->get_BB7_MADC_Side(i);
+        int Strip = RAW->get_BB7_MADC_Strip(i);
+        if (Side > -1 && Strip > -1)
+        {
+            int Energy = RAW->get_BB7_MADC_ADC(i);
+
+            hBB7_MADC_Raw_E[Side][Strip]->Fill(Energy);
+            hBB7_MADC_Raw_E_Sum_Side[Side]->Fill(Energy); // CEJ: is this useful?
+            hBB7_MADC_Raw_E_Sum_Total->Fill(Energy);
+            // CEJ: currently 1-64, could be per side or febex module
+            hBB7_MADC_Hit_Pattern->Fill(Side * BB7_STRIPS_PER_SIDE + Strip);
+        }
+    }
+    
+}
+
+
 //-----------------------------------------------------------------------------------------------------------------------------//
 /**----------------------------------------------------------------------------------------------**/
 /**----------------------------------------   Beam Monitor   -----------------------------------------**/
@@ -3548,6 +3510,8 @@ void EventUnpackProc::Make_BeamMonitor_Histos(){
    	gBM_s2gr_dctime->GetXaxis()->SetNdivisions(-4);
 	gBM_s2gr_dctime->Draw("APC");
    }
+
+
    //-----------------------------------------------------------------------------------------------------------------------------//
 void EventUnpackProc::Fill_BeamMonitor_Histos(){
 	Int_t BM_Hits;
@@ -3749,49 +3713,6 @@ void EventUnpackProc::Fill_BeamMonitor_Histos(){
    }
 //-----------------------------------------------------------------------------------------------------------------------------//
 
-// void EventUnpackProc::checkTAMEXorVME(){
-//
-//   std::ifstream PL_FILE("Configuration_Files/DESPEC_General_Setup/TAMEX_or_VME.txt");
-//
-//   std::string line;
-//
-//   if(PL_FILE.fail()){
-//     std::cerr << "Could not find Configuration_Files/DESPEC_General_Setup/TAMEX_or_VME.txt file" << std::endl;
-//     exit(1);
-//   }
-//   bool T_or_V_bPlas = false;
-//   bool T_or_V_Fatima = false;
-//   bool T_and_V_Fatima = false;
-//   while(std::getline(PL_FILE,line)){
-//     if(line[0] == '#') continue;
-//
-//     if(line == "VME_bPlas") T_or_V_bPlas = true;
-//     if(line == "TAMEX_bPlas") T_or_V_bPlas = false;
-//
-//     if(line == "VME_Fatima") T_or_V_Fatima = true;
-//     if(line == "TAMEX_Fatima") T_or_V_Fatima = false;
-//
-//     if(line == "VME_AND_TAMEX_Fatima") T_or_V_Fatima = false;
-//     if(line == "VME_AND_TAMEX_Fatima") T_and_V_Fatima = true;
-//
-//     if(line == "VME_Fatima") T_and_V_Fatima = false;
-//     if(line == "TAMEX_Fatima") T_and_V_Fatima = false;
-//
-//
-// //     if(line != "VME_bPlas" && line != "TAMEX_bPlas"){
-// //       std::cerr << line << " module of PLASTIC not known!" <<std::endl;
-// //       exit(1);
-// //     }
-//   }
-//
-//   VME_TAMEX_bPlas = T_or_V_bPlas;
-//   VME_TAMEX_Fatima = T_or_V_Fatima;
-//   VME_AND_TAMEX_Fatima = T_and_V_Fatima;
-//
-//
-// }
-
-
 
 //-----------------------------------------------------------------------------------------------------------------------------//
 
@@ -3826,38 +3747,26 @@ TH1I* EventUnpackProc::MakeH1I(const char* fname,
 }
 //-----------------------------------------------------------------------------------------------------------------------------//
 
-// TH2I* EventUnpackProc::MakeH2I(const char* fname,
-//                              const char* hname,
-//                              Int_t nbinsx, Float_t xmin, Float_t xmax,
-//                              Int_t nbinsy, Float_t ymin, Float_t ymax,
-//                              const char* xtitle, const char* ytitle,
-//                              Color_t markercolor) {
-// //    TNamed* res = TestObject((getfunc)&TGo4EventProcessor::GetHistogram, fname, hname);
-// //    if (res!=0) return dynamic_cast<TH2I*>(res);
-// 
-//    TH2I* histo = new TH2I(hname, hname, nbinsx, xmin, xmax, nbinsy, ymin, ymax);
-//    histo->SetMarkerColor(markercolor);
-//    histo->SetXTitle(xtitle);
-//    histo->SetYTitle(ytitle);
-//    AddHistogram(histo, fname);
-//    return histo;
-// }
-// TH1I* EventUnpackProc::MakeTH1(const char* foldername, const char* name, int nameindex,
-//                   Int_t nbinsx, Float_t xmin, Float_t xmax,
-//                   const char* xtitle, Color_t linecolor, Color_t fillcolor)
-// {
-//   char fullname[100];
-//   if(nameindex>=0)
-//     sprintf(fullname,"%s%s",tpc_name_ext1[nameindex],name);
-//   else
-//     strcpy(fullname, name);
-//   return MakeH1I(foldername, fullname, nbinsx, xmin, xmax, xtitle,
-//          linecolor, fillcolor);
-// }
 const  char* EventUnpackProc::tpc_name_ext1[7]={"TPC21_","TPC22_","TPC23_","TPC24_","TPC41_","TPC42_", "TPC31_"};
 const  char* EventUnpackProc::tpc_folder_ext1[7]={"TPC21","TPC22","TPC23","TPC24","TPC41","TPC42","TPC31"};
+
 
 
 //-----------------------------------------------------------------------------------------------------------------------------//
 //                                                            END                                                              //
 //-----------------------------------------------------------------------------------------------------------------------------//
+
+double EventUnpackProc::CalibrateImplantE_FEBEX(double e, int i, int j)
+{
+    double Energy;
+    Energy = e - fCal->BB7_FEBEX_HighE_A[i][j];
+    return Energy;
+}
+
+double EventUnpackProc::CalibrateDecayE_FEBEX(double e, int i, int j)
+{
+    double Energy;
+    Energy = fCal->BB7_FEBEX_LowE_A[i][j] * e + fCal->BB7_FEBEX_LowE_B[i][j];
+    return Energy;
+}
+

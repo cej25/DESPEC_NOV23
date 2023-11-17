@@ -18,6 +18,8 @@
 
 
 #include "AIDA_Event.h"
+#include "BB7_FEBEX_Event_Store.h"
+#include "BB7_TWINPEAKS_Event_Store.h"
 #include "TGo4EventElement.h"
 
 // KW add
@@ -35,6 +37,18 @@ struct AidaUnpackData {
 
       std::vector<AidaHit> Implants;
       std::vector<AidaHit> Decays;
+};
+
+struct BB7_FEBEX_UnpackData
+{
+    std::vector<BB7_FEBEX_Event> Implants;
+    std::vector<BB7_FEBEX_Event> Decays;
+};
+
+struct BB7_TWINPEAKS_UnpackData
+{
+    std::vector<BB7_TWINPEAKS_Event> Implants;
+    std::vector<BB7_TWINPEAKS_Event> Decays;
 };
 
 class EventUnpackStore : public TGo4EventElement {
@@ -104,7 +118,7 @@ public:
         //General Output
         Int_t     fevent_number;
         Int_t     fTrigger;
-        Int_t     fProcID[7];
+        Int_t     fProcID[NUM_SUBSYS];
         Int_t     fScalar_fired;
         Int_t     fScalar_ID;
 
@@ -159,6 +173,38 @@ public:
          bool     fGe_Pileup[Germanium_MAX_HITS];
          bool     fGe_Overflow[Germanium_MAX_HITS];
          Long64_t fGe_WR;
+
+         // BB7
+         Long64_t fBM_WR;
+         Long64_t fBB7_FEBEX_WR;
+
+        std::vector<BB7_FEBEX_UnpackData> fBB7_FEBEX;
+
+
+        int fBB7_FEBEX_Hits;
+        int fBB7_FEBEX_Side[BB7_FEBEX_MAX_HITS];
+        int fBB7_FEBEX_Strip[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Event_Time[BB7_FEBEX_MAX_HITS];
+        double fBB7_FEBEX_Chan_Energy[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Chan_Time[BB7_FEBEX_MAX_HITS];
+        ULong64_t fBB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
+        bool fBB7_FEBEX_Pileup[BB7_FEBEX_MAX_HITS];
+        bool fBB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
+
+        Long64_t fBB7_TWINPEAKS_WR;
+        int fBB7_TWINPEAKS_FastStrip[BB7_SIDES];
+        int fBB7_TWINPEAKS_SlowStrip[BB7_SIDES];
+        int fBB7_TWINPEAKS_Fast_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        double fBB7_TWINPEAKS_Fast_Lead[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+        int fBB7_TWINPEAKS_Slow_Lead_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        double fBB7_TWINPEAKS_Slow_Lead[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS];
+        int fBB7_TWINPEAKS_Fast_Trail_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        double fBB7_TWINPEAKS_Fast_Trail[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS]; // tamex_max_hits?
+        int fBB7_TWINPEAKS_Slow_Trail_N[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        double fBB7_TWINPEAKS_Slow_Trail[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_MAX_HITS]; // tamex_max_hits?
+        
+    
+         Long64_t fBB7_MADC_WR;
 
 
         Long64_t fFinger_WR;

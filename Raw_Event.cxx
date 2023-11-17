@@ -441,44 +441,11 @@ for(int i=0; i<10; i++){
 
     
     ID_mhtdc_tof4221 = id_mhtdc_tof4221;
-    
-
-//          ID_mhtdc_AoQ = id_mhtdc_aoq;
-//          ID_mhtdc_Z1 = id_mhtdc_z1;
-//          ID_mhtdc_Z2 = id_mhtdc_z2;
-//          ID_mhtdc_dEdeg = id_mhtdc_dEdeg;
-//          ID_mhtdc_dEdegoQ = id_mhtdc_dEdegoQ;
-//          ID_mhtdc_Beta = id_mhtdc_beta;
 
 }
 
-// #################################################################
-
-// int Raw_Event::get_Event_type(){
-//     return Event_Type;
-// }
-//
-//
-// void Raw_Event::set_DATA_FATIMA(int QDC_FIRED,int TDC_FIRED,std::vector<double> &Ql_Raw,std::vector<double> &Qs_Raw,
-//                                 std::vector<double> &Ql,std::vector<ULong64_t> &TDC,std::vector<double> &TDC_ns,
-//                                 std::vector<ULong64_t> &QDC_c,std::vector<double> &QDC_f,std::vector<int> &det_ids_QDC,
-//                                 std::vector<int> &det_ids_TDC){
-//
-//     FATIMA_Data.SetDATA(QDC_FIRED,TDC_FIRED,Ql_Raw,Qs_Raw,Ql,TDC,TDC_ns,QDC_c,QDC_f,det_ids_QDC,det_ids_TDC);
-//  cout << FATIMA_Data.SetDATA(&Ql) << endl;
-//     Event_Type = 3;
-//
-// }
 
 
-/*
-int Raw_Event::get_Event_type(){
-    return Event_Type;
-
-}*/
-
-
-// void Raw_Event::set_AIDA_Event(){}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //--------------------------------------AIDA  ------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -561,48 +528,9 @@ void Raw_Event::set_DATA_FINGER(int* it,double** Edge_Coarse,double** Edge_fine,
 
    // Event_Type = 2;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-//---------------------------------------PLASTIC VME  ------------------------------------------------//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// void Raw_Event::set_DATA_PLASTIC_VME(int QDC_ite, int TDC_ite, double* VME_QDC_Dat1, double* VME_QDC_Dat2, int* VME_QDC_Chan, double* VME_TDC_Dat, int* VME_TDC_Chan){
-//      QDC_IT=0;
-//     this-> QDC_IT = QDC_ite;
-//     this->TDC_IT = TDC_ite;
-//     for (int i = 0; i<QDC_IT; i++){
-//     this->VME_QDC_DAT1[i] = VME_QDC_Dat1[i];
-//     this->VME_QDC_DAT2[i] = VME_QDC_Dat2[i];
-//     this->VME_QDC_CHA[i] = VME_QDC_Chan[i];
-//
-//       }
-//
-//     for(int j=0; j<TDC_IT; j++) {
-//
-//     this->VME_TDC_CHA[j] = VME_TDC_Chan[j];
-//     this->VME_TDC_DAT[j] = VME_TDC_Dat[j];
-//
-//
-//          }
-//        Event_Type=2;
-//         }
-/*
-    void Raw_Event::set_DATA_SCALER(int Scaler_ite,  double* Scaler_Dat){
-
-    this->SCALER_ITERATOR = Scaler_ite;
-
-    for(int i=1; i<SCALER_ITERATOR; i++) {
-    this->SCALER_DATA[i] = Scaler_Dat[i];
 
 
-         }*/
-/*
-    Event_Type=2;
-        }*/
-//---------------------------------------------------------------
 
-// bool Raw_Event::PLASTIC_CheckVME(){
-//     return VME_Event;
-// }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //--------------------------------------PLASTIC TAMEX  ------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -669,17 +597,6 @@ void Raw_Event::set_DATA_PLASTIC_TAMEX(int* it_bPlas,double** Edge_Coarse_bPlas,
 void Raw_Event::set_DATA_PLASTIC_TWINPEAKS(int* it_bPlastTwinPeaks,double** Edge_Coarse_bPlastTwinPeaks,double** Edge_fine_bPlastTwinPeaks,UInt** ch_ed_bPlastTwinPeaks,double* Coarse_Trigger_bPlastTwinPeaks,double* Fine_Trigger_bPlastTwinPeaks,int amount_hit_bPlastTwinPeaks, int** Lead_Arr_bPlastTwinPeaks){
 
     this->amount_hit_bPlastTwinPeaks = amount_hit_bPlastTwinPeaks;
-    //reset lead and trail hits
-//     for(int i = 0;i < bPLASTIC_TAMEX_MODULES;i++){
-//        
-//         for(int j = 0;j < 32;j++){
-//             leading_hits_ch_bPlastTwinPeaks[i][j] = 0;
-//             trailing_hits_ch_bPlastTwinPeaks[i][j] = 0;
-//             leading_array_bPlastTwinPeaks[i][j] = 0;
-// //             coarse_T_edge_lead_bPlastTwinPeaks[i][j] = 0;
-// //             fine_T_edge_lead_bPlastTwinPeaks[i][j] = 0;
-//         }
-//     }
 
     //loop over all tamex modules
     for(int i = 0;i < amount_hit_bPlastTwinPeaks;i++){
@@ -942,6 +859,8 @@ void Raw_Event::set_DATA_FATIMA_TAMEX(int* it_fat,double** Edge_Coarse_fat,doubl
 
  //   Event_Type = 3;
 }
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-------------------------------------- Germanium FEBEX  ------------------------------------------------//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -976,6 +895,159 @@ void Raw_Event::set_DATA_Germanium_Traces(int ge_trace_fired, int ge_trace_lengt
                 }
             }
         }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- BB7 FEBEX  ------------------------------------------------//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Raw_Event::set_DATA_BB7_FEBEX(int Hits, int* Side, int* Strip, ULong64_t* Sum_Time, ULong64_t* Chan_Time, double* Chan_Energy, ULong64_t* Chan_CF, bool* Pileup, bool* Overflow)
+{   
+    BB7_FEBEX_Hits = Hits;
+    for (int i = 0; i < BB7_FEBEX_Hits; i++)
+    {   
+        BB7_FEBEX_Side[i] = Side[i];
+        BB7_FEBEX_Strip[i] = Strip[i];
+        BB7_FEBEX_Sum_Time[i] = Sum_Time[i];
+        BB7_FEBEX_Chan_Time[i] = Chan_Time[i];
+        BB7_FEBEX_Chan_Energy[i] = Chan_Energy[i];
+        BB7_FEBEX_Chan_CF[i] = Chan_CF[i];
+        BB7_FEBEX_Pileup[i] = Pileup[i];
+        BB7_FEBEX_Overflow[i] = Overflow[i];
+    }
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- BB7 MADC  ------------------------------------------------//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void Raw_Event::set_DATA_BB7_MADC(int Hits, int* Side, int* Strip, int* ADC_Data)
+{   
+    BB7_MADC_Hits = Hits;
+    for (int i = 0; i < BB7_MADC_Hits; i++)
+    {   
+        BB7_MADC_Side[i] = Side[i];
+        BB7_MADC_Strip[i] = Strip[i];
+        BB7_MADC_ADC_Data[i] = ADC_Data[i];
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- CEJ: will rework.... BB7 TWINPEAKS  ------------------------------------------------//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void Raw_Event::set_DATA_BB7_TWINPEAKS(int* it_BB7_TWINPEAKS, double** Edge_Coarse_BB7_TWINPEAKS, double** Edge_Fine_BB7_TWINPEAKS, UInt** ch_ed_BB7_TWINPEAKS, double* Coarse_Trigger_BB7_TWINPEAKS, double* Fine_Trigger_BB7_TWINPEAKS, int amount_hit_BB7_TWINPEAKS, int** Lead_Arr_BB7_TWINPEAKS)
+{   
+    this->amount_hit_BB7_TWINPEAKS = amount_hit_BB7_TWINPEAKS;
+
+    // HELENA CODE
+    // first she resets everything... should we do this? why isn't it done anywhere else?
+    for (int i = 0; i < BB7_TAMEX_MODULES; i++)
+    {   
+        // 100 is max iterator.. this needs clarifying
+        for (int j = 0; j < 100; j++)
+        {
+            leading_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            trailing_hits_ch_BB7_TWINPEAKS[i][j] = 0;
+            leading_array_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_lead_BB7_TWINPEAKS[i][j] = 0;
+            fine_T_edge_trail_BB7_TWINPEAKS[i][j] = 0;
+        }
+    }
+
+
+    for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
+    {
+        // no if check
+        iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
+        trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
+        trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
+        fired_tamex_BB7_TWINPEAKS[i] = (iterator_BB7_TWINPEAKS[i] > 0);
+        leading_hits_BB7_TWINPEAKS[i] = 0;
+        trailing_hits_BB7_TWINPEAKS[i] = 0;
+
+        for (int j = 0; j < iterator_BB7_TWINPEAKS[i]; j++)
+        {
+            ch_ID_BB7_TWINPEAKS[i][j] = ch_ed_BB7_TWINPEAKS[i][j];
+            leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 1)
+            {
+                coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]);
+                leading_hits_BB7_TWINPEAKS[i]++;
+                leading_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+            }
+
+            if (ch_ID_BB7_TWINPEAKS[i][j] > 33 && Lead_Arr_BB7_TWINPEAKS[i][j] == 0)
+            {
+                coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                trailing_hits_BB7_TWINPEAKS[i]++;
+                phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j] - 33);
+                if (phys_channel_BB7_TWINPEAKS[i][j] < 100)
+                {
+                    trailing_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+                }
+            }
+        }
+    }
+
+
+
+    // loop over TAMEX modules
+    /*for (int i = 0; i < amount_hit_BB7_TWINPEAKS; i++)
+    {
+        if (i < BB7_TAMEX_MODULES && it_BB7_TWINPEAKS[i] < 100)
+        {   
+            
+            iterator_BB7_TWINPEAKS[i] = it_BB7_TWINPEAKS[i];
+            trigger_coarse_BB7_TWINPEAKS[i] = Coarse_Trigger_BB7_TWINPEAKS[i];
+            trigger_fine_BB7_TWINPEAKS[i] = Fine_Trigger_BB7_TWINPEAKS[i];
+            fired_tamex_BB7_TWINPEAKS[i] = (iterator_BB7_TWINPEAKS[i] > 0);
+            leading_hits_BB7_TWINPEAKS[i] = 0;
+            trailing_hits_BB7_TWINPEAKS[i] = 0;
+
+            for (int j = 0; j < iterator_BB7_TWINPEAKS[i]; j++)
+            {
+                ch_ID_BB7_TWINPEAKS[i][j] = ch_ed_BB7_TWINPEAKS[i][j];
+                leading_array_BB7_TWINPEAKS[i][j] = Lead_Arr_BB7_TWINPEAKS[i][j];
+
+                // CEJ: I think here there were issues with lead/trail when you get lead-lead or trail-trail
+                // hmm maybe not. Not sure.
+                if (ch_ID_BB7_TWINPEAKS[i][j] < 33 && j % 2 == 0)
+                {
+                    coarse_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                    fine_T_edge_lead_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+
+                    phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]);
+                    leading_hits_BB7_TWINPEAKS[i]++;
+                    leading_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+                }
+                if (ch_ID_BB7_TWINPEAKS[i][j] > 33 && j % 2 == 1 && ch_ID_BB7_TWINPEAKS[i][j] < 66)
+                {
+                    coarse_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Coarse_BB7_TWINPEAKS[i][j];
+                    fine_T_edge_trail_BB7_TWINPEAKS[i][j] = (double) Edge_Fine_BB7_TWINPEAKS[i][j];
+                    
+                    // CEJ: this is because trails get adjusted by max_cha_input in TWINPEAKS_Detector_System
+                    phys_channel_BB7_TWINPEAKS[i][j] = (ch_ID_BB7_TWINPEAKS[i][j]) - 33;
+                    trailing_hits_BB7_TWINPEAKS[i]++;
+                    if (phys_channel_BB7_TWINPEAKS[i][j] < 100)
+                    {
+                        trailing_hits_ch_BB7_TWINPEAKS[i][phys_channel_BB7_TWINPEAKS[i][j]]++;
+                    }
+                }
+            }
+        }
+    }*/
+}
+
+
     
 //TEMPORARY GETTERS FOR FRS, FATIMA, PLASTIC, and Germanium
 
@@ -1317,6 +1389,44 @@ ULong64_t Raw_Event::get_WR(){return WR;}
 
     int Raw_Event::get_FINGER_physical_trail_hits(int i,int j){return trailing_hits_ch[i][j];}
 
+
+
+// ------------------------------------ BB7 TAMEX -----------------------------------------------//
+
+int Raw_Event::get_BB7_TWINPEAKS_tamex_hits() { return amount_hit_BB7_TWINPEAKS; }
+int Raw_Event::get_BB7_TWINPEAKS_am_Fired(int i) { return iterator_BB7_TWINPEAKS[i]; }
+double Raw_Event::get_BB7_TWINPEAKS_trigger_T(int i) { return (trigger_coarse_BB7_TWINPEAKS[i] - trigger_fine_BB7_TWINPEAKS[i]) * 5000; }
+int Raw_Event::get_BB7_TWINPEAKS_CH_ID(int i, int j) { return ch_ID_BB7_TWINPEAKS[i][j]; }
+double Raw_Event::get_BB7_TWINPEAKS_lead_T(int i, int j) { return (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]); }
+double Raw_Event::get_BB7_TWINPEAKS_trail_T(int i, int j) { return (coarse_T_edge_trail_BB7_TWINPEAKS[i][j] - fine_T_edge_trail_BB7_TWINPEAKS[i][j]); }
+double Raw_Event::get_BB7_TWINPEAKS_coarse_lead(int i, int j) { return coarse_T_edge_lead_BB7_TWINPEAKS[i][j]; }
+double Raw_Event::get_BB7_TWINPEAKS_fine_lead(int i, int j) { return fine_T_edge_lead_BB7_TWINPEAKS[i][j]; }
+double Raw_Event::get_BB7_TWINPEAKS_coarse_trail(int i, int j) { return coarse_T_edge_trail_BB7_TWINPEAKS[i][j]; }
+double Raw_Event::get_BB7_TWINPEAKS_fine_trail(int i, int j) { return fine_T_edge_trail_BB7_TWINPEAKS[i][j]; }
+double Raw_Event::get_BB7_TWINPEAKS_Lead_Lead(int i, int j)
+{ 
+    double T_lead_BB7_TWINPEAKS1 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]);
+    double T_lead_BB7_TWINPEAKS2 = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j + 2] - fine_T_edge_lead_BB7_TWINPEAKS[i][j + 2]);
+    return T_lead_BB7_TWINPEAKS1 - T_lead_BB7_TWINPEAKS2;
+}
+double Raw_Event::get_BB7_TWINPEAKS_TOT(int i,int j)
+{
+    double T_lead_BB7_TWINPEAKS = (coarse_T_edge_lead_BB7_TWINPEAKS[i][j] - fine_T_edge_lead_BB7_TWINPEAKS[i][j]);
+    double T_trail_BB7_TWINPEAKS = (coarse_T_edge_trail_BB7_TWINPEAKS[i][j+1] - fine_T_edge_trail_BB7_TWINPEAKS[i][j+1]);
+    return T_trail_BB7_TWINPEAKS - T_lead_BB7_TWINPEAKS;
+}
+int Raw_Event::get_BB7_TWINPEAKS_trail_hits(int i) { return trailing_hits_bPlastTwinPeaks[i]; }
+int Raw_Event::get_BB7_TWINPEAKS_lead_hits(int i) { return leading_hits_bPlastTwinPeaks[i]; }
+int Raw_Event::get_BB7_TWINPEAKS_physical_channel(int i, int j) { return phys_channel_BB7_TWINPEAKS[i][j]; }
+int Raw_Event::get_BB7_TWINPEAKS_physical_lead_hits(int i, int j) { return leading_hits_ch_BB7_TWINPEAKS[i][j]; }
+int Raw_Event::get_BB7_TWINPEAKS_physical_trail_hits(int i, int j) { return trailing_hits_ch_BB7_TWINPEAKS[i][j]; }
+int Raw_Event::get_BB7_TWINPEAKS_leading_arr(int i, int j) { return leading_array_BB7_TWINPEAKS[i][j]; }
+
+
+
+
+
+
 //------------------------------------- bPlastic TAMEX ------------------------------------------//
 
     int Raw_Event::get_PLASTIC_tamex_hits(){return amount_hit_tamex_bPlas;}
@@ -1427,13 +1537,6 @@ ULong64_t Raw_Event::get_WR(){return WR;}
                return T_trail_bPlastTwinPeaks - T_lead_bPlastTwinPeaks;
                    }
                    
-//          double Raw_Event::get_bPLAST_TWINPEAKS_TOT_added(int i,int j){
-//         double T_lead1 = (coarse_T_edge_lead_bPlastTwinPeaks[i][j] - fine_T_edge_lead_bPlastTwinPeaks[i][j])*5000;
-//         double T_trail1 = (coarse_T_edge_trail_bPlastTwinPeaks[i][j+1] - fine_T_edge_trail_bPlastTwinPeaks[i][j+1])*5000;
-//         double T_lead2 = (coarse_T_edge_lead_bPlastTwinPeaks[i][j-2] - fine_T_edge_lead_bPlastTwinPeaks[i][j-2])*5000;
-//         double T_trail2 = (coarse_T_edge_trail_bPlastTwinPeaks[i][j-1] - fine_T_edge_trail_bPlastTwinPeaks[i][j-1])*5000;
-//                return (T_trail1 - T_lead1) + (T_trail2 - T_lead2);
-//                    }
 
     int Raw_Event::get_bPLAST_TWINPEAKS_trail_hits(int i){return trailing_hits_bPlastTwinPeaks[i];}
 
@@ -1445,23 +1548,31 @@ ULong64_t Raw_Event::get_WR(){return WR;}
 
     int Raw_Event::get_bPLAST_TWINPEAKS_physical_trail_hits(int i,int j){return trailing_hits_ch_bPlastTwinPeaks[i][j];}
 
-//------------------------------------------ bPlastic VME----------------------------------------//
-//  int Raw_Event::get_plastic_VME_QDC_fired(){return QDC_IT;}
-//  int Raw_Event::get_plastic_VME_TDC_fired(){return TDC_IT;}
-//  double Raw_Event::get_plastic_VME_QDC_dat1(int i){return VME_QDC_DAT1[i];}
-//  double Raw_Event::get_plastic_VME_QDC_dat2(int i){return VME_QDC_DAT2[i];}
-//  int Raw_Event::get_plastic_VME_QDC_cha(int i){return VME_QDC_CHA[i];}
-//  double Raw_Event::get_plastic_VME_TDC_dat(int i){return VME_TDC_DAT[i];}
-//  int Raw_Event::get_plastic_VME_TDC_cha(int i){return VME_TDC_CHA[i];}
 
-//  int Raw_Event::get_scaler_iterator(){return SCALER_ITERATOR;}
-//  double Raw_Event::get_scaler_data(int i){return SCALER_DATA[i];}
-/*
-PLASTIC_VME_DataStruct* Raw_Event::PassPLASTIC_VME(){ return &PLASTIC_VME_Data;}
+int Raw_Event::get_BB7_MADC_Hits() { return BB7_MADC_Hits; }
+int Raw_Event::get_BB7_MADC_Side(int i) { return BB7_MADC_Side[i]; }
+int Raw_Event::get_BB7_MADC_Strip(int i) { return BB7_MADC_Strip[i]; }
+int Raw_Event::get_BB7_MADC_ADC(int i) { return BB7_MADC_ADC_Data[i]; }
 
-//---------------------------------------------------------------
 
-PLASTIC_DataStruct* Raw_Event::PassPLASTIC(){ return &PLASTIC_Data;}*/
+//------------------------------------------ BB7 FEBEX ------------------------------------------//
+
+int Raw_Event::get_BB7_FEBEX_Hits() { return BB7_FEBEX_Hits; }
+int Raw_Event::get_BB7_FEBEX_Side(int i) { return BB7_FEBEX_Side[i]; }
+int Raw_Event::get_BB7_FEBEX_Strip(int i) { return BB7_FEBEX_Strip[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Sum_Time(int i) { return BB7_FEBEX_Sum_Time[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Chan_Time(int i) { return BB7_FEBEX_Chan_Time[i]; }
+double Raw_Event::get_BB7_FEBEX_Chan_Energy(int i) { return BB7_FEBEX_Chan_Energy[i]; }
+ULong64_t Raw_Event::get_BB7_FEBEX_Chan_CF(int i) { return BB7_FEBEX_Chan_CF[i]; } 
+bool Raw_Event::get_BB7_FEBEX_Pileup(int i) { return BB7_FEBEX_Pileup[i]; }
+bool Raw_Event::get_BB7_FEBEX_Overflow(int i) { return BB7_FEBEX_Overflow[i]; }
+
+
+// CEJ: will traces be required?
+//int Raw_Event::get_BB7_FEBEX_Trace_Length(){return BB7_FEBEX_Tr_Length;}
+//int Raw_Event::get_BB7_FEBEX_Trace_First(int i,int j){return BB7_Tr_First[i][j];}
+//int Raw_Event::get_BB7_FEBEX_Trace_Second(int i, int j){return BB7_FEBEX_Tr_Second[i][j];}
+
 
 //------------------------------------------ Germanium FEBEX ------------------------------------------//
 
@@ -1489,6 +1600,9 @@ PLASTIC_DataStruct* Raw_Event::PassPLASTIC(){ return &PLASTIC_Data;}*/
     int Raw_Event::get_Germanium_Trace_Length(){return Ge_Tr_Length;}
     int Raw_Event::get_Germanium_Trace_First(int i,int j){return Ge_Tr_First[i][j];}
     int Raw_Event::get_Germanium_Trace_Second(int i, int j){return Ge_Tr_Second[i][j];}
+  
+  
+  
   //------------------------------------------ Beam Monitor ------------------------------------------//
     Long64_t Raw_Event::get_BM_LDiff_S2(int i){return L_diff_S2[i];}
     
@@ -1497,3 +1611,4 @@ PLASTIC_DataStruct* Raw_Event::PassPLASTIC(){ return &PLASTIC_Data;}*/
     Long64_t Raw_Event::get_BM_LDiff_S4(int i){return L_diff_S4[i];}
     
     UInt_t Raw_Event::get_BM_Hits_S4(){return Hits_S4;}
+

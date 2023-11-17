@@ -5,10 +5,6 @@
 #include <float.h>
 #include <vector>
 
-
-//#include "PLASTIC_DataStruct.h"
-//#include "PLASTIC_VME_DataStruct.h"
-//#include "FATIMA_DataStruct.h"
 #include "AIDA_Event.h"
 #include "AIDA_Decay_Event_Store.h"
 #include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
@@ -362,6 +358,41 @@ private:
     double  fine_T_edge_trail_bPlastTwinPeaks[bPLASTIC_TAMEX_MODULES][100];
     bool    fired_tamex_bPlastTwinPeaks[bPLASTIC_TAMEX_MODULES];
 
+    // BB7 TWINPEAKS TAMEX
+    int     amount_hit_BB7_TWINPEAKS;
+    int     iterator_BB7_TWINPEAKS[BB7_TAMEX_MODULES];
+    double  trigger_coarse_BB7_TWINPEAKS[100];
+    double  trigger_fine_BB7_TWINPEAKS[100];
+    int     leading_array_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    int     leading_hits_BB7_TWINPEAKS[BB7_TAMEX_MODULES];
+    int     trailing_hits_BB7_TWINPEAKS[BB7_TAMEX_MODULES];
+    int     phys_channel_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    int     leading_hits_ch_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    int     trailing_hits_ch_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    UInt_t    ch_ID_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    double  coarse_T_edge_lead_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    double  coarse_T_edge_trail_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    double  fine_T_edge_lead_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    double  fine_T_edge_trail_BB7_TWINPEAKS[BB7_TAMEX_MODULES][100];
+    bool    fired_tamex_BB7_TWINPEAKS[BB7_TAMEX_MODULES];
+
+    // BB7 FEBEX
+    int         BB7_FEBEX_Hits;
+    int         BB7_FEBEX_Side[BB7_FEBEX_MAX_HITS];
+    int         BB7_FEBEX_Strip[BB7_FEBEX_MAX_HITS];
+    ULong64_t   BB7_FEBEX_Sum_Time[BB7_FEBEX_MAX_HITS];
+    ULong64_t   BB7_FEBEX_Chan_Time[BB7_FEBEX_MAX_HITS];
+    double      BB7_FEBEX_Chan_Energy[BB7_FEBEX_MAX_HITS];
+    ULong64_t   BB7_FEBEX_Chan_CF[BB7_FEBEX_MAX_HITS];
+    bool        BB7_FEBEX_Pileup[BB7_FEBEX_MAX_HITS];
+    bool        BB7_FEBEX_Overflow[BB7_FEBEX_MAX_HITS];
+
+    // BB7 MADC
+    int BB7_MADC_Hits;
+    int BB7_MADC_Side[BB7_MADC_MAX_HITS];
+    int BB7_MADC_Strip[BB7_MADC_MAX_HITS];
+    int BB7_MADC_ADC_Data[BB7_MADC_MAX_HITS];
+
 	//Germanium
         int         Ge_hits;
         int         Germanium_Det_Nums[Germanium_MAX_HITS];
@@ -456,19 +487,9 @@ public:
     void set_DATA_Germanium_Traces(int, int, int**, int**);
 
 
-
-// 	void set_DATA_PLASTIC(std::vector<int> &it,std::vector<std::vector<double> > &Edge_Coarse,
-//                           std::vector<std::vector<double> > &Edge_fine, std::vector<std::vector<UInt> > &ch_ed,
-//                           std::vector<double> &Coarse_Trigger,std::vector<double> &Fine_Trigger,int amount_hit_tamex);
-//
-// 	void set_DATA_PLASTIC_VME(int TDC_iterator,std::vector<double> &VME_QDC_Data,std::vector<double> &VME_QDC_Channels,
-// 						  std::vector<double> &VME_TDC_Data,std::vector<double> &VME_TDC_Channels);
-
-	//void set_DATA_Germanium(int,ULong64_t*,int*,int*,ULong64_t*,double*,int*);
-
-//	int get_Event_type();
-
-//	bool PLASTIC_CheckVME();
+    void set_DATA_BB7_FEBEX(int, int*, int*, ULong64_t*, ULong64_t*, double*, ULong64_t*, bool*, bool*);
+    void set_DATA_BB7_MADC(int, int*, int*, int*);
+    void set_DATA_BB7_TWINPEAKS(int*, double**, double**, UInt**, double*, double*, int, int**);
 
 
 	// ####################################################
@@ -663,19 +684,6 @@ public:
 	std::vector<AidaScaler> const& get_AIDA_scaler() { return AIDA_SCALERS; }
 	std::vector<AidaPauseResume> const& get_AIDA_pr() { return AIDA_PAUSERESUME; }
 
-
-//     double get_AIDA_DecayEnergy(int i,int j,int k);
-//     ULong64_t get_AIDA_DecayTimestamp(int i,int j);
-//     int get_AIDA_DecayID(int i);
-//     int get_AIDA_Decayhits();
-//     int get_AIDA_DecayFEEID();
-//
-//     double get_AIDA_ImpEnergy(int i,int j);
-//     ULong64_t get_AIDA_ImpTimestamp(int i,int j);
-//     int get_AIDA_ImpID(int i);
-//     int get_AIDA_Imphits();
-//     int get_AIDA_ImpFEEID();
-
 	//temporary FATIMA getters
 	  int    get_FAT_det_fired();
 	  int    get_FAT_id(int i);
@@ -735,7 +743,47 @@ public:
     double  get_bPLAST_TWINPEAKS_TOT_added(int,int);
     int     get_bPLAST_TWINPEAKS_tamex_hits();
     double  get_bPLAST_TWINPEAKS_Lead_Lead(int,int);
-   // FATIMA_DataStruct* PassFATIMA();
+
+    // ----------------   BB7 TWINPEAKS Getters ---------------- //
+    int     get_BB7_TWINPEAKS_am_Fired(int);
+    double  get_BB7_TWINPEAKS_trigger_T(int);
+    int     get_BB7_TWINPEAKS_CH_ID(int,int);
+    double  get_BB7_TWINPEAKS_lead_T(int,int);
+    double  get_BB7_TWINPEAKS_trail_T(int,int);
+    int     get_BB7_TWINPEAKS_trail_hits(int);
+    int     get_BB7_TWINPEAKS_lead_hits(int);
+    int     get_BB7_TWINPEAKS_physical_channel(int,int);
+    int     get_BB7_TWINPEAKS_physical_lead_hits(int,int);
+    int     get_BB7_TWINPEAKS_physical_trail_hits(int,int);
+    double  get_BB7_TWINPEAKS_coarse_lead(int,int);
+    double  get_BB7_TWINPEAKS_fine_lead(int,int);
+    double  get_BB7_TWINPEAKS_coarse_trail(int,int);
+    double  get_BB7_TWINPEAKS_fine_trail(int,int);
+    double  get_BB7_TWINPEAKS_TOT(int,int);
+    double  get_BB7_TWINPEAKS_TOT_added(int,int);
+    int     get_BB7_TWINPEAKS_tamex_hits();
+    double  get_BB7_TWINPEAKS_Lead_Lead(int,int);
+    int     get_BB7_TWINPEAKS_leading_arr(int,int);
+
+    // BB7 FEBEX Getters
+    int         get_BB7_FEBEX_Hits();
+    int         get_BB7_FEBEX_Side(int);
+    int         get_BB7_FEBEX_Strip(int);
+    ULong64_t   get_BB7_FEBEX_Sum_Time(int);
+    ULong64_t   get_BB7_FEBEX_Chan_Time(int);
+    double      get_BB7_FEBEX_Chan_Energy(int);
+    ULong64_t   get_BB7_FEBEX_Chan_CF(int);
+    bool        get_BB7_FEBEX_Pileup(int);
+    bool        get_BB7_FEBEX_Overflow(int);
+
+    // BB7 MADC Getters
+    int get_BB7_MADC_Hits();
+    int get_BB7_MADC_ADC(int);
+    int get_BB7_MADC_Side(int);
+    int get_BB7_MADC_Strip(int);
+
+    // ------------------------------------------------------------///
+
 
     //temporary FINGER getters
     int     get_FINGER_am_Fired(int);

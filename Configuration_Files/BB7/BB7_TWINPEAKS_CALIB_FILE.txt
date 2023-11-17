@@ -1,0 +1,4 @@
+#BB7 TWINPEAKS calibration type file
+#This file is rewritten to OFFLINE after reading, if FORCE is not set to 1
+ONLINE		0
+FORCE		0

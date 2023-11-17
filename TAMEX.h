@@ -73,7 +73,7 @@ struct TAMEX_ERROR
 struct EPOCH
 {
    unsigned int epoch_count : 28;
-   unsigned int reserve : 4;
+   unsigned int six_eight : 4;
    
 };
 

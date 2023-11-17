@@ -276,12 +276,15 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
 // // 
         if(hold->six_eight == six_f ){
            // cerr << "***Only single channel fired!***" << endl;
+	  //cout << "I see epoch data" << endl;
+	  //cout << "Empty: " << hold->empty << endl;
             pdata++;
             continue;
         }
 //       //  pdata++;
      if(hold->six_eight != six_f) written = false;
 
+         //cout << "I see normal data" << endl;
 //         if(hold->six_eight != six_f){
 //             cerr << dec << hold->six_eight << endl;
 //             cerr << "PLACE_HOLDER error (edges) in TAMEX!" << endl;
@@ -295,11 +298,11 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
 
         //extract data
         TAMEX_DATA* data = (TAMEX_DATA*) pdata;
-      //  printf(" pdata 0x%08x\n", (unsigned int*) pdata); 
+       // printf(" pdata 0x%08x\n", (unsigned int*) pdata); 
 //         cout<<"LEADING PDATA " << ((*pdata & 0x800) >> 11) << endl;
        
        // cout<<"data->leading_E " <<data->leading_E << "  data->coarse_T "<<(double) data->coarse_T<<" data->ch_ID "<<data->ch_ID << endl;
-       
+       //cout << "TDC: " << data->TDC << endl;
 //         cout<<"FAST EDGE " << data->leading_E << endl;
 //         leading_edge
             if(data->leading_E ==1){
@@ -309,7 +312,7 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
             ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
             lead_arr[tamex_iter][iterator[tamex_iter]] = (data->ch_ID % 2);
      
-         //cout << "LEAD EDGE " <<" leading_hit "<<leading_hit<< edge_coarse[tamex_iter][iterator[tamex_iter]] << " fine " << edge_fine[tamex_iter][iterator[tamex_iter]]<< " Chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<" tamex_iter " <<tamex_iter << " iterator[tamex_iter] " <<iterator[tamex_iter] <<  endl; 
+     //    cout << "LEAD EDGE " <<" leading_hit "<<leading_hit<< edge_coarse[tamex_iter][iterator[tamex_iter]] << " fine " << edge_fine[tamex_iter][iterator[tamex_iter]]<< " Chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<" tamex_iter " <<tamex_iter << " iterator[tamex_iter] " <<iterator[tamex_iter] <<  endl; 
         }
         
 //   if(data->leading_E ==1)  ch_ID_edge_lead[tamex_iter][iterator[tamex_iter]]=data->ch_ID;
@@ -320,17 +323,15 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
              
              leading_hit=data->leading_E;
               //cout<<"TRAIL EDGE " << data->leading_E << endl;
-                edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T;
-                edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
-                ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID+MAX_CHA_INPUT;
+        edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T;
+        edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
+        ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID+MAX_CHA_INPUT;
         
             //  cout << "TRAIL EDGE " <<" leading_hit "<<leading_hit<< edge_coarse[tamex_iter][iterator[tamex_iter]] << " fine " << edge_fine[tamex_iter][iterator[tamex_iter]]<< " Chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<" tamex_iter " <<tamex_iter << " iterator[tamex_iter] " <<iterator[tamex_iter] <<  endl; 
         }
 //        cout << "coarse " << edge_coarse[tamex_iter][iterator[tamex_iter]] << " fine " << edge_fine[tamex_iter][iterator[tamex_iter]]<< " Chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<"  lead_arr[tamex_iter][iterator[tamex_iter]] " << lead_arr[tamex_iter][iterator[tamex_iter]] <<  endl;  
          
         iterator[tamex_iter]++;
-        if(iterator[tamex_iter]>100)break;
-       // cout<<"iterator[tamex_iter] " <<iterator[tamex_iter] << " tamex_iter " <<tamex_iter << endl;
 
         written = true;
 
@@ -413,7 +414,7 @@ void PLASTIC_TWINPEAKS_Detector_System::calibrate_ONLINE(){
 void PLASTIC_TWINPEAKS_Detector_System::calibrate_OFFLINE(){
 ;
     int channel_ID_tmp = 0;
-    for(int i = 0;i < 9;++i){
+    for(int i = 0;i < 9;++i){ // 9?
         for(int j = 0;j < iterator[i];++j){
             channel_ID_tmp = (int) ch_ID_edge[i][j];
             if(edge_coarse[i][j] != 131313) edge_fine[i][j] = PLASTIC_TAMEX_Calibration->get_Calibration_val(edge_fine[i][j],i,channel_ID_tmp);

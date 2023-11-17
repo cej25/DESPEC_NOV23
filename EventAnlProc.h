@@ -31,6 +31,8 @@
 #include "Configuration_Files/DESPEC_General_Setup/DESPEC_Setup_File.h"
 #include "TFRSParameter.h"
 
+#include "BB7_FEBEX_Event_Store.h"
+
 //These are for TAMEX
 #define CYCLE_TIME  (Double_t) 5000
 #define COARSE_CT_RANGE  0x800  // 11 bits
@@ -163,8 +165,8 @@ class EventAnlProc : public TGo4EventProcessor {
       void ProcessAida(EventUnpackStore* pInput, EventAnlStore* pOutput);
 
 
-      int PrcID_Conv[7];
-      int Used_Systems[7];
+      int PrcID_Conv[NUM_SUBSYS];
+      int Used_Systems[NUM_SUBSYS];
       int event_number;
       bool VMEorTAMEX_bPlas;
       bool VMEorTAMEX_fatima;
@@ -350,6 +352,22 @@ class EventAnlProc : public TGo4EventProcessor {
       double maxToT_added;
       int    maxToT_added_Chan;
 
+
+      // BB7 variables and array
+      int BB7_TWINPEAKS_Total_Hits[BB7_SIDES];  
+      double Lead_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double Lead_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double ToT_BB7_TWINPEAKS_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double ToT_BB7_TWINPEAKS_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      int Hits_BB7_TWINPEAKS_Lead_Fast;
+      int Hits_BB7_TWINPEAKS_Trail_Fast;
+      int Hits_BB7_TWINPEAKS_Lead_Slow;
+      int Hits_BB7_TWINPEAKS_Trail_Slow;
+      double BB7_TWINPEAKS_RefStrip0_Side0[BB7_TAMEX_ANL_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref0[BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+      double BB7_TWINPEAKS_RefStrip0_Side1[BB7_TAMEX_ANL_HITS];
+      double Lead_Lead_BB7_TWINPEAKS_Ref1[BB7_STRIPS_PER_SIDE][BB7_TAMEX_ANL_HITS];
+
      void Make_FRS_Histos();
      void Make_Aida_Histos();
     // void Make_Plastic_VME_Histos();
@@ -360,6 +378,8 @@ class EventAnlProc : public TGo4EventProcessor {
      void Make_Fatima_VME_Tamex_Histos();
      void Make_Germanium_Histos();
      void Make_Finger_Histos();
+     void Make_BB7_FEBEX_Histos();
+     void Make_BB7_TWINPEAKS_Histos();
      void Make_WR_Histos();
 
      void Make_Fat_Plas_Histos();
@@ -369,6 +389,8 @@ class EventAnlProc : public TGo4EventProcessor {
    //  void Process_Plastic_VME_Histos(EventAnlStore* pOutput);
      void Process_Plastic_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Plastic_Twinpeaks_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
+     void Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
+     void Process_BB7_FEBEX_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Fatima_Tamex_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
      void Process_Fatima_Histos(EventUnpackStore* pInput, EventAnlStore* pOutput);
 
@@ -430,8 +452,65 @@ class EventAnlProc : public TGo4EventProcessor {
             std::vector<TH1*> decays_per_event;
             std::vector<TH1*> decays_channels;
 
+
+            // same histograms, for BB7 layer (FEBEX/TWINPEAKS)
+            TH2* hBB7_FEBEX_implants_strip_xy;
+            //TH2* hBB7_FEBEX_implants_strip_xy_stopped;
+            TH2* hBB7_FEBEX_implants_pos_xy;
+            //TH2* hBB7_FEBEX_implants_pos_xy_stopped;
+            TH1* hBB7_FEBEX_implants_e;
+            TH1* hBB7_FEBEX_implants_e_xy;
+            TH1* hBB7_FEBEX_implants_time_delta;
+            TH1* hBB7_FEBEX_implants_strip_1d;
+            TH2* hBB7_FEBEX_implants_strip_1d_energy;
+            TH1* hBB7_FEBEX_implants_per_event;
+            TH1* hBB7_FEBEX_implants_channels;
+            TH2* hBB7_FEBEX_implants_x_ex;
+            TH2* hBB7_FEBEX_implants_y_ey;
+
+            TH2* hBB7_FEBEX_decays_strip_xy;
+            TH2* hBB7_FEBEX_decays_pos_xy;
+            TH1* hBB7_FEBEX_decays_e;
+            TH2* hBB7_FEBEX_decays_e_xy;
+            TH1* hBB7_FEBEX_decays_time_delta;
+            TH1* hBB7_FEBEX_decays_strip_1d;
+            TH2* hBB7_FEBEX_decays_strip_1d_energy;
+            TH1* hBB7_FEBEX_decays_per_event;
+            TH1* hBB7_FEBEX_decays_channel; 
+
+            TH2* hBB7_TWINPEAKS_implants_strip_xy;
+            //TH2* hBB7_TWINPEAKS_implants_strip_xy_stopped;
+            TH2* hBB7_TWINPEAKS_implants_pos_xy;
+            //TH2* hBB7_TWINPEAKS_implants_pos_xy_stopped;
+            TH1* hBB7_TWINPEAKS_implants_e;
+            TH1* hBB7_TWINPEAKS_implants_e_xy;
+            TH1* hBB7_TWINPEAKS_implants_time_delta;
+            TH1* hBB7_TWINPEAKS_implants_strip_1d;
+            TH2* hBB7_TWINPEAKS_implants_strip_1d_energy;
+            TH1* hBB7_TWINPEAKS_implants_per_event;
+            TH1* hBB7_TWINPEAKS_implants_channels;
+            TH2* hBB7_TWINPEAKS_implants_x_ex;
+            TH2* hBB7_TWINPEAKS_implants_y_ey;
+
+            TH2* hBB7_TWINPEAKS_decays_strip_xy;
+            TH2* hBB7_TWINPEAKS_decays_pos_xy;
+            TH1* hBB7_TWINPEAKS_decays_e;
+            TH2* hBB7_TWINPEAKS_decays_e_xy;
+            TH1* hBB7_TWINPEAKS_decays_time_delta;
+            TH1* hBB7_TWINPEAKS_decays_strip_1d;
+            TH2* hBB7_TWINPEAKS_decays_strip_1d_energy;
+            TH1* hBB7_TWINPEAKS_decays_per_event;
+            TH1* hBB7_TWINPEAKS_decays_channel;
+
+
             std::vector<AidaCluster> EventsToClusters(std::vector<AidaEvent> const&);
+            std::vector<BB7_FEBEX_Cluster> BB7_FEBEX_EventsToClusters(std::vector<BB7_FEBEX_Event> const&);
+            std::vector<BB7_TWINPEAKS_Cluster> BB7_TWINPEAKS_EventsToClusters(std::vector<BB7_TWINPEAKS_Event> const&);
             AidaHit ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const&);
+            BB7_FEBEX_Hit BB7_FEBEX_ClusterPairToHit(std::pair<BB7_FEBEX_Cluster, BB7_FEBEX_Cluster> const&);
+            BB7_TWINPEAKS_Hit BB7_TWINPEAKS_ClusterPairToHit(std::pair<BB7_TWINPEAKS_Cluster, BB7_TWINPEAKS_Cluster> const&);
+            double CalibrateImplantToT(double&, int, int);
+            double CalibrateDecayToT(double&, int, int);
 
             int      IsData(std::ifstream &f);
 
@@ -453,6 +532,7 @@ class EventAnlProc : public TGo4EventProcessor {
             TH1 *hFRS_FatTAM_WRdT;
             TH1 *hFRS_FatVME_FatTAM;
             TH1 *hbPlast_FatTAM;
+
 
             //FRS Histograms
             TH2  *hID_Z1_vs_T;
@@ -672,6 +752,23 @@ class EventAnlProc : public TGo4EventProcessor {
 	    // NEW H.M.A.
 // 	    TH2 *hFIMP_ToT_Correlation_Comb1;
 // 	    TH2 *hFIMP_ToT_Correlation_Comb2;
+
+            // BB7 TWINPEAKS HISTOS
+            TH1 *hBB7_TWINPEAKS_ToT_Slow_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_ToT_Fast_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_ToT_Fast_Side_Strip[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_ToT_Slow_Side_Strip[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Hit_Pattern_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_Lead_T_Slow[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Lead_T_Fast[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Lead_dT_coinc[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+
+            //TH1 *hBB7_TWINPEAKS_ToT_Slow_Side[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            //TH1 *hBB7_TWINPEAKS_ToT_Fast_Side[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1 *hBB7_TWINPEAKS_Multiplicity_Side[BB7_SIDES];
+            TH1 *hBB7_TWINPEAKS_Multiplicity;
+            TH2 *hBB7_TWINPEAKS_ToT_Slow_vs_Fast_Strip7;
+            TH1 *hBB7_TWINPEAKS_Lead_Lead_Ref_Det[BB7_SIDES][BB7_STRIPS_PER_SIDE];
 
 
              TH1 *hFat_Lead_Fast_T[FATIMA_TAMEX_CHANNELS+1];
