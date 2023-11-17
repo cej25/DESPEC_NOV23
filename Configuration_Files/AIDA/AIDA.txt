@@ -4,8 +4,8 @@
 #---------------------------
 # Configuration
 #---------------------------
-FEEs: 16
-DSSDs: 2
+FEEs: 8
+DSSDs: 1
 Wide: true
 
 #---------------------------
@@ -24,7 +24,7 @@ EventWindow: 2200
 # Maximum time difference between good front-back coincidences (in nanoseconds)
 FrontBackWindow: 4400
 # Maximum energy difference for implants (in MeV)
-#FrontBackEnergyH: 1000
+FrontBackEnergyH: 1000
 # Maximum energy difference for decays (in keV)
 FrontBackEnergyL: 350
 
@@ -32,9 +32,9 @@ FrontBackEnergyL: 350
 # Analysis Options
 #-------------------------
 Analysis:
-- ReduceNoise: true
-- ClusterImplants: true
-- ClusterDecays: true
+- ReduceNoise: false
+- ClusterImplants: false
+- ClusterDecays: false
 - Calibrate: false
 - ParallelCalibrate: false
 - HugeThreshold: 400
@@ -46,23 +46,12 @@ Analysis:
 DSSD: 1
 - Top: 2
 - Bottom: 4
-- LeftLeft: 11
-- LeftRight: 9
+- LeftLeft: 7
+- LeftRight: 5
 - CentreLeft: 3
 - CentreRight: 1
-- RightLeft: 12
-- RightRight: 10
-- X: Junction
-- Y: Ohmic
-DSSD: 2
-- Top: 6
-- Bottom: 8
-- LeftLeft: 5
-- LeftRight: 13
-- CentreLeft: 7
-- CentreRight: 15
-- RightLeft: 14
-- RightRight: 16
+- RightLeft: 8
+- RightRight: 6
 - X: Junction
 - Y: Ohmic
 
@@ -73,7 +62,5 @@ Scalers:
 - 1: Pulser
 - 3: Time Machine Original
 - 4: Time Machine Delayed
-- 5: SC42 L
-- 6: SC42 R
 - 7: SC41 L
 - 8: SC41 R
