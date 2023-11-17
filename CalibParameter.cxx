@@ -58,7 +58,27 @@ CalibParameter::CalibParameter()
        Ge_T_align_par[i]=0;
        Ge_cfd_align_par[i]=0;
         } 
-    } 
+    
+
+    // mapping for BB7 assumed to be known
+
+    for (int i = 0; i < BB7_SIDES; i++)
+    {
+        for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+        {
+            BB7_FEBEX_LowE_A[i][j] = 0;
+            BB7_FEBEX_LowE_B[i][j] = 0;
+            BB7_FEBEX_HighE_A[i][j] = 0;
+
+            BB7_TWINPEAKS_LowE_A[i][j] = 0;
+            BB7_TWINPEAKS_LowE_B[i][j] = 0;
+            BB7_TWINPEAKS_HighE_A[i][j] = 0;
+        }
+    }
+    
+
+
+} // end of CalibParameter
 
   //----------------------------------------------
 CalibParameter::CalibParameter(const Text_t *name)
@@ -86,6 +106,116 @@ CalibParameter::CalibParameter(const Text_t *name)
       if(IsData(file)) file >> DetIDPlas_TAMEX  >> Abplas_TAMEX[i] >> Bbplas_TAMEX[i] ;
        if (file.fail()) cout << "ERROR reading Plastic_TAMEX_Energy_Calibration.txt\n ";
     }
+  }
+  file.close();
+
+  // Following calibration files assume known mapping of TWINPEAKS/FEBEX ID/Chan -> BB7 Strip/Side
+
+  file.open("Configuration_Files/BB7/BB7_FEBEX_Energy_Calibration_LowE.txt");
+  
+  if (file.fail())
+  {
+      std::cout << "Error - could not open file: BB7_FEBEX_Energy_Calibration_LowE.txt (params set to 1 and 0)" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              BB7_FEBEX_LowE_A[i][j] = 1;
+              BB7_FEBEX_LowE_B[i][j] = 0;
+          }
+      }
+  }
+  else
+  {
+      std::cout << "Reading Calib Parameters from BB7_FEBEX_Energy_Calibration_LowE.txt" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              if (IsData(file)) file >> BB7_FEBEX_Side >> BB7_FEBEX_Strip >> BB7_FEBEX_LowE_A[i][j] >> BB7_FEBEX_LowE_B[i][j];
+              //if (file.fail()) std::cout << "Error while reading BB7_FEBEX_Energy_Calibration_LowE.txt" << std::endl;
+          }
+      }
+  }
+  file.close();
+
+  file.open("Configuration_Files//BB7/BB7_FEBEX_Energy_Calibration_HighE.txt");
+  if (file.fail())
+  {
+      std::cout << "Error - could not open file: BB7_FEBEX_Energy_Calibration_HighE.txt! (param set to 0)" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              BB7_FEBEX_HighE_A[i][j] = 0;
+          }
+      }
+  }
+  else
+  {
+      std::cout << "Reading Calib Parameters from BB7_FEBEX_Energy_Calibration_HighE.txt" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              if (IsData(file)) file >> BB7_FEBEX_Side >> BB7_FEBEX_Strip >> BB7_FEBEX_HighE_A[i][j];
+              //if (file.fail()) std::cout << "Error while reading BB7_FEBEX_Energy_Calibration_HighE.txt" << std::endl;
+          }
+      }
+  }
+  file.close();
+  
+
+  file.open("Configuration_Files/BB7/BB7_TWINPEAKS_Energy_Calibration_LowE.txt");
+  if (file.fail())
+  {
+      std::cout << "Error - could not open file: BB7_TWINPEAKS_Energy_Calibration_LowE.txt! (params set to 1 and 0)" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              BB7_TWINPEAKS_LowE_A[i][j] = 1;
+              BB7_TWINPEAKS_LowE_B[i][j] = 0;
+          }
+      }
+  }
+  else
+  {
+      std::cout << "Reading Calib Parameters from BB7_TWINPEAKS_Energy_Calibration_LowE.txt!" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              if (IsData(file)) file >> BB7_TWINPEAKS_Side >> BB7_TWINPEAKS_Strip >> BB7_TWINPEAKS_LowE_A[i][j] >> BB7_TWINPEAKS_LowE_B[i][j];
+              //if (file.fail()) std::cout << "Error while reading BB7_TWINPEAKS_Energy_Calibration_LowE.txt" << std::endl;
+          }
+      }
+  }
+  file.close();
+
+  file.open("Configuration_Files/BB7/BB7_TWINPEAKS_Energy_Calibration_HighE.txt");
+  if (file.fail())
+  {
+      std::cout << "Error - could not open file BB7_TWINPEAKS_Energy_Calibration_HighE.txt! (params set to 0)" << std::endl;
+      for (int i = 0; i < BB7_SIDES; i++)
+      {   
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              BB7_TWINPEAKS_HighE_A[i][j] = 0;
+          }
+      }
+  }
+  else
+  { 
+      for (int i = 0; i < BB7_SIDES; i++)
+      {
+          for (int j = 0; j < BB7_STRIPS_PER_SIDE; j++)
+          {
+              if (IsData(file)) file >> BB7_TWINPEAKS_Side >> BB7_TWINPEAKS_Strip >> BB7_TWINPEAKS_HighE_A[i][j];
+              //if (file.fail()) std::cout << "Error while reading BB7_TWINPEAKS_Energy_Calibration_HighE.txt" << std::endl;
+          }
+      }
+      
   }
   file.close();
   
@@ -297,7 +427,7 @@ Bool_t CalibParameter::UpdateFrom(TGo4Parameter *pp)
        
        Ge_cfd_align_par[i] = from->Ge_cfd_align_par[i];
 
-      // CEJ: switching off a bunch of unnecessary commits upon startup
+      // CEJ: switching off a bunch of unnecessary comments upon startup
       //cout << "CalibParameter - Parameter : " << GetName() << " UPDATED\n";
      }
   }

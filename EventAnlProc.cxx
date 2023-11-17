@@ -4074,7 +4074,9 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
                             ToT_BB7_TWINPEAKS_Slow[i][j][k] = CYCLE_TIME * ToT_BB7_TWINPEAKS_Slow[i][j][k];                         
                         } // concerned about this
 
-                        // now some note about gain matching and a commented line
+                        // calibration of ToT as done for FATIMA commented below for reminder
+                        //ToT_slow_fat_calib[i][j] = (fCal->Afat_TAMEX[i-1] * pow(ToT_slow_fat[i][j],3)+ fCal->Bfat_TAMEX[i-1] *pow(ToT_slow_fat[i][j],2) + fCal->Cfat_TAMEX[i-1] *ToT_slow_fat[i][j] + fCal->Dfat_TAMEX[i-1]);
+                        // CEJ: We will calibrate once we know if implant or decay, should we pass calibrated ToT?
                         pOutput->pBB7_TWINPEAKS_Slow_ToTCalib[i][j][k] = ToT_BB7_TWINPEAKS_Slow[i][j][k];
 
 
@@ -4089,16 +4091,18 @@ void EventAnlProc::Process_BB7_TWINPEAKS_Histos(EventUnpackStore* pInputMain, Ev
                             evt.Side = i;                            
                             evt.Strip = j;
                             evt.Time = pOutput->pBB7_TWINPEAKS_FastLeadT[i][j][k];
-                            evt.Energy = ToT_BB7_TWINPEAKS_Slow[i][j][k];
+                            //evt.Energy = ToT_BB7_TWINPEAKS_Slow[i][j][k];
 
-                            // CEJ just for compilation...no calibration to energy performed..
-                            if (evt.Energy > BB7_IMPLANT_E_THRESHOLD)
-                            {
+                            // CEJ different calibrations depending on energy range...
+                            if (ToT_BB7_TWINPEAKS_Slow[i][j][k] > BB7_IMPLANT_E_THRESHOLD)
+                            {   
+                                evt.Energy = CalibrateImplantToT(ToT_BB7_TWINPEAKS_Slow[i][j][k], i, j);
                                 BB7_TWINPEAKS_Unp.Implants.push_back(evt);
                                 //std::cout << "implant!" << std::endl;
                             }
                             else
-                            {
+                            {   
+                                evt.Energy = CalibrateDecayToT(ToT_BB7_TWINPEAKS_Slow[i][j][k], i, j);
                                 BB7_TWINPEAKS_Unp.Decays.push_back(evt);
                                 //std::cout << "decay!" << std::endl;
                             }
@@ -4389,4 +4393,18 @@ void EventAnlProc::Process_BB7_FEBEX_Histos(EventUnpackStore* pInputMain, EventA
         pOutput->pBB7_FEBEX.push_back(BB7_FEBEX);
     }
 
+}
+
+double EventAnlProc::CalibrateImplantToT(double& ToT, int i, int j)
+{   
+    double Energy;
+    Energy = ToT - fCal->BB7_TWINPEAKS_HighE_A[i][j];
+    return Energy;
+}
+
+double EventAnlProc::CalibrateDecayToT(double& ToT, int i, int j)
+{
+    double Energy;
+    Energy = fCal->BB7_TWINPEAKS_LowE_A[i][j] * ToT + fCal->BB7_TWINPEAKS_LowE_B[i][j];
+    return Energy;
 }

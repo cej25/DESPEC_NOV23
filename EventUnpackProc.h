@@ -87,7 +87,9 @@ using namespace std;
 
             Bool_t BuildEvent(TGo4EventElement* dest);
              void Process_AIDA_Event(EventUnpackStore* event);
-
+        
+            double CalibrateImplantE_FEBEX(double, int, int);
+            double CalibrateDecayE_FEBEX(double, int, int);
 
              TIDParameter* frs_id;
 
