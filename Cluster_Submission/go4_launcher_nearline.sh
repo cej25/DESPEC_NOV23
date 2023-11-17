@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##Setup environment
-source /cvmfs/eel.gsi.de/bin/go4login
+source /cvmfs/eel.gsi.de/centos7-x86_64/bin/go4login
 export ROOT_INCLUDE_PATH=/lustre/gamma/DESPEC_NOV23_NEARLINE
 echo "DESPEC Kronos Started at `date`"
 

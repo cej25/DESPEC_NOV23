@@ -1,0 +1,2 @@
+/cvmfs/eel.gsi.de/bin/go4login: line 19: /cvmfs/eel.gsi.de/unknown8.8-x86_64/bin/go4login: No such file or directory
+/var/spool/slurm/d/job14877389/slurm_script: line 26: go4analysis: command not found
