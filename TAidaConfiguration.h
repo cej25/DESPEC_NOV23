@@ -34,6 +34,8 @@ struct DSSDConfiguration
   // Side mapping
   DSSDSide XSide;
   DSSDSide YSide;
+  // MEC
+  bool MEC;
 };
 
 struct FEEConfiguration
