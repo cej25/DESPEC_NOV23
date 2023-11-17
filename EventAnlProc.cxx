@@ -1638,20 +1638,34 @@ void EventAnlProc::Make_Aida_Histos(){
     implants_e[i] = MakeTH1('F', Form("AIDA/Implants/DSSD%d_implants_energy", i+1), Form("DSSD %d implant energy", i+1), 2000, 0, 20000, "Implant Energy/MeV");
     implants_e_xy[i] = MakeTH2('F', Form("AIDA/Implants/DSSD%d_implants_energy_XY", i+1), Form("DSSD %d implant front energy vs back energy", i+1), 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
     implants_time_delta[i] = MakeTH1('F', Form("AIDA/Implants/DSSD%d_implants_time_delta", i+1), Form("DSSD %d implant front vs back time", i+1), 1000, -10000, 10000, "Time Difference/ns");
-    implants_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_implants_strip_1d_energy", i+1), Form("DSSD %d implants 1D strip vs energy", i+1), xstrips + 128, 0, xstrips + 128, 1000, 0, 20000);
+    implants_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Implants/DSSD%d_implants_strip_1d_energy", i+1), Form("DSSD %d implants 1D strip vs energy", i+1), xstrips + 128, 0, xstrips + 128, 1000, 0, 20000);
     implants_strip_1d[i] = MakeTH1('I', Form("AIDA/Implants/DSSD%d_implants_strip_1d", i+1), Form("DSSD %d implant 1D hit pattern", i+1), 128 + xstrips, 0, 128 + xstrips, "Strip number");
     implants_per_event[i] = MakeTH1('I', Form("AIDA/Implants/DSSD%d_implants_per_event", i+1), Form("DSSD %d implants per event", i+1), 100, 0, 100, "Number of implants");
     implants_x_ex[i] = MakeTH2('F', Form("AIDA/Implants/DSSD%d_implants_x_ex", i+1), Form("DSSD %d Ex vs X position", i+1), 128, 0, 128, 2000, 0, 20000, "X Strip", "X Energy");
     implants_y_ey[i] = MakeTH2('F', Form("AIDA/Implants/DSSD%d_implants_y_ey", i+1), Form("DSSD %d Ey vs Y position", i+1), 128, 0, 128, 2000, 0, 20000, "Y Strip", "Y Energy");
 
-    decays_strip_xy[i] = MakeTH2('I', Form("AIDA/Decays/DSSD%d_decays_strip_XY", i+1), Form("DSSD %d decay hit pattern", i+1), xstrips, 0, xstrips, 128, 0, 128, "X strip", "Y strip");
-    decays_pos_xy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_pos_XY", i+1), Form("DSSD %d decay position", i+1), xstrips, -xmax, xmax, 128, -37.8, 37.8, "X position/mm", "Y position/mm");
-    decays_e[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_energy", i+1), Form("DSSD %d decay energy", i+1), 1000, 0, 20000, "Decay Energy/keV");
-    decays_e_xy[i] = MakeTH2('F', Form("AIDA/Decays/DSSD%d_decays_energy_XY", i+1), Form("DSSD %d decay front energy vs back energy", i+1), 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
-    decays_time_delta[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_time_delta", i+1), Form("DSSD %d decay front vs back time", i+1), 1000, -10000, 10000, "Time Difference/ns");
-    decays_strip_1d[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_strip_1d", i+1), Form("DSSD %d decay 1D hit pattern", i+1), 128 + xstrips, 0, 128 + xstrips, "Strip number");
-    decays_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_strip_1d_energy", i+1), Form("DSSD %d decay 1D strip vs energy", i+1), 128 + xstrips, 0, 128 + xstrips, 1000, 0, 20000);
-    decays_per_event[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_per_event", i+1), Form("DSSD %d decays per event", i+1), 100, 0, 100, "Number of decays");
+    if (conf->DSSD(i).MEC)
+    {
+      decays_strip_xy[i] = MakeTH2('I', Form("AIDA/Decays/DSSD%d_decays_strip_XY", i+1), Form("DSSD %d decay (MEC) hit pattern", i+1), xstrips, 0, xstrips, 128, 0, 128, "X strip", "Y strip");
+      decays_pos_xy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_pos_XY", i+1), Form("DSSD %d decay (MEC) position", i+1), xstrips, -xmax, xmax, 128, -37.8, 37.8, "X position/mm", "Y position/mm");
+      decays_e[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_energy", i+1), Form("DSSD %d decay (MEC) energy", i+1), 1000, 0, 100000, "Decay Energy/keV");
+      decays_e_xy[i] = MakeTH2('F', Form("AIDA/Decays/DSSD%d_decays_energy_XY", i+1), Form("DSSD %d decay (MEC) front energy vs back energy", i+1), 1000, 0, 100000, 1000, 0, 100000, "X Energy", "Y Energy");
+      decays_time_delta[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_time_delta", i+1), Form("DSSD %d decay (MEC) front vs back time", i+1), 1000, -10000, 10000, "Time Difference/ns");
+      decays_strip_1d[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_strip_1d", i+1), Form("DSSD %d decay (MEC) 1D hit pattern", i+1), 128 + xstrips, 0, 128 + xstrips, "Strip number");
+      decays_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_strip_1d_energy", i+1), Form("DSSD %d decay (MEC) 1D strip vs energy", i+1), 128 + xstrips, 0, 128 + xstrips, 1000, 0, 100000);
+      decays_per_event[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_per_event", i+1), Form("DSSD %d decays (MEC) per event", i+1), 100, 0, 100, "Number of decays");
+    }
+    else
+    {
+      decays_strip_xy[i] = MakeTH2('I', Form("AIDA/Decays/DSSD%d_decays_strip_XY", i+1), Form("DSSD %d decay hit pattern", i+1), xstrips, 0, xstrips, 128, 0, 128, "X strip", "Y strip");
+      decays_pos_xy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_pos_XY", i+1), Form("DSSD %d decay position", i+1), xstrips, -xmax, xmax, 128, -37.8, 37.8, "X position/mm", "Y position/mm");
+      decays_e[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_energy", i+1), Form("DSSD %d decay energy", i+1), 1000, 0, 20000, "Decay Energy/keV");
+      decays_e_xy[i] = MakeTH2('F', Form("AIDA/Decays/DSSD%d_decays_energy_XY", i+1), Form("DSSD %d decay front energy vs back energy", i+1), 1000, 0, 20000, 1000, 0, 20000, "X Energy", "Y Energy");
+      decays_time_delta[i] = MakeTH1('F', Form("AIDA/Decays/DSSD%d_decays_time_delta", i+1), Form("DSSD %d decay front vs back time", i+1), 1000, -10000, 10000, "Time Difference/ns");
+      decays_strip_1d[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_strip_1d", i+1), Form("DSSD %d decay 1D hit pattern", i+1), 128 + xstrips, 0, 128 + xstrips, "Strip number");
+      decays_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_decays_strip_1d_energy", i+1), Form("DSSD %d decay 1D strip vs energy", i+1), 128 + xstrips, 0, 128 + xstrips, 1000, 0, 20000);
+      decays_per_event[i] = MakeTH1('I', Form("AIDA/Decays/DSSD%d_decays_per_event", i+1), Form("DSSD %d decays per event", i+1), 100, 0, 100, "Number of decays");
+    }
 
 //     implants_channels[i] = MakeTH1('I', Form("AIDA/DSSD%d_implants_channels", i+1), Form("DSSD %d number of implant channels", i+1), 769, 0, 769);
 //     decays_channels[i] = MakeTH1('I', Form("AIDA/DSSD%d_decays_channels", i+1), Form("DSSD %d number of decay channels", i+1), 769, 0, 769);
@@ -1836,8 +1850,9 @@ void EventAnlProc::ProcessAida(EventUnpackStore* pInputMain, EventAnlStore* pOut
 #endif
       }
       int channelM = 0;
-      for (int i = 0; i < 768; ++i)
-      if (channels[i]) ++channelM;
+      for (int i = 0; i < 64 * conf->FEEs(); ++i){
+        if (channels[i]) ++channelM;
+      }
 
      // decays_channels[0]->Fill(channelM);
 
