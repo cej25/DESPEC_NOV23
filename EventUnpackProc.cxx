@@ -1596,7 +1596,8 @@ void EventUnpackProc::FILL_HISTOGRAMS(int PrcID_Conv, int PrcID, int SubType,Eve
 //-----------------------------------------------------------------------------------------------------------------------------//
 void EventUnpackProc::ResetMultiplexer()
 {
-  for (int i = 0; i < 12; ++i)
+  auto* conf = TAidaConfiguration::GetInstance();
+  for (int i = 0; i < conf->FEEs(); ++i)
   {
     for (int j = 0; j < 4; ++j)
     {
