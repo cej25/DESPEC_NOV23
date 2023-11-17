@@ -384,6 +384,11 @@ bool AIDA_Detector_System::BuildAIDAADCEvent(TGo4MbsSubEvent* psubevt, Int_t wor
       evt.Energy = evt.Intensity * 0.7; // Energy in MeV
       Energy[Hits] = evt.Energy;
     }
+    else if (veto == 0 && conf->DSSD(evt.DSSD - 1).MEC)
+    {
+      evt.Energy = evt.Intensity * 35;
+      Energy[Hits] = evt.Energy;
+    }
     else
     {
       evt.Energy = evt.Intensity * dssdGains[evt.DSSD - 1][evt.Side == conf->DSSD(evt.DSSD - 1).XSide ? 0 : 1][evt.Strip];

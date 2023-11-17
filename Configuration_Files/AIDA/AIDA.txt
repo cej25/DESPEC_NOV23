@@ -54,6 +54,7 @@ DSSD: 1
 - RightRight: 6
 - X: Junction
 - Y: Ohmic
+- MEC: true
 
 #---------------------------
 # Scaler Mapping
