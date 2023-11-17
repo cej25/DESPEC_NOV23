@@ -1618,7 +1618,7 @@ void EventAnlProc::Make_Aida_Histos(){
     implants_e[i] = MakeTH1('F', Form("AIDA/Implants/DSSD%d_implants_energy", i+1), Form("DSSD %d implant energy", i+1), 2000, 0, 20000, "Implant Energy/MeV");
     implants_e_xy[i] = MakeTH2('F', Form("AIDA/Implants/DSSD%d_implants_energy_XY", i+1), Form("DSSD %d implant front energy vs back energy", i+1), 2000, 0, 20000, 2000, 0, 20000, "X Energy", "Y Energy");
     implants_time_delta[i] = MakeTH1('F', Form("AIDA/Implants/DSSD%d_implants_time_delta", i+1), Form("DSSD %d implant front vs back time", i+1), 1000, -10000, 10000, "Time Difference/ns");
-    implants_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Decays/DSSD%d_implants_strip_1d_energy", i+1), Form("DSSD %d implants 1D strip vs energy", i+1), xstrips + 128, 0, xstrips + 128, 1000, 0, 20000);
+    implants_strip_1d_energy[i] = MakeTH2('D', Form("AIDA/Implants/DSSD%d_implants_strip_1d_energy", i+1), Form("DSSD %d implants 1D strip vs energy", i+1), xstrips + 128, 0, xstrips + 128, 1000, 0, 20000);
     implants_strip_1d[i] = MakeTH1('I', Form("AIDA/Implants/DSSD%d_implants_strip_1d", i+1), Form("DSSD %d implant 1D hit pattern", i+1), 128 + xstrips, 0, 128 + xstrips, "Strip number");
     implants_per_event[i] = MakeTH1('I', Form("AIDA/Implants/DSSD%d_implants_per_event", i+1), Form("DSSD %d implants per event", i+1), 100, 0, 100, "Number of implants");
     implants_x_ex[i] = MakeTH2('F', Form("AIDA/Implants/DSSD%d_implants_x_ex", i+1), Form("DSSD %d Ex vs X position", i+1), 128, 0, 128, 2000, 0, 20000, "X Strip", "X Energy");
@@ -1816,8 +1816,9 @@ void EventAnlProc::ProcessAida(EventUnpackStore* pInputMain, EventAnlStore* pOut
 #endif
       }
       int channelM = 0;
-      for (int i = 0; i < 768; ++i)
-      if (channels[i]) ++channelM;
+      for (int i = 0; i < 64 * conf->FEEs(); ++i){
+        if (channels[i]) ++channelM;
+      }
 
      // decays_channels[0]->Fill(channelM);
 
