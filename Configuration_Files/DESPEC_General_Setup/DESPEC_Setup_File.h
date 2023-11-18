@@ -107,7 +107,7 @@
 ///bPlastic Downstream Detector
 #define bPLASTIC_DOWNSTREAM_DET 2
 ///bPlast Additional signals Module Num
-#define bPLASTIC_ADDITIONAL_CH_MOD 3
+#define bPLASTIC_ADDITIONAL_CH_MOD 3 // 2 or 3
 ///bPlast Additional signals Channel Num
 #define bPLASTIC_FATTAMEX 9
 #define bPLASTIC_FATVME 8
@@ -120,8 +120,8 @@
 //Add ge trigger
 
 ///bPlast Time Machine Channels
-#define bPlastTimeMachineCh1 9
-#define bPlastTimeMachineCh2 8
+#define bPlastTimeMachineCh1 1
+#define bPlastTimeMachineCh2 2
 ///bPlastic reference channels
 #define bPlastRefCh_Det1 0
 #define bPlastRefCh_Det2 0
