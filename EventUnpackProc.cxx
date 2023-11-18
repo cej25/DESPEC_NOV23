@@ -146,7 +146,7 @@ EventUnpackProc::EventUnpackProc(const char* name) : TGo4EventProcessor(name)
 
   if (Used_Systems[8]) Make_BB7_FEBEX_Histos();
 
-  if (Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
+  //if (Used_Systems[9]) Make_BB7_TWINPEAKS_Histos();
 
   if (Used_Systems[10]) Make_BB7_MADC_Histos();
 
@@ -1596,7 +1596,8 @@ void EventUnpackProc::FILL_HISTOGRAMS(int PrcID_Conv, int PrcID, int SubType,Eve
 //-----------------------------------------------------------------------------------------------------------------------------//
 void EventUnpackProc::ResetMultiplexer()
 {
-  for (int i = 0; i < 12; ++i)
+  auto* conf = TAidaConfiguration::GetInstance();
+  for (int i = 0; i < conf->FEEs(); ++i)
   {
     for (int j = 0; j < 4; ++j)
     {
