@@ -179,7 +179,7 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
     else if (option == "mec" && sub && sub_DSSD > 0)
     {
       bool mec = false;
-      line >> mec;
+      line >> std::boolalpha >> mec;
       dssd[sub_DSSD - 1].MEC = mec;
     }
     else if (option == "scalers")
