@@ -331,6 +331,9 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
     {
         //cout<<"bPLASTIC_ADDITIONAL_CH_MOD " <<bPLASTIC_ADDITIONAL_CH_MOD << " bPlastTimeMachineCh2 " <<bPlastTimeMachineCh2 <<" cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] <<endl;
 
+
+	
+		
         if(cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c]!=0 && cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c]!=0)
         {
             //cout<<"cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] << endl;
@@ -441,10 +444,10 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
             ///Fatima TAMEX bPlast (WR gate 11.)
             if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0&& cOutput->cbPlast_TimeMachine_dT[a]!=0)
             {
-                if((cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GbPlas_Fattam_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GbPlas_Fattam_THigh)
-                {
+                //if((cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GbPlas_Fattam_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GbPlas_Fattam_THigh)
+                //{
                     hFatTAMEX_bPlast_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cbPlast_TimeMachine_dT[a]);
-                }
+                //}
             }
 
             ///Fatima TAMEX AIDA (WR gate 19.)
