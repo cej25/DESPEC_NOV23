@@ -43,8 +43,8 @@
 #define SC41R_FatVME  37
 #define SC41L_FatVME_Digi  38
 #define SC41R_FatVME_Digi  39
-#define FatVME_TimeMachineCh1 40
-#define FatVME_TimeMachineCh2 41
+#define FatVME_TimeMachineCh1 13
+#define FatVME_TimeMachineCh2 14
 #define FatVME_bPlast_UP 42
 #define FatVME_bPlast_DOWN 43
 #define FatVME_bPlast_MASTER 44
@@ -59,8 +59,8 @@
 #define FATIMA_TAMEX_SC41R  50 
 #define FATIMA_TAMEX_SC41L_Digi  51
 #define FATIMA_TAMEX_SC41R_Digi  52
-#define FatTAMEX_TimeMachineCh1 53
-#define FatTAMEX_TimeMachineCh2 54
+#define FatTAMEX_TimeMachineCh1 13
+#define FatTAMEX_TimeMachineCh2 14
 
 // BB7 LAYER
 #define BB7_DETECTORS 1
@@ -107,7 +107,7 @@
 ///bPlastic Downstream Detector
 #define bPLASTIC_DOWNSTREAM_DET 2
 ///bPlast Additional signals Module Num
-#define bPLASTIC_ADDITIONAL_CH_MOD 3 // 2 or 3
+#define bPLASTIC_ADDITIONAL_CH_MOD 2
 ///bPlast Additional signals Channel Num
 #define bPLASTIC_FATTAMEX 9
 #define bPLASTIC_FATVME 8
