@@ -278,39 +278,39 @@ void FATIMA_TAMEX_Detector_System::reset_edges(){
 
 //---------------------------------------------------------------
 
-void FATIMA_TAMEX_Detector_System::get_edges(){
+void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
     //set iterator[tamex_iter] of edges to 0
     iterator[tamex_iter] = 0;
 
     //loop over remaining words (getting leading and trailing edge data)
     written = false;
 
+    int testcounter = 0;
+    int last_epoch = -1;
+    int first_epoch = 0;
+     
     while(no_error_reached()){
-        
-        ///Epoch extraction AM AB 
-//         printf("Data word pdata 0x%08x\n", (unsigned int*) *pdata);
-//          printf("1 pdata & 0xe0000000 0x%08x\n", (*pdata & 0xe0000000 )); 
-         if((*pdata & 0xe0000000)== 0x60000000) { 
-             EPOCH* epoch = (EPOCH*) pdata;
-            // printf("A pdata 0x%08x\n", *pdata); 
-           
-           epoch_data =0; 
-           epoch_data=(*pdata & 0xffffffff );
-            // cout<<"epoch_data " << epoch_data << " epoch_count " << epoch->epoch_count << " tamex_iter " <<tamex_iter<<" iterator[tamex_iter] " <<iterator[tamex_iter]  << endl;
-          
-         }
         
         //check place holder in stream
         PLACE_HOLDER* hold = (PLACE_HOLDER*) pdata;
 // // 
         if(hold->six_eight == six_f ){
            // cerr << "***Only single channel fired!***" << endl;
+	  if(debugmode)cout << endl << "I see epoch data" << endl << endl;
+	  if(debugmode)cout << "epoch: " << hold->empty << endl;
+	  last_epoch = hold->empty;
+	  
+	  
+        
+          
+	  
             pdata++;
             continue;
         }
 //       //  pdata++;
      if(hold->six_eight != six_f) written = false;
 
+         if(debugmode)cout << "I see normal data" << endl;
 //         if(hold->six_eight != six_f){
 //             cerr << dec << hold->six_eight << endl;
 //             cerr << "PLACE_HOLDER error (edges) in TAMEX!" << endl;
@@ -321,81 +321,57 @@ void FATIMA_TAMEX_Detector_System::get_edges(){
 
         //next word
       
+     
 
-        
+
         //extract data
         TAMEX_DATA* data = (TAMEX_DATA*) pdata;
        // printf(" pdata 0x%08x\n", (unsigned int*) pdata); 
 //         cout<<"LEADING PDATA " << ((*pdata & 0x800) >> 11) << endl;
-       
-       // cout<<"data->leading_E " <<data->leading_E << "  data->coarse_T "<<(double) data->coarse_T<<" data->ch_ID "<<data->ch_ID << endl;
-       
-//         cout<<"FAST EDGE " << data->leading_E << endl;
-        
-          
-           
-           
-//         leading_edge
-      // cout<<"1 data1 " << data1 <<" data->leading_E "<<data->leading_E<<endl;
-       if(data1!=data->leading_E){
-        data1=data->leading_E ;
-        
-//        if(data1<data->leading_E){
-//            data1=data->leading_E;
-//        }
-       // cout<<"2 data1 " << data1<<endl;
-        //cout<<"data->leading_E " <<data->leading_E  << endl;
-            if(data->leading_E ==1 && tamex_iter<4){
-            leading_hit=data->leading_E;
-            edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T;
-            edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
-            ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
-            lead_arr[tamex_iter][iterator[tamex_iter]] = (data->ch_ID % 2);
-            
-         
-            epoch_data_ch_leading[tamex_iter][iterator[tamex_iter]] = epoch_data;
-          //   cout<<"1 Lead " << epoch_data_ch_leading[tamex_iter][iterator[tamex_iter]] << " tamex_iter " <<tamex_iter << "  iterator " <<iterator[tamex_iter]<<"  edge_coarse " << edge_coarse[tamex_iter][iterator[tamex_iter]] <<  " edge_fine " << edge_fine[tamex_iter][iterator[tamex_iter]] <<" chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<  endl;
-           // printf("Leading pdata 0x%08x\n", (unsigned int*) *pdata); 
-          //  cout<<"Leading tamex_iter " << tamex_iter << " iterator[tamex_iter] " <<iterator[tamex_iter] << " channel " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] << " epoch " << epoch_data_ch_leading[tamex_iter][iterator[tamex_iter]] << endl;
-            
-        }
-        
 
-  if(data->leading_E ==0 && tamex_iter<4){
-             
-             leading_hit=data->leading_E;
-              //cout<<"TRAIL EDGE " << data->leading_E << endl;
-          //   cout<<"tamex_iter " << tamex_iter <<" iterator[tamex_iter] " <<iterator[tamex_iter] << endl;
-             
-             ///tamex_iter = board number
-             ///Lead iterator[tamex_iter]
-        edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T;
+        if(debugmode)cout<<"data->leading_E " <<data->leading_E << " coarse_T "<< data->coarse_T<<" [card][ch_ID]: [" << tamex_iter << "][" <<data->ch_ID << "], fine_T: " << data->fine_T << ", TDC: " << data->TDC << endl;
+	//epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
+	if(debugmode)cout << "current epoch for this ch " << data->ch_ID << " is " << last_epoch << endl;
+	
+	
+	// Implement epoch correction already here....?
+        //epoch_ch is an epoch counter per channel that gets zeroed before each new triggered event	  
+	   
+  	epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
+	
+	
+	
+	if(debugmode)if(epoch_ch[tamex_iter][data->ch_ID] != epoch_ch[tamex_iter][0])cout <<  "EPOCH FOR CHANNEL " << data->ch_ID << "is different to trigger!!!!!!!!!!!!!!!!!!" << endl;
+
         
-        
-        edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
-        ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID+MAX_CHA_INPUT;
-        
-        epoch_data_ch_trailing[tamex_iter][iterator[tamex_iter]] = epoch_data;
-         
-       // cout<<"1 trail " << epoch_data_ch_trailing[tamex_iter][iterator[tamex_iter]] << " tamex_iter " <<tamex_iter << "  iterator " <<iterator[tamex_iter]<<"  edge_coarse " << edge_coarse[tamex_iter][iterator[tamex_iter]] <<  " edge_fine " << edge_fine[tamex_iter][iterator[tamex_iter]] << " chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] << endl;
-         //printf("Trailing pdata 0x%08x\n", (unsigned int*) *pdata); 
-          //  cout<<"Trailing tamex_iter " << tamex_iter << " iterator[tamex_iter] " <<iterator[tamex_iter] << " channel " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<" epoch " << epoch_data_ch_trailing[tamex_iter][iterator[tamex_iter]] <<  endl;
-        
-        
-        }
-       }
-//        cout << "coarse " << edge_coarse[tamex_iter][iterator[tamex_iter]] << " fine " << edge_fine[tamex_iter][iterator[tamex_iter]]<< " Chan " << ch_ID_edge[tamex_iter][iterator[tamex_iter]] <<"  lead_arr[tamex_iter][iterator[tamex_iter]] " << lead_arr[tamex_iter][iterator[tamex_iter]] <<  endl;  
-         
+	
+	// basic idea is to shift times relative to epoch for trigger for each channel. Coarse time is in units of 5ns!
+	// i.e. there are 2048 coarse clock ticks in an epoch - coarse time should never be >2048.
+	// Subtract [ (trigger epoch) - (channel epoch) ] * 2048
+	
+        data->coarse_T = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048);
+	if(debugmode) cout << "epoch_ch[tamex_iter][0]: " << epoch_ch[tamex_iter][0] << ", epoch_ch[tamex_iter][data->ch_ID]: " << epoch_ch[tamex_iter][data->ch_ID] << endl;
+	if(debugmode) cout << "(epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048: " << (epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048 << endl;
+	
+	  
+	  
+	leading_hit=data->leading_E;
+	edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048);
+	edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
+	lead_arr[tamex_iter][iterator[tamex_iter]] = data->leading_E;
+	
+	if(debugmode) cout << "NEW CORRECTED FATIMA COARSE TIME: " << edge_coarse[tamex_iter][iterator[tamex_iter]] << endl;
+	
+        if(data->leading_E == 1) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
+	if(data->leading_E == 0) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID+MAX_CHA_INPUT;
+
         iterator[tamex_iter]++;
-         
+
         written = true;
 
         //next word
         pdata++; 
-        
-        
         //pdata++; 
-        
        
     }
 }
