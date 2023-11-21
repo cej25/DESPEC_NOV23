@@ -59,8 +59,8 @@
 #define FATIMA_TAMEX_SC41R  50 
 #define FATIMA_TAMEX_SC41L_Digi  51
 #define FATIMA_TAMEX_SC41R_Digi  52
-#define FatTAMEX_TimeMachineCh1 13
-#define FatTAMEX_TimeMachineCh2 14
+#define FatTAMEX_TimeMachineCh1 1
+#define FatTAMEX_TimeMachineCh2 2
 
 // BB7 LAYER
 #define BB7_DETECTORS 1
