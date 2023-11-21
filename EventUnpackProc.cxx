@@ -2970,8 +2970,10 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     hAIDA_TimeMachine = MakeTH1('I', "AIDA/Scaler/TimeMachine", "AIDA Time Machine dT", 200, 0, 2000, "dT (ns)");
 }
 
+// CEJ: currently segfaulting here after {some number} events
 void EventUnpackProc::Fill_AIDA_Histos() {
   AIDA_Hits = RAW->get_AIDA_HITS();
+
 
   for(int i = 0; i<AIDA_Hits; i++) {
     int fee = RAW-> get_AIDA_FEE_ID(i);
@@ -3027,7 +3029,7 @@ void EventUnpackProc::Fill_AIDA_Histos() {
   {
     int i = 0;
     for (auto val : aida_scaler_queue[scaler.first])
-    {
+    {   
         hAIDA_Scaler[scaler.first]->SetBinContent(i + 1, val);
         i++;
     }
