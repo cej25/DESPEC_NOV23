@@ -102,8 +102,8 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
     if (fCorrel->GSetup_corr_FRS_BB7_TWINPEAKS == true) Make_FRS_BB7_TWINPEAKS_Histos();
 
     // CEJ:  set up fCorrel
-    //Make_bPlast_AIDA_Histos();
-    //Process_bPlast_AIDA(cInput, cOutput);
+    Make_bPlast_AIDA_Histos();
+    Process_bPlast_AIDA(cInput, cOutput);
   //  if(fCorrel->GSetup_corr_FRS_Aida_Gamma==true) Make_FRS_AIDA_Gamma_Histos();
     
   //  if(fCorrel->GSetup_corr_FRS_bPlast==true)  Make_FRS_bPlast_Histos();
@@ -634,7 +634,7 @@ void EventCorrelProc::Process_FRS_BB7_TWINPEAKS(EventAnlStore* cInputMain, Event
     // process correlations....
 }
 
-/*
+
 void EventCorrelProc::Make_bPlast_AIDA_Histos()
 {
     TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
@@ -645,9 +645,9 @@ void EventCorrelProc::Make_bPlast_AIDA_Histos()
         
     }
 }
-*/
 
-/*void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+
+void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
 {
     TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
     for (auto & cInputRef : cInputMain->pAida)
@@ -675,7 +675,7 @@ void EventCorrelProc::Make_bPlast_AIDA_Histos()
         }
     }
 }
-*/
+
 
 
 
