@@ -642,7 +642,7 @@ void EventCorrelProc::Make_bPlast_AIDA_Histos()
     hAIDA_implants_e_bPlas_SlowToT.resize(conf->DSSDs());
     for (int i = 0; i < conf->DSSDs(); i++)
     {
-        hAIDA_implants_e_bPlas_SlowToT[i] = MakeTH2('F', Form("Correlations/AIDA-bPlast/DSSD%d_Implants_bPlast_SlowToT", i+1), Form("DSSD%d Implant E vs bPlast Slow ToT", i+1), 10000, 0, 100000, 40000, 0., 4000000.);
+        hAIDA_implants_e_bPlas_SlowToT[i] = MakeTH2('F', Form("Correlations/AIDA-bPlast/DSSD%d_Implants_bPlast_SlowToT", i+1), Form("DSSD%d Implant E vs bPlast Slow ToT", i+1), 2000, 0, 100000, 10000, 0., 4000000.);
         
     }
 }
