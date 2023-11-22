@@ -796,7 +796,7 @@ for (int i=0; i<10; i++){
 	    //  cout<<"chan_fat_fast_lead " << chan_fat_fast_lead <<" i " << i << " j " << j <<" (RAW->get_FATIMA_physical_channel(i, j)+1)/2 " <<(RAW->get_FATIMA_physical_channel(i, j)+1)/2<< endl;
                     int N1_fast = fOutput->fFat_Fast_Lead_N[chan_fat_fast_lead]++;
            if( RAW->get_FATIMA_lead_T(i,j)>0){
-                    fOutput->fFat_Lead_Fast[0][0] = RAW->get_FATIMA_lead_T(i,j);
+                    fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] = RAW->get_FATIMA_lead_T(i,j);
                    // cout<<"fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] " <<fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] << " chan_fat_fast_lead " <<chan_fat_fast_lead << " N1_fast " << N1_fast << endl;
            }
                     //cout<<"FAST LEAD RAW->get_FATIMA_physical_channel(i, j) " << RAW->get_FATIMA_physical_channel(i, j) << " chan_fat_fast_lead " <<chan_fat_fast_lead << " N1_fast " <<N1_fast << " fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast]  " <<fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast]  << " i " << i << " j " << j << endl;
@@ -3073,6 +3073,11 @@ void EventUnpackProc::Fill_AIDA_Histos() {
     int64_t interval = i.Time - last_pauses[i.Module];
 
     int64_t intervalbins = interval / 100000000ULL;
+    if (intervalbins > 6000) {
+      // ignore stupid long pauses, probably missing a marker?
+      last_pauses[i.Module] = 0;
+      continue;
+    }
 
 
     int64_t resbins = i.Time / 100000000ULL;
@@ -3085,7 +3090,7 @@ void EventUnpackProc::Fill_AIDA_Histos() {
     if (intervalbins == 0)
     {
       double frac = (interval) / 1e8;
-      aida_deadtime_queue[i.Module][(start + pos) % m] += frac;
+      aida_deadtime_queue[i.Module][(start + pos) % m] = frac;
     }
     else
     {
@@ -3096,7 +3101,7 @@ void EventUnpackProc::Fill_AIDA_Histos() {
         aida_deadtime_queue[i.Module][(start + j + pos) % m] = 1;
       }
       double end_frac = (i.Time - resbins*100000000ULL) / 1e8;
-      aida_deadtime_queue[i.Module][(start + pos) % m] += end_frac;
+      aida_deadtime_queue[i.Module][(start + pos) % m] = end_frac;
     }
     redraw = true;
     last_pauses[i.Module] = 0;

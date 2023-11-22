@@ -21,6 +21,7 @@ public:
  Bool_t GSetup_corr_FRS_Fatima_LT;
  Bool_t GSetup_corr_Beta_Gamma_bPlastSpillOff;
  Bool_t GSetup_corr_Beta_Gamma, GSetup_corr_Beta_Gamma_Gamma, GSetup_corr_Beta_Gamma_Fatima, GSetup_corr_Beta_Gamma_Fatima_LT;
+ Bool_t GSetup_corr_bPlast_AIDA;
  
  Int_t GZ1Z2_Gate;
  
