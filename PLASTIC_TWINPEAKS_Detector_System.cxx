@@ -280,8 +280,6 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
 // // 
         if(hold->six_eight == six_f ){
            // cerr << "***Only single channel fired!***" << endl;
-	  if(debugmode)cout << endl << "I see epoch data" << endl << endl;
-	  if(debugmode)cout << "epoch: " << hold->empty << endl;
 	  last_epoch = hold->empty;
 	  
 	  
@@ -294,7 +292,6 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
 //       //  pdata++;
      if(hold->six_eight != six_f) written = false;
 
-         if(debugmode)cout << "I see normal data" << endl;
 //         if(hold->six_eight != six_f){
 //             cerr << dec << hold->six_eight << endl;
 //             cerr << "PLACE_HOLDER error (edges) in TAMEX!" << endl;
@@ -313,19 +310,13 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
        // printf(" pdata 0x%08x\n", (unsigned int*) pdata); 
 //         cout<<"LEADING PDATA " << ((*pdata & 0x800) >> 11) << endl;
 
-        if(debugmode)cout<<"data->leading_E " <<data->leading_E << " coarse_T "<< data->coarse_T<<" [card][ch_ID]: [" << tamex_iter << "][" <<data->ch_ID << "], fine_T: " << data->fine_T << ", TDC: " << data->TDC << endl;
 	//epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
-	if(debugmode)cout << "current epoch for this ch " << data->ch_ID << " is " << last_epoch << endl;
 	
 	
 	// Implement epoch correction already here....?
         //epoch_ch is an epoch counter per channel that gets zeroed before each new triggered event	  
 	   
   	epoch_ch[tamex_iter][data->ch_ID] = last_epoch;
-	
-	
-	
-	if(debugmode)if(epoch_ch[tamex_iter][data->ch_ID] != epoch_ch[tamex_iter][0])cout <<  "EPOCH FOR CHANNEL " << data->ch_ID << "is different to trigger!!!!!!!!!!!!!!!!!!" << endl;
 
         
 	
@@ -334,17 +325,13 @@ void PLASTIC_TWINPEAKS_Detector_System::get_edges(){
 	// Subtract [ (trigger epoch) - (channel epoch) ] * 2048
 	
         data->coarse_T = data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048);
-	if(debugmode) cout << "epoch_ch[tamex_iter][0]: " << epoch_ch[tamex_iter][0] << ", epoch_ch[tamex_iter][data->ch_ID]: " << epoch_ch[tamex_iter][data->ch_ID] << endl;
-	if(debugmode) cout << "(epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048: " << (epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048 << endl;
-	
-	  
+
 	  
 	leading_hit=data->leading_E;
 	edge_coarse[tamex_iter][iterator[tamex_iter]] = (double) data->coarse_T - ((epoch_ch[tamex_iter][0] - epoch_ch[tamex_iter][data->ch_ID])*2048);
 	edge_fine[tamex_iter][iterator[tamex_iter]] = (double) data->fine_T;
 	lead_arr[tamex_iter][iterator[tamex_iter]] = data->leading_E;
 	
-	if(debugmode) cout << "NEW CORRECTED COARSE TIME: " << edge_coarse[tamex_iter][iterator[tamex_iter]] << endl;
 	
         if(data->leading_E == 1) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID;
 	if(data->leading_E == 0) ch_ID_edge[tamex_iter][iterator[tamex_iter]] = data->ch_ID+MAX_CHA_INPUT;
