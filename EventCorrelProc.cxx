@@ -101,9 +101,8 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 
     if (fCorrel->GSetup_corr_FRS_BB7_TWINPEAKS == true) Make_FRS_BB7_TWINPEAKS_Histos();
 
-    // CEJ:  set up fCorrel
-    Make_bPlast_AIDA_Histos();
-    Process_bPlast_AIDA(cInput, cOutput);
+    if (fCorrel->GSetup_corr_bPlast_AIDA == true) Make_bPlast_AIDA_Histos();
+
   //  if(fCorrel->GSetup_corr_FRS_Aida_Gamma==true) Make_FRS_AIDA_Gamma_Histos();
     
   //  if(fCorrel->GSetup_corr_FRS_bPlast==true)  Make_FRS_bPlast_Histos();
@@ -171,6 +170,8 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
         ///BDG with AIDA
           if(fCorrel->GSetup_corr_Beta_Gamma==true) Process_Beta_Gamma(cInput, cOutput);
 
+          // CEJ: slow ToT vs AIDA "implant" energy
+          if (fCorrel->GSetup_corr_bPlast_AIDA == true) Process_bPlast_AIDA(cInput, cOutput);
 
       }
 
@@ -641,7 +642,7 @@ void EventCorrelProc::Make_bPlast_AIDA_Histos()
     hAIDA_implants_e_bPlas_SlowToT.resize(conf->DSSDs());
     for (int i = 0; i < conf->DSSDs(); i++)
     {
-        hAIDA_implants_e_bPlas_SlowToT[i] = MakeTH2('F', Form("Correlations/AIDA-bPlast/DSSD%d_Implants_bPlast_SlowToT", i+1), Form("DSSD%d Implant E vs bPlast Slow ToT", i+1), 2000, 0, 20000, 40000, 0., 4000000.);
+        hAIDA_implants_e_bPlas_SlowToT[i] = MakeTH2('F', Form("Correlations/AIDA-bPlast/DSSD%d_Implants_bPlast_SlowToT", i+1), Form("DSSD%d Implant E vs bPlast Slow ToT", i+1), 2000, 0, 100000, 10000, 0., 4000000.);
         
     }
 }
@@ -653,20 +654,21 @@ void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrel
     for (auto & cInputRef : cInputMain->pAida)
     {
         auto * cInput = &cInputRef;
-        std::vector<AidaHit> ImplantHits = cInput->Implants;
-        std::cout << "here 1?" << std::endl;
+        // CEJ: this should be implants, but we see none for now, so using Decay branch.
+        std::vector<AidaHit> ImplantHits = cInput->Decays;
+        //std::cout << "here 1?" << std::endl;
         for (auto & i : ImplantHits)
         { 
-            std::cout << "here 4" << std::endl;
+            //std::cout << "here 4" << std::endl;
             AidaHit hit = i;
 
-            std::cout << "here? 3" << std::endl;
+            //std::cout << "here? 3" << std::endl;
 
             if(hit.Time - cInputMain->pbPLAS_WR > fCorrel->GAIDA_bPlas_TLow && hit.Time - cInputMain->pbPLAS_WR < fCorrel->GAIDA_bPlas_THigh)
             {
                 //if 
                 //{ 
-                    std::cout << "here? 2" << std::endl;
+                    //std::cout << "here? 2" << std::endl;
                     
                     hAIDA_implants_e_bPlas_SlowToT[hit.DSSD-1]->Fill(hit.Energy, cInputMain->pbPlas_Slow_ToTCalib[1][0][0]);
                 //}
@@ -687,6 +689,7 @@ void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrel
       for (auto& cInputRef : cInputMain->pAida)
      {
        auto* cInput = &cInputRef;
+       //std::cout << "print this every time you go through the loop please" << std::endl;
        ///AIDA Implants
          std::vector<AidaHit> hits = cInput->Implants;
 //
