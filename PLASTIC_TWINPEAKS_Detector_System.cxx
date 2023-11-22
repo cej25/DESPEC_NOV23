@@ -26,6 +26,12 @@ PLASTIC_TWINPEAKS_Detector_System::PLASTIC_TWINPEAKS_Detector_System(){
     iterator = new int[200];
     for(int i = 0;i < 200;++i) iterator[i] = 0;
 
+    epoch_ch = new int*[200];
+
+    for(int i = 0;i < 200;++i){
+        epoch_ch[i] = new int[200*2+1];
+    }
+
     tamex_iter = 0;
     lead_arr = new int*[200];
     leading_hits = new int*[200];

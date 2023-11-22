@@ -26,6 +26,12 @@ FATIMA_TAMEX_Detector_System::FATIMA_TAMEX_Detector_System(){
     iterator = new int[4];
     for(int i = 0;i < 4;++i) iterator[i] = 0;
 
+    epoch_ch = new int*[4];
+
+    for(int o = 0;o < 4;++o){
+        epoch_ch[o] = new int[4*2+1];
+    }
+
     tamex_iter = 0;
     lead_arr = new int*[4];
 //     leading_hits = new int*[4];
