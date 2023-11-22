@@ -5,6 +5,7 @@
 ///Note that channels start from 0
 
 #define WHITE_RABBIT_ENABLED 1
+#define NUM_SUBSYS 11 // CEJ: number of subsystems for wr/procid
 
 ///Use FRS MHTDC for Analysis (1) or NIM TAC (0)
 #define MHTDC_OR_TAC 0
@@ -42,8 +43,8 @@
 #define SC41R_FatVME  37
 #define SC41L_FatVME_Digi  38
 #define SC41R_FatVME_Digi  39
-#define FatVME_TimeMachineCh1 40
-#define FatVME_TimeMachineCh2 41
+#define FatVME_TimeMachineCh1 13
+#define FatVME_TimeMachineCh2 14
 #define FatVME_bPlast_UP 42
 #define FatVME_bPlast_DOWN 43
 #define FatVME_bPlast_MASTER 44
@@ -58,8 +59,39 @@
 #define FATIMA_TAMEX_SC41R  50 
 #define FATIMA_TAMEX_SC41L_Digi  51
 #define FATIMA_TAMEX_SC41R_Digi  52
-#define FatTAMEX_TimeMachineCh1 53
-#define FatTAMEX_TimeMachineCh2 54
+#define FatTAMEX_TimeMachineCh1 13
+#define FatTAMEX_TimeMachineCh2 14
+
+// BB7 LAYER
+#define BB7_DETECTORS 1
+#define BB7_SIDES 5 // 2 for Nov tests
+#define BB7_STRIPS_PER_SIDE 32 // up to
+#define BB7_IMPLANT_E_THRESHOLD 600000 // keV // made up for compilation, change// 
+#define BB7_FRONT_BACK_E_GATE_IMPLANT 200 // keV
+#define BB7_FRONT_BACK_E_GATE_DECAY 200
+#define BB7_FRONT_BACK_T_GATE 200 // no idea
+#define BB7_XLENGTH 65.18 // inner L, 68.08 outer L, unsure.
+#define BB7_YLENGTH 65.18
+
+#define BB7_FEBEX_MODULES 4
+#define BB7_FEBEX_CHAN_PER_MOD 16
+#define BB7_FEBEX_MAX_CHANNELS (BB7_FEBEX_MODULES * BB7_FEBEX_CHAN_PER_MOD)
+#define BB7_FEBEX_MAX_HITS BB7_FEBEX_MAX_CHANNELS
+#define BB7_FEBEX_TM_SIDE1 0
+#define BB7_FEBEX_TM_SIDE2 0
+#define BB7_FEBEX_TM_STRIP1 0
+#define BB7_FEBEX_TM_STRIP2 1
+#define BB7_TAMEX_MODULES 9 // CEJ: USE 9 FOR TRICKING PLASTIC DATA
+#define BB7_TAMEX_CHANNELS 16 // CEJ: 32 tdc channels, 16 * fast+slow tamex channels
+#define BB7_TAMEX_MAX_HITS 200
+#define BB7_TAMEX_ANL_HITS 5 // why is this 5 and max hits for unpacking is 200?
+#define BB7_TWINPEAKS_TM_SIDE1 4
+#define BB7_TWINPEAKS_TM_SIDE2 4
+#define BB7_TWINPEAKS_TM_STRIP1 9
+#define BB7_TWINPEAKS_TM_STRIP2 8
+#define BB7_MADC_MODULES 2
+#define BB7_MADC_CHANNELS 32
+#define BB7_MADC_MAX_HITS (BB7_MADC_MODULES * BB7_MADC_CHANNELS)
 
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 
@@ -75,7 +107,7 @@
 ///bPlastic Downstream Detector
 #define bPLASTIC_DOWNSTREAM_DET 2
 ///bPlast Additional signals Module Num
-#define bPLASTIC_ADDITIONAL_CH_MOD 3
+#define bPLASTIC_ADDITIONAL_CH_MOD 2
 ///bPlast Additional signals Channel Num
 #define bPLASTIC_FATTAMEX 9
 #define bPLASTIC_FATVME 8
@@ -88,8 +120,8 @@
 //Add ge trigger
 
 ///bPlast Time Machine Channels
-#define bPlastTimeMachineCh1 9
-#define bPlastTimeMachineCh2 8
+#define bPlastTimeMachineCh1 1
+#define bPlastTimeMachineCh2 2
 ///bPlastic reference channels
 #define bPlastRefCh_Det1 0
 #define bPlastRefCh_Det2 0

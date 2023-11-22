@@ -91,11 +91,19 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
     isValid=kTRUE;
     static bool create =false;
     if(!create){
-
+    
+    // CEJ: Starting here
     Make_Timemachine_Histos();
 
     if(fCorrel->GSetup_corr_FRS_Aida==true)   Make_FRS_AIDA_Histos();
     
+    if (fCorrel->GSetup_corr_FRS_BB7_FEBEX == true) Make_FRS_BB7_FEBEX_Histos();
+
+    if (fCorrel->GSetup_corr_FRS_BB7_TWINPEAKS == true) Make_FRS_BB7_TWINPEAKS_Histos();
+
+    // CEJ:  set up fCorrel
+    Make_bPlast_AIDA_Histos();
+    Process_bPlast_AIDA(cInput, cOutput);
   //  if(fCorrel->GSetup_corr_FRS_Aida_Gamma==true) Make_FRS_AIDA_Gamma_Histos();
     
   //  if(fCorrel->GSetup_corr_FRS_bPlast==true)  Make_FRS_bPlast_Histos();
@@ -123,11 +131,15 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
         bPLAS_WR = cInput->pbPLAS_WR;
         FAT_WR = cInput->pFAT_WR;
         Ge_WR = cInput->pGe_WR;
+        BB7_FEBEX_WR = cInput->pBB7_FEBEX_WR; // IS
+        BB7_TWINPEAKS_WR = cInput->pBB7_TWINPEAKS_WR;
         cOutput->cAIDA_WR = cInput->pAIDA_WR;
         cOutput->cFRS_WR = cInput->pFRS_WR;
         cOutput->cbPlast_WR = cInput->pbPLAS_WR;
         cOutput->cFAT_WR = cInput->pFAT_WR;
         cOutput->cGe_WR = cInput->pGe_WR;
+        cOutput->cBB7_FEBEX_WR = cInput->pBB7_FEBEX_WR;
+        cOutput->cBB7_TWINPEAKS_WR = cInput->pBB7_TWINPEAKS_WR;
 
         Process_Timemachine(cInput, cOutput);
 
@@ -135,7 +147,11 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 ///Demand at least FRS to be activated to do correlations
          // Fat_TimeCorrection(cInput);
           if(fCorrel->GSetup_corr_FRS_Aida==true)Process_FRS_AIDA(cInput, cOutput);
-          
+
+          // CEJ: maybe we need FEBEX/TWINPEAKS discrimination here too
+          if (fCorrel->GSetup_corr_FRS_BB7_FEBEX == true) Process_FRS_BB7_FEBEX(cInput, cOutput);
+          if (fCorrel->GSetup_corr_FRS_BB7_TWINPEAKS == true) Process_FRS_BB7_TWINPEAKS(cInput, cOutput);
+
         //  if(fCorrel->GSetup_corr_FRS_Aida_Gamma==true) Process_FRS_AIDA_Gamma_Histos();
           
           //if(fCorrel->GSetup_corr_FRS_bPlast==true && bPLASTIC_TWINPEAKS==1) Process_FRS_bPlast(cInput, cOutput);
@@ -186,19 +202,27 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
    /**----------------------------------------------------------------------------------------------**/
  /**----------------------------------    Timemachine   -------------------------**/
  /**----------------------------------------------------------------------------------------------**/
- void EventCorrelProc::Make_Timemachine_Histos(){
-     ///Check if FATIMA is used
-     if(Used_Systems[3]==1 || Used_Systems[4] ==1){
-     hFatVME_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Fatima_VME_TimeMachinedT","Fatima VME TM Ch.1 -Ch.2 ",200,0,2000);
+ void EventCorrelProc::Make_Timemachine_Histos()
+ {
 
-     hFatTAMEX_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Fatima_Tamex_TimeMachinedT","Fatima TAMEX TM Ch.1 -Ch.2 ",200,0,2000);
-     }
-     
-     hGe_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Ge_FEBEX_TimeMachinedT","Germanium FEBEX TM Ch.1 -Ch.2 ",200,0,2000);
+    ///Check if FATIMA is used
+    if(Used_Systems[3]==1 || Used_Systems[4] ==1)
+    {
+        hFatVME_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Fatima_VME_TimeMachinedT","Fatima VME TM Ch.1 -Ch.2 ",200,0,2000);
 
-     hbPlastic_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/bPlast_TAMEX_TimeMachinedT","bPlastic TAMEX TM Ch.1 -Ch.2 ",200,0,2000);
+        hFatTAMEX_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Fatima_Tamex_TimeMachinedT","Fatima TAMEX TM Ch.1 -Ch.2 ",200,0,2000);
+    }
+    
+    hGe_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/Ge_FEBEX_TimeMachinedT","Germanium FEBEX TM Ch.1 -Ch.2 ",200,0,2000);
 
-     hAida_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/AIDA_TimeMachinedT","AIDA TM Ch.1 -Ch.2 ",200,0,2000);
+    hbPlastic_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/bPlast_TAMEX_TimeMachinedT","bPlastic TAMEX TM Ch.1 -Ch.2 ",200,0,2000);
+
+    hAida_TMdT= MakeTH1('I',"TimeMachine/Systems_dT/AIDA_TimeMachinedT","AIDA TM Ch.1 -Ch.2 ",200,0,2000);
+
+    // CEJ
+   // hBB7_FEBEX_TMdT = MakeTH1()
+    hBB7_TWINPEAKS_TMdT = MakeTH1('I', "TimeMachine/Systems_dT/BB7_TimeMachineT", "BB7 Layer TM Ch1 - Ch2", 200, 0, 2000);
+    
 
      ///AIDA Time machine WR dT gates
       hAIDA_WRTM_FRS = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-FRS","White Rabbit AIDA WR TM - FRS",10000,-10000,10000,"WR dT(AIDA TM WR - FRS)[ns]", "Counts");
@@ -214,6 +238,10 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
      
       hAIDA_WRTM_bPlast = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-bPlast","White Rabbit AIDA WR TM - bPlast",10000,-10000,10000,"WR dT(AIDA TM WR - bPlast)[ns]", "Counts");
 
+      // CEJ: so for our "trick".. bPlast + Germanium data can be used for:
+      // BB7_TWINPEAKS-Germanium
+      // bPlast - BB7_FEBEX
+      hBB7_WRTM_bPlast = MakeTH1('I', "WR/BB7/TimeMachine_BB7-bPlast", "White Rabbit BB7 WR TM - bPlast", 10000, -10000, 10000, "WR dT (BB7 TM WR - bPlast)[ns]", "Counts");
 
      ///Coincidence matrices
         ///Check if FATIMA is used
@@ -238,72 +266,104 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
       hGe_AIDA_TM = MakeTH2('D',"TimeMachine/Correlation_matrices/Germanium_AIDA","Time Machine Germanium vs AIDA", 200,0,2000, 200,0,2000,"Germanium FEBEX TimeMachine","AIDA TimeMachine");
 
       hAIDA_bPlast_TM = MakeTH2('D',"TimeMachine/Correlation_matrices/AIDA_bPlastic","Time Machine AIDA vs bPlastic TAMEX", 200,0,2000, 200,0,2000,"AIDA TimeMachine","bPlastic TAMEX TimeMachine");
+
+      hbPlast_BB7_TWINPEAKS_TM = MakeTH2('D', "TimeMachine/Correlation_matrices/bPlast_BB7_TWINPEAKS", "Time Machine bPlast TWINPEAKS vs BB7 Layer", 200, 0, 2000, 200, 0, 2000, "bPlast TWINPEAKS TimeMachine","BB7 TimeMachine");
+
+      hAIDA_BB7_TWINPEAKS_TM = MakeTH2('D', "TimeMachine/Correlation_matrices/AIDA_BB7_TWINPEAKS", "Time Machine AIDA vs BB7 LAYER", 200, 0, 2000, 200, 0, 2000, "AIDA TimeMachine", "BB7 TwinPeaks TimeMachine");
+
+
 }
- void EventCorrelProc::Process_Timemachine(EventAnlStore* cInputMain, EventCorrelStore* cOutput){
- for(int i=0; i<10; i++){
-    FatimaTAMEX_TimeMachine_dT[i]=0;
- }
-   ///Check if FATIMA is used
-     if(Used_Systems[3]==1 || Used_Systems[4] ==1){
-     ///Fatima VME
-        for(int aa=0; aa<10; aa++){
+ void EventCorrelProc::Process_Timemachine(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+ {
+    for(int i=0; i<10; i++)
+    {
+        FatimaTAMEX_TimeMachine_dT[i]=0;
+    }
+    ///Check if FATIMA is used
+    if(Used_Systems[3] == 1 || Used_Systems[4] == 1)
+    {
+        ///Fatima VME
+        for(int aa=0; aa<10; aa++)
+        {
 
 
-             if(cInputMain->pFat_TMCh1[aa] !=0 && cInputMain->pFat_TMCh2[aa] !=0){
-                 FatimaVME_TimeMachine_dT[aa] =  cInputMain->pFat_TMCh2[aa]-cInputMain->pFat_TMCh1[aa];
-                 hFatVME_TMdT->Fill(FatimaVME_TimeMachine_dT[aa]);
-		 cOutput->cFatimaVME_TimeMachine_dT[aa] =  FatimaVME_TimeMachine_dT[aa];
+            if(cInputMain->pFat_TMCh1[aa] !=0 && cInputMain->pFat_TMCh2[aa] !=0)
+            {
+                FatimaVME_TimeMachine_dT[aa] =  cInputMain->pFat_TMCh2[aa]-cInputMain->pFat_TMCh1[aa];
+                hFatVME_TMdT->Fill(FatimaVME_TimeMachine_dT[aa]);
+                cOutput->cFatimaVME_TimeMachine_dT[aa] =  FatimaVME_TimeMachine_dT[aa];
 
-		//cout<<"FatimaVME_TimeMachine_dT[aa] " <<FatimaVME_TimeMachine_dT[aa] << " b " << aa << endl;
+                //cout<<"FatimaVME_TimeMachine_dT[aa] " <<FatimaVME_TimeMachine_dT[aa] << " b " << aa << endl;
             }
         }
 
-     ///Fatima TAMEX
-     for(int b=0; b<10; b++){
-   
-       if(b<10){
-        if(cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh1][b]!=0 && cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh2][b]!=0 ){
-                FatimaTAMEX_TimeMachine_dT[b] = (cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh2][b]-cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh1][b])*5;
+        ///Fatima TAMEX
+        for(int b=0; b<10; b++)
+        {
+          
+            if(b<10)
+            {
+                if(cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh1][b]!=0 && cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh2][b]!=0 )
+                {
+                    FatimaTAMEX_TimeMachine_dT[b] = (cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh2][b]-cInputMain->pFat_Fast_LeadT[FatTAMEX_TimeMachineCh1][b])*5;
 
 
-		hFatTAMEX_TMdT->Fill(FatimaTAMEX_TimeMachine_dT[b]);
-		cOutput->cFatimaTAMEX_TimeMachine_dT[b] = FatimaTAMEX_TimeMachine_dT[b];
+                    hFatTAMEX_TMdT->Fill(FatimaTAMEX_TimeMachine_dT[b]);
+                    cOutput->cFatimaTAMEX_TimeMachine_dT[b] = FatimaTAMEX_TimeMachine_dT[b];
+                }
+            }
         }
-      }
-     }
     }
-     ///Germanium
+    
+    ///Germanium
 
-         if(cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh1]!=0 && cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh2]!=0){
-             Germanium_TimeMachine_dT = cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh2] - cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh1];
-             hGe_TMdT->Fill(Germanium_TimeMachine_dT);
-	     cOutput->cGermanium_TimeMachine_dT=Germanium_TimeMachine_dT;
+    if(cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh1]!=0 && cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh2]!=0)
+    {
+        Germanium_TimeMachine_dT = cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh2] - cInputMain->pGe_T[Germanium_TimeMachine_Det][Germanium_TimeMachineCh1];
+        hGe_TMdT->Fill(Germanium_TimeMachine_dT);
+        cOutput->cGermanium_TimeMachine_dT=Germanium_TimeMachine_dT;
 
-         }
+    }
 
-      ///bPlastic
-      for(int c=0; c<bPLASTIC_TAMEX_HITS; c++){
-  //cout<<"bPLASTIC_ADDITIONAL_CH_MOD " <<bPLASTIC_ADDITIONAL_CH_MOD << " bPlastTimeMachineCh2 " <<bPlastTimeMachineCh2 <<" cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] <<endl;
-  
-  
-        if(cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c]!=0 && cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c]!=0){
-	    //cout<<"cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] << endl;
-          bPlast_TimeMachine_dT[c] = (cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c] - cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c])*5;
+    // BB7 FEBEX -- AnlStore not yet passed through.
+    //if (cInputMain->pBB7_FEBEX_T)
 
 
-          hbPlastic_TMdT->Fill(bPlast_TimeMachine_dT[c]);
-	   cOutput->cbPlast_TimeMachine_dT[c] = bPlast_TimeMachine_dT[c];
+    // bPlastic
+    for(int c=0; c<bPLASTIC_TAMEX_HITS; c++)
+    {
+        //cout<<"bPLASTIC_ADDITIONAL_CH_MOD " <<bPLASTIC_ADDITIONAL_CH_MOD << " bPlastTimeMachineCh2 " <<bPlastTimeMachineCh2 <<" cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] <<endl;
+
+        if(cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c]!=0 && cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c]!=0)
+        {
+            //cout<<"cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] << endl;
+            bPlast_TimeMachine_dT[c] = (cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c] - cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c])*5;
+
+            hbPlastic_TMdT->Fill(bPlast_TimeMachine_dT[c]);
+            cOutput->cbPlast_TimeMachine_dT[c] = bPlast_TimeMachine_dT[c];
         }
-      }
+    }
 
-     ///AIDA
+    // BB7 TWINPEAKS
+    for (int i = 0; i < BB7_TAMEX_ANL_HITS; i++)
+    {
+        if (cInputMain->pBB7_TWINPEAKS_FastLeadT[BB7_TWINPEAKS_TM_SIDE1][BB7_TWINPEAKS_TM_STRIP1][i] != 0 && cInputMain->pBB7_TWINPEAKS_FastLeadT[BB7_TWINPEAKS_TM_SIDE2][BB7_TWINPEAKS_TM_STRIP2][i] != 0)
+        {
+            BB7_TWINPEAKS_TimeMachine_dT[i] = (cInputMain->pBB7_TWINPEAKS_FastLeadT[BB7_TWINPEAKS_TM_SIDE2][BB7_TWINPEAKS_TM_STRIP2][i] - cInputMain->pBB7_TWINPEAKS_FastLeadT[BB7_TWINPEAKS_TM_SIDE1][BB7_TWINPEAKS_TM_STRIP1][i]) * 5;
+            hBB7_TWINPEAKS_TMdT->Fill(BB7_TWINPEAKS_TimeMachine_dT[i]);
+            cOutput->cBB7_TWINPEAKS_TimeMachine_dT[i] = BB7_TWINPEAKS_TimeMachine_dT[i];
+        }
+    }
+
+
+    ///AIDA
     int64_t aida_t_o = 0, aida_t_d = 0;
     for (auto sv : cInputMain->pAidaScalers)
     {
-      if (sv.Module + 1 == 3) aida_t_o = sv.Time;
-      if (sv.Module + 1 == 4) aida_t_d = sv.Time;
+        if (sv.Module + 1 == 3) aida_t_o = sv.Time;
+        if (sv.Module + 1 == 4) aida_t_d = sv.Time;
     }
-     cOutput->cAIDA_TM_WR = aida_t_o;
+    cOutput->cAIDA_TM_WR = aida_t_o;
      ///Now fill for WR TM gating
      if(aida_t_o){
         if(cInputMain->pFRS_WR)   hAIDA_WRTM_FRS ->Fill(aida_t_o-cInputMain->pFRS_WR);
@@ -323,89 +383,124 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 
 
      ///Now cross correlate
-     for(int a=0; a<10; a++){
-  ///Check if FATIMA is used
-     if(Used_Systems[3]==1 || Used_Systems[4] ==1){
-    
-          ///Fatima VME vs Fatima TAMEX (WR gate 13.)
-         if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0){
-             if((cInputMain->pFAT_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GFat_Fattam_TLow && (cInputMain->pFAT_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GFat_Fattam_THigh){
-
-                 hFatVME_FatTAMEX_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cFatimaTAMEX_TimeMachine_dT[a]);
+    for(int a=0; a<10; a++)
+    {
+        ///Check if FATIMA is used
+        if(Used_Systems[3]==1 || Used_Systems[4] ==1)
+        {
+  
+            ///Fatima VME vs Fatima TAMEX (WR gate 13.)
+            if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0)
+            {
+              if((cInputMain->pFAT_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GFat_Fattam_TLow && (cInputMain->pFAT_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GFat_Fattam_THigh)
+              {
+                  hFatVME_FatTAMEX_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cFatimaTAMEX_TimeMachine_dT[a]);
+              }
             }
-         }
 
-     ///Fatima VME vs Germanium (WR gate 14.)
+            ///Fatima VME vs Germanium (WR gate 14.)
 
-        if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 &&  cOutput->cGermanium_TimeMachine_dT!=0){
-             if((cInputMain->pFAT_WR-cInputMain->pGe_WR)>fCorrel->GFat_Ge_TLow && (cInputMain->pFAT_WR-cInputMain->pGe_WR)<fCorrel->GFat_Ge_THigh){
+            if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 &&  cOutput->cGermanium_TimeMachine_dT!=0)
+            {
+                if((cInputMain->pFAT_WR-cInputMain->pGe_WR)>fCorrel->GFat_Ge_TLow && (cInputMain->pFAT_WR-cInputMain->pGe_WR)<fCorrel->GFat_Ge_THigh)
+                {
 
-                 hFatVME_Ge_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cGermanium_TimeMachine_dT);
-             }
+                    hFatVME_Ge_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cGermanium_TimeMachine_dT);
+                }
+            }
+
+            ///Fatima VME bPlast (WR gate 10.)
+
+            if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0)
+            {
+
+                if((cInputMain->pbPLAS_WR-cInputMain->pFAT_WR)>fCorrel->GbPlas_Fat_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_WR)<fCorrel->GbPlas_Fat_THigh)
+                {
+
+                    hFatVME_bPlast_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cbPlast_TimeMachine_dT[a]);
+                }
+            }
+
+            ///Fatima VME AIDA (WR gate 18.)
+            if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cAIDA_TimeMachine_dT!=0)
+            {
+                if((cOutput->cAIDA_TM_WR-cInputMain->pFAT_WR)>fCorrel->GAIDA_TM_Fat_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pFAT_WR)<fCorrel->GAIDA_TM_Fat_THigh)
+                {
+
+                    hFatVME_AIDA_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cAIDA_TimeMachine_dT);
+                }
+            }
+
+
+            ///FATIMA TAMEX Germanium (WR gate 15.)
+            if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0 && cOutput->cGermanium_TimeMachine_dT!=0)
+            {
+                if((cInputMain->pFAT_Tamex_WR-cInputMain->pGe_WR)>fCorrel->GFattam_Ge_TLow && (cInputMain->pFAT_Tamex_WR-cInputMain->pGe_WR)<fCorrel->GFattam_Ge_THigh){
+
+                    hFatTAMEX_Ge_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cGermanium_TimeMachine_dT);
+                }
+            }
+            
+            ///Fatima TAMEX bPlast (WR gate 11.)
+            if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0&& cOutput->cbPlast_TimeMachine_dT[a]!=0)
+            {
+                if((cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GbPlas_Fattam_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GbPlas_Fattam_THigh)
+                {
+                    hFatTAMEX_bPlast_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cbPlast_TimeMachine_dT[a]);
+                }
+            }
+
+            ///Fatima TAMEX AIDA (WR gate 19.)
+            if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0 && cOutput->cAIDA_TimeMachine_dT!=0)
+            {
+                if((cOutput->cAIDA_TM_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GAIDA_TM_Fattam_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GAIDA_TM_Fattam_THigh)
+                {
+                    hFatTAMEX_AIDA_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cAIDA_TimeMachine_dT);
+                }
+            }
         }
-
-     ///Fatima VME bPlast (WR gate 10.)
-
-        if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0){
-
-             if((cInputMain->pbPLAS_WR-cInputMain->pFAT_WR)>fCorrel->GbPlas_Fat_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_WR)<fCorrel->GbPlas_Fat_THigh){
-
-                hFatVME_bPlast_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cbPlast_TimeMachine_dT[a]);
+        ///Germanium bPlast (WR gate 12.)
+        if(cOutput->cGermanium_TimeMachine_dT!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0)
+        {
+            if((cInputMain->pbPLAS_WR-cInputMain->pGe_WR)>fCorrel->GbPlast_Ge_TLow && (cInputMain->pbPLAS_WR-cInputMain->pGe_WR)<fCorrel->GbPlast_Ge_THigh)
+            {
+                hGe_bPlast_TM->Fill(cOutput->cGermanium_TimeMachine_dT,cOutput->cbPlast_TimeMachine_dT[a]);
             }
         }
 
-     ///Fatima VME AIDA (WR gate 18.)
-        if(cOutput->cFatimaVME_TimeMachine_dT[a]!=0 && cOutput->cAIDA_TimeMachine_dT!=0){
-             if((cOutput->cAIDA_TM_WR-cInputMain->pFAT_WR)>fCorrel->GAIDA_TM_Fat_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pFAT_WR)<fCorrel->GAIDA_TM_Fat_THigh){
-
-                hFatVME_AIDA_TM->Fill(cOutput->cFatimaVME_TimeMachine_dT[a], cOutput->cAIDA_TimeMachine_dT);
-             }
-        }
-
-
-     ///FATIMA TAMEX Germanium (WR gate 15.)
-     if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0 && cOutput->cGermanium_TimeMachine_dT!=0){
-          if((cInputMain->pFAT_Tamex_WR-cInputMain->pGe_WR)>fCorrel->GFattam_Ge_TLow && (cInputMain->pFAT_Tamex_WR-cInputMain->pGe_WR)<fCorrel->GFattam_Ge_THigh){
-
-            hFatTAMEX_Ge_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cGermanium_TimeMachine_dT);
-      }
-     }
-      ///Fatima TAMEX bPlast (WR gate 11.)
-        if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0&& cOutput->cbPlast_TimeMachine_dT[a]!=0){
-            if((cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GbPlas_Fattam_TLow && (cInputMain->pbPLAS_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GbPlas_Fattam_THigh){
-
-                hFatTAMEX_bPlast_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cbPlast_TimeMachine_dT[a]);
-            }
-        }
-
-      ///Fatima TAMEX AIDA (WR gate 19.)
-        if(cOutput->cFatimaTAMEX_TimeMachine_dT[a]!=0 && cOutput->cAIDA_TimeMachine_dT!=0){
-             if((cOutput->cAIDA_TM_WR-cInputMain->pFAT_Tamex_WR)>fCorrel->GAIDA_TM_Fattam_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pFAT_Tamex_WR)<fCorrel->GAIDA_TM_Fattam_THigh){
-
-                hFatTAMEX_AIDA_TM->Fill(cOutput->cFatimaTAMEX_TimeMachine_dT[a], cOutput->cAIDA_TimeMachine_dT);
-            }
-        }
-     }
-       ///Germanium bPlast (WR gate 12.)
-    if(cOutput->cGermanium_TimeMachine_dT!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0){
-         if((cInputMain->pbPLAS_WR-cInputMain->pGe_WR)>fCorrel->GbPlast_Ge_TLow && (cInputMain->pbPLAS_WR-cInputMain->pGe_WR)<fCorrel->GbPlast_Ge_THigh){
-            hGe_bPlast_TM->Fill(cOutput->cGermanium_TimeMachine_dT,cOutput->cbPlast_TimeMachine_dT[a]);
-        }
-    }
-
-     ///Germanium AIDA  (WR gate 17.)
-        if(cOutput->cGermanium_TimeMachine_dT!=0 && cOutput->cAIDA_TimeMachine_dT!=0){
-             if((cOutput->cAIDA_TM_WR-cInputMain->pGe_WR)>fCorrel->GAIDA_TM_Ge_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pGe_WR)<fCorrel->GAIDA_TM_Ge_THigh){
+        ///Germanium AIDA  (WR gate 17.)
+        if(cOutput->cGermanium_TimeMachine_dT!=0 && cOutput->cAIDA_TimeMachine_dT!=0)
+        {
+            if((cOutput->cAIDA_TM_WR-cInputMain->pGe_WR)>fCorrel->GAIDA_TM_Ge_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pGe_WR)<fCorrel->GAIDA_TM_Ge_THigh)
+            {
                 hGe_AIDA_TM->Fill(cOutput->cGermanium_TimeMachine_dT, cOutput->cAIDA_TimeMachine_dT);
             }
         }
 
-     ///AIDA bPlast  (WR gate 20.)
-        if(cOutput->cAIDA_TimeMachine_dT!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0){
-            if((cOutput->cAIDA_TM_WR-cInputMain->pbPLAS_WR)>fCorrel->GAIDA_TM_bPlast_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pbPLAS_WR)<fCorrel->GAIDA_TM_bPlast_THigh){
+        ///AIDA bPlast  (WR gate 20.)
+        if(cOutput->cAIDA_TimeMachine_dT!=0 && cOutput->cbPlast_TimeMachine_dT[a]!=0)
+        {
+            if((cOutput->cAIDA_TM_WR-cInputMain->pbPLAS_WR)>fCorrel->GAIDA_TM_bPlast_TLow && (cOutput->cAIDA_TM_WR-cInputMain->pbPLAS_WR)<fCorrel->GAIDA_TM_bPlast_THigh)
+            {
                 hAIDA_bPlast_TM->Fill(cOutput->cAIDA_TimeMachine_dT,cOutput->cbPlast_TimeMachine_dT[a]);
             }
         }
+        
+        // febex...
+
+        // bPlast vs BB7 TWINPEAKS (WR GATE 21)
+
+        // AIDA vs BB7 TWINPEAKS (WR GATE 22)
+        if (cOutput->cAIDA_TimeMachine_dT != 0 && cOutput->cBB7_TWINPEAKS_TimeMachine_dT[a] != 0)
+        {
+            if ((cOutput->cAIDA_TM_WR - cInputMain->pBB7_TWINPEAKS_WR) > fCorrel->GAIDA_TM_BB7_TWINPEAKS_TLow && (cOutput->cAIDA_TM_WR - cInputMain->pBB7_TWINPEAKS_WR) < fCorrel->GAIDA_TM_BB7_TWINPEAKS_THigh)
+            {
+                hAIDA_BB7_TWINPEAKS_TM->Fill(cOutput->cAIDA_TimeMachine_dT, cOutput->cBB7_TWINPEAKS_TimeMachine_dT[a]);
+            }
+        }
+      
+
+
      }
 }
 
@@ -516,6 +611,74 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 
 
 }
+
+
+void EventCorrelProc::Make_FRS_BB7_FEBEX_Histos()
+{
+    // make the histos....
+}
+
+
+void EventCorrelProc::Make_FRS_BB7_TWINPEAKS_Histos()
+{
+    // make the histos...
+}
+
+void EventCorrelProc::Process_FRS_BB7_FEBEX(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+{
+   // process correlations....
+}
+
+void EventCorrelProc::Process_FRS_BB7_TWINPEAKS(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+{
+    // process correlations....
+}
+
+
+void EventCorrelProc::Make_bPlast_AIDA_Histos()
+{
+    TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
+    hAIDA_implants_e_bPlas_SlowToT.resize(conf->DSSDs());
+    for (int i = 0; i < conf->DSSDs(); i++)
+    {
+        hAIDA_implants_e_bPlas_SlowToT[i] = MakeTH2('F', Form("Correlations/AIDA-bPlast/DSSD%d_Implants_bPlast_SlowToT", i+1), Form("DSSD%d Implant E vs bPlast Slow ToT", i+1), 2000, 0, 20000, 40000, 0., 4000000.);
+        
+    }
+}
+
+
+void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+{
+    TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
+    for (auto & cInputRef : cInputMain->pAida)
+    {
+        auto * cInput = &cInputRef;
+        std::vector<AidaHit> ImplantHits = cInput->Implants;
+        std::cout << "here 1?" << std::endl;
+        for (auto & i : ImplantHits)
+        { 
+            std::cout << "here 4" << std::endl;
+            AidaHit hit = i;
+
+            std::cout << "here? 3" << std::endl;
+
+            if(hit.Time - cInputMain->pbPLAS_WR > fCorrel->GAIDA_bPlas_TLow && hit.Time - cInputMain->pbPLAS_WR < fCorrel->GAIDA_bPlas_THigh)
+            {
+                //if 
+                //{ 
+                    std::cout << "here? 2" << std::endl;
+                    
+                    hAIDA_implants_e_bPlas_SlowToT[hit.DSSD-1]->Fill(hit.Energy, cInputMain->pbPlas_Slow_ToTCalib[1][0][0]);
+                //}
+            }
+
+        }
+    }
+}
+
+
+
+
 /**----------------------------------------------------------------------------------------------**/
  void EventCorrelProc::Process_FRS_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput){
 
@@ -530,7 +693,6 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
         for (auto& i : hits)
       {
          AidaHit hit = i;
-
           /// AIDA implant DEAD TIME
        if (hit.Time > 0) {
 

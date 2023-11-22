@@ -7,15 +7,26 @@
 class CalibParameter : public TGo4Parameter {
 
 public:
-          CalibParameter();
-          CalibParameter(const Text_t *name);
-  virtual ~CalibParameter();
-  Int_t   PrintParameter(Text_t *buf, Int_t);
-  Bool_t  UpdateFrom(TGo4Parameter *);
-  int      IsData(std::ifstream &f);
+        CalibParameter();
+        CalibParameter(const Text_t *name);
+        virtual ~CalibParameter();
+        Int_t   PrintParameter(Text_t *buf, Int_t);
+        Bool_t  UpdateFrom(TGo4Parameter *);
+        int      IsData(std::ifstream &f);
 
- Double_t Abplas_TAMEX[48], Bbplas_TAMEX[48];
+        Double_t Abplas_TAMEX[48], Bbplas_TAMEX[48];
+        
+        Double_t BB7_FEBEX_LowE_A[BB7_SIDES][BB7_STRIPS_PER_SIDE], BB7_FEBEX_LowE_B[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        Double_t BB7_FEBEX_HighE_A[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        // only calibrate slow so tamex_channels is fine
+        Double_t BB7_TWINPEAKS_LowE_A[BB7_SIDES][BB7_STRIPS_PER_SIDE], BB7_TWINPEAKS_LowE_B[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+        Double_t BB7_TWINPEAKS_HighE_A[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+
+
  Int_t DetIDPlas_TAMEX;
+ Int_t BB7_TWINPEAKS_ChID;
+ Int_t BB7_TWINPEAKS_Side, BB7_TWINPEAKS_Strip;
+ Int_t BB7_FEBEX_Side, BB7_FEBEX_Strip;
  
  Int_t TDCfatID;
  

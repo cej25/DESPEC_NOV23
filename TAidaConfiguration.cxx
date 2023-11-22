@@ -80,6 +80,7 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
       for (DSSDConfiguration& d : dssd)
       {
         d.DSSD = -1;
+        d.MEC = false;
       }
     }
     else if (option == "wide")
@@ -174,6 +175,12 @@ void TAidaConfiguration::ReadConfiguration(std::string path)
       std::string arg;
       line >> arg;
       dssd[sub_DSSD - 1].YSide = ParseSide(arg);
+    }
+    else if (option == "mec" && sub && sub_DSSD > 0)
+    {
+      bool mec = false;
+      line >> std::boolalpha >> mec;
+      dssd[sub_DSSD - 1].MEC = mec;
     }
     else if (option == "scalers")
     {

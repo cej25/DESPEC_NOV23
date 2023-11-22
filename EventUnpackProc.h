@@ -46,6 +46,9 @@
 #include "Beam_Monitor_Detector_System.h"
 #include "PLASTIC_TAMEX_Detector_System.h"
 #include "Germanium_Detector_System.h"
+#include "BB7_FEBEX_Detector_System.h"
+#include "BB7_TWINPEAKS_Detector_System.h"
+#include "BB7_MADC_Detector_System.h"
 #include "DESPECAnalysis.h"
 #include "FRS_Detector_System.h"
 
@@ -84,7 +87,9 @@ using namespace std;
 
             Bool_t BuildEvent(TGo4EventElement* dest);
              void Process_AIDA_Event(EventUnpackStore* event);
-
+        
+            double CalibrateImplantE_FEBEX(double, int, int);
+            double CalibrateDecayE_FEBEX(double, int, int);
 
              TIDParameter* frs_id;
 
@@ -516,7 +521,29 @@ using namespace std;
 			TH1 *hGe_Raw_E[Germanium_MAX_DETS][Germanium_CRYSTALS];
             TH1 *h_trace[Germanium_MAX_DETS][Germanium_CRYSTALS];
 
+
+            // BB7 Potential histograms
+            TH1* hBB7_FEBEX_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Side[BB7_SIDES];
+            TH1* hBB7_FEBEX_Raw_E_Sum_Total;
+            TH1* hBB7_FEBEX_Hit_Pattern;
+
+            BB7_FEBEX_UnpackData BB7_FEBEX;
+
+            // tamex??
+            TH1* hBB7_MADC_Raw_E[BB7_SIDES][BB7_STRIPS_PER_SIDE];
+            TH1* hBB7_MADC_Raw_E_Sum_Side[BB7_SIDES];
+            TH1* hBB7_MADC_Raw_E_Sum_Total;
+            TH1* hBB7_MADC_Hit_Pattern;
+
 		private:
+
+            std::map<std::pair<int,int>, std::pair<int,int>> BB7_TWINPEAKS_Map;
+            int bb7_twinpeaks_mod;
+            int bb7_twinpeaks_chan;
+            int bb7_twinpeaks_side;
+            int bb7_twinpeaks_strip;
+
 
 
             int AIDA_Hits=0;
@@ -529,8 +556,8 @@ using namespace std;
             int AIDA_Strip[AIDA_MAX_HITS] = {0};
             int AIDA_evtID[AIDA_MAX_HITS] = {0};
 
-			Int_t PrcID_Array[10][9];
-			bool Used_Systems[10];
+			Int_t PrcID_Array[NUM_SUBSYS][8]; // was 10 9???
+			bool Used_Systems[NUM_SUBSYS];
 
             Int_t Type;
             Int_t SubType;
@@ -658,6 +685,7 @@ using namespace std;
             void load_FingerID_File();
             void load_FatTamex_Allocationfile();
             void load_bPlasticTamex_Allocationfile();
+            void load_BB7_TWINPEAKS_AllocationFile();
 			void load_PrcID_File();
 
 			void Make_FRS_Histos();
@@ -680,12 +708,21 @@ using namespace std;
 
 			void Make_Germanium_Histos();
 			void Fill_Germanium_Histos();
-
+        
             void Make_Finger_Histos();
             void Fill_Finger_Histos();
             
             void Make_BeamMonitor_Histos();
             void Fill_BeamMonitor_Histos();
+
+            void Make_BB7_FEBEX_Histos();
+            void Make_BB7_TWINPEAKS_Histos();
+            void Make_BB7_MADC_Histos();
+
+            void Fill_BB7_FEBEX_Histos();
+            void Fill_BB7_TWINPEAKS_Histos();
+            void Fill_BB7_MADC_Histos();
+
 
 			void FILL_HISTOGRAMS(int,int,int,EventUnpackStore* fOutput);
 

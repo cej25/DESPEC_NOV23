@@ -3,7 +3,7 @@
 //       The GSI Online Offline Object Oriented (Go4) Project
 //         Experiment Data Processing at EE department, GSI
 //-----------------------------------------------------------------------
-// Copyright (C) 2000- GSI Helmholtzzentrum für Schwerionenforschung GmbH
+// Copyright (C) 2000- GSI Helmholtzzentrum fï¿½r Schwerionenforschung GmbH
 //                     Planckstr. 1, 64291 Darmstadt, Germany
 // Contact:            http://go4.gsi.de
 //-----------------------------------------------------------------------
@@ -44,6 +44,8 @@ void EventCorrelStore::Clear(Option_t *t)
             cFAT_WR= -1;
             cGe_WR= -1;
             cFRS_WR= -1;
+            cBB7_FEBEX_WR = -1;
+            cBB7_TWINPEAKS_WR = -1;
        
           ZERO_ARRAY(cAIDA_dT_imp_decay);
           ZERO_ARRAY(cAIDA_dT_imp_decay_FRS_gated);        
@@ -53,9 +55,11 @@ void EventCorrelStore::Clear(Option_t *t)
       ZERO_ARRAY(cFatimaVME_TimeMachine_dT);
       ZERO_ARRAY(cbPlast_TimeMachine_dT);
       ZERO_ARRAY(cFatimaTAMEX_TimeMachine_dT);
+      ZERO_ARRAY(cBB7_TWINPEAKS_TimeMachine_dT);
       
       cGermanium_TimeMachine_dT=0;
       cAIDA_TimeMachine_dT=0;
+      cBB7_FEBEX_TimeMachine_dT = 0;
       cAIDA_TM_WR=0;
       
                 

@@ -114,6 +114,8 @@ class EventCorrelProc : public TGo4EventProcessor {
 
     void Make_FRS_AIDA_Histos();
     void Make_FRS_bPlast_Histos();
+    void Make_FRS_BB7_FEBEX_Histos();
+    void Make_FRS_BB7_TWINPEAKS_Histos();
 
     void Make_FRS_Prompt_Ge_Histos();
     void Make_FRS_Prompt_Fat_Histos();
@@ -130,6 +132,12 @@ class EventCorrelProc : public TGo4EventProcessor {
 
     void Process_FRS_AIDA(EventAnlStore* cInput, EventCorrelStore* cOutput);
     void Process_FRS_bPlast(EventAnlStore* cInput, EventCorrelStore* cOutput);
+    
+    void Make_bPlast_AIDA_Histos();
+    void Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput);
+
+    void Process_FRS_BB7_FEBEX(EventAnlStore* cInput, EventCorrelStore* cOutput);
+    void Process_FRS_BB7_TWINPEAKS(EventAnlStore* cInput, EventCorrelStore* cOutput);
 
     void Process_FRS_Prompt_Fat(EventAnlStore* cInput, EventCorrelStore* cOutput);
     void Process_FRS_Prompt_Ge(EventAnlStore* cInput, EventCorrelStore* cOutput);
@@ -233,6 +241,11 @@ class EventCorrelProc : public TGo4EventProcessor {
         TH1 *hbPlastic_TMdT;
         TH1 *hAida_TMdT;
 
+        TH1 *hBB7_TWINPEAKS_TMdT;
+        TH1 *hBB7_WRTM_bPlast;
+        TH2 *hbPlast_BB7_TWINPEAKS_TM;
+        TH2 *hAIDA_BB7_TWINPEAKS_TM;
+
         TH1 *hAIDA_WRTM_FRS;
         TH1 *hAIDA_WRTM_Ge;
         TH1 *hAIDA_WRTM_FatVME;
@@ -274,6 +287,8 @@ class EventCorrelProc : public TGo4EventProcessor {
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position[MAX_FRS_GATE][3];
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position_stopped[MAX_FRS_GATE][3];
 
+      std::vector<TH2*> hAIDA_implants_e_bPlas_SlowToT;
+
       std::vector<TH2*> hA_FRS_ZAoQ_implants_pos_xy;
      // std::vector<TH1*> hA_FRS_ZAoQ_implants_e;
 
@@ -284,6 +299,10 @@ class EventCorrelProc : public TGo4EventProcessor {
       std::vector<TH1*> hA_FRS_ZAoQ_implants_strip_1d;
       std::vector<TH1*> hA_FRS_ZAoQ_implants_per_event;
       std::vector<TH2*> hA_FRS_ZAoQ_implants_strip_xy_dssdg;
+
+
+
+
       TH1 *hA_Imp_FRS_dT;
       TH1 *hA_bPlast_dT;
 
@@ -408,12 +427,14 @@ class EventCorrelProc : public TGo4EventProcessor {
       TGo4PolyCond  *cFat_EdT_cut[MAX_FRS_GATE];
 
       int event_number;
-      int Used_Systems[7];
+      int Used_Systems[NUM_SUBSYS];
       Long64_t AIDA_WR;
       Long64_t FRS_WR;
       Long64_t bPLAS_WR;
       Long64_t FAT_WR;
       Long64_t Ge_WR;
+      Long64_t BB7_FEBEX_WR;
+      Long64_t BB7_TWINPEAKS_WR;
       Long64_t dT_AIDA_FRS;
       Long64_t dT_AIDA_bPlast;
       Long64_t dT_FRS_bPlast;
@@ -440,11 +461,14 @@ class EventCorrelProc : public TGo4EventProcessor {
        Long64_t aida_imptime[3][128][128];
        Long64_t aida_imptime_FRS_gated[3][128][128];
 
-       Double_t FatimaVME_TimeMachine_dT[10];
-       Double_t FatimaTAMEX_TimeMachine_dT[10];
-       Long64_t Germanium_TimeMachine_dT;
-       Double_t bPlast_TimeMachine_dT[10];
-       Double_t AIDA_TimeMachine_dT;
+      Double_t FatimaVME_TimeMachine_dT[10];
+      Double_t FatimaTAMEX_TimeMachine_dT[10];
+      Long64_t Germanium_TimeMachine_dT;
+      Double_t bPlast_TimeMachine_dT[10];
+      Double_t AIDA_TimeMachine_dT;
+
+      Double_t BB7_FEBEX_TimeMachine_dT;
+      Double_t BB7_TWINPEAKS_TimeMachine_dT[10]; // only goes to BB7_TAMEX_ANL_HITS max
 
       ClassDef(EventCorrelProc, 1)
     };
