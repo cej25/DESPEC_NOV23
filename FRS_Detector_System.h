@@ -144,6 +144,8 @@ virtual ~FRS_Detector_System();
   void VFTX_Readout(Int_t **pdata, int module);
   void ClearVftx();
   // end KW
+  virtual void Clear_MTDC_32();
+  virtual void Clear_MQDC_32();
 
     const char* get_filename();
 //     #if CALIBRATION_VFTX
@@ -251,6 +253,10 @@ private:
   // UShort_t vftx_ft[VFTX_N][VFTX_MAX_CHN][VFTX_MAX_HITS];
   // UShort_t vftx_mult[VFTX_N][VFTX_MAX_CHN];
   // end KW
+
+  Int_t mtdc32_dt_trg0_raw[32];
+  Int_t mtdc32_dt_trg1_raw[32];
+  Int_t mqdc32_raw[32];
 
   Int_t Proc_iterator;
    bool skip;
@@ -1041,6 +1047,8 @@ private:
     void Write_Setup_Parameters();
 
     Int_t getbits(Int_t, int, int, int);
+    Int_t get_bits(int, uint32_t, uint32_t)
+
 
     Int_t get2bits(Int_t, int, int, int);
 

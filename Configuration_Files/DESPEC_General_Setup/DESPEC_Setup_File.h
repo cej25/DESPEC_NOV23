@@ -96,6 +96,7 @@
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 
 #define bPLASTIC_TWINPEAKS 1
+#define bPLASTIC_DETECTORS 1 // 
 ///TAMEX: 3 for narrow, 9 for wide
 #define bPLASTIC_TAMEX_MODULES 9
 #define bPLASTIC_TAMEX_HITS 5

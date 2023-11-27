@@ -932,6 +932,7 @@ for (int i=0; i<10; i++){
                             }
                     }
               }///End of lead hits
+
               
                if(j % 2 == 1){ ///TRAIL 
                               ///Fast trail channels even
@@ -1512,7 +1513,11 @@ for (int i=0; i<10; i++){
                                             continue;
                                         }*/
                                         int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
-                                        fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        if (N1_fast_bb7 < 5)
+                                        {
+                                            fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        }
+                                        //fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
                                         
                                     }
                                 } // fast trails
