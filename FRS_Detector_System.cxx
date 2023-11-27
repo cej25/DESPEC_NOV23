@@ -1831,7 +1831,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     std::cout << "Error: ProcID 40 barrier missed! " << std::hex << *pdata << std::dec << std::endl;
                 }
 
-                Int_t no_of_words;
+                Int_t no_of_words = 0;
 
                 // MQDC-32 header
                 if (((*pdata & 0xFF000000) >> 24) == 0b01000000)
