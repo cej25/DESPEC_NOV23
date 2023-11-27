@@ -1856,8 +1856,11 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     std::cout << "procid 40 number of words: " << no_of_words << std::endl;
                     for (int i_wrd = 0; i_wrd < no_of_words - 1; i_wrd++)
                     {   
-                        std::cout << "data... seg fault?? " << *pdata << std::endl;
                         int MQDC_chnl_num = (*pdata >> 16) & 0x1F;
+                        if (MQDC_chnl_num < 0)
+                        {
+                            std::cout << "channel is negative, dumbass" << std::endl;
+                        }
                         int MQDC_ampltd = *pdata & 0xFFF;
 
                         mqdc32_raw[MQDC_chnl_num] = MQDC_ampltd;
