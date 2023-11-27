@@ -1853,9 +1853,10 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 {
                     Clear_MQDC_32();
 
+                    std::cout << "procid 40 number of words: " << no_of_words << std::endl;
                     for (int i_wrd = 0; i_wrd < no_of_words - 1; i_wrd++)
                     {
-                        int MQDC_chnl_num = (*pdata >> 16) & 0x1f;
+                        int MQDC_chnl_num = (*pdata >> 16) & 0x1F;
                         int MQDC_ampltd = *pdata & 0xFFF;
 
                         mqdc32_raw[MQDC_chnl_num] = MQDC_ampltd;
