@@ -1273,7 +1273,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
     psubevt = psubevent;
     pdata = psubevt->GetDataField();
     len = 0;
-    lenMax = (psubevt->GetFlen() - 2) / 2;
+    lenMax = (psubevt->GetDlen() - 2) / 2;
 
     switch(psubevt->GetProcid())
     {
@@ -1298,7 +1298,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     pdata++; len++;
                     for (int i_ch = 0; i_ch < vme_nlw; i_ch++)
                     {
-                        scaler_main[i_ch] = *pdata;
+                        scaler_frs[i_ch] = *pdata;
                         pdata++; len++;
                     }
                     pdata++; len++; // skip trailer
@@ -1335,7 +1335,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                                 vme_type = get_bits(*pdata, 24, 26);
                                 vme_chn = get_bits(*pdata, 16, 20);
                                 vme_frs[vme_geo][vme_chn] = get_bits(*pdata, 0, 11);
-                                pdata++; len++; iword++;
+                                pdata++; len++; i_word++;
                             }
                         }
                         // sanity check at end of V7X5
@@ -1370,9 +1370,27 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
             {
                 if (getbits(*pdata, 2, 1, 16 != 62752))
                 {
-                    std::cout << "Error: ProcID "
+                    std::cout << "Error: ProcID 10 barrier missed! " << std::hex << *pdata << std::dec << std::endl;;
                 }
-            } // end of V820
+                else
+                {
+                    pdata++; len++;
+                    Int_t vme_geo = getbits(*pdata, 2, 12, 5);
+                    Int_t vme_type = getbits(*pdata, 2, 9, 3);
+                    Int_t vme_nlw = getbits(*pdata, 2, 3, 6);
+                    if (vme_type != 4)
+                    {
+                        std::cout << "Error: Scaler type missed match! GEO: " << vme_geo << " type 2 != " << vme_type << std::endl;
+                    }
+                    pdata++; len++;
+                    for (int i_ch = 0; i_ch < vme_nlw; i_ch++)
+                    {
+                        scaler_main[i_ch] = *pdata;
+                        pdata++; len++;
+                    }
+                    pdata++; len++; // skip trailer
+                }
+            } // end of V830
 
             // CAEN V792
             {
@@ -1413,7 +1431,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     std::cout << "Error: ProcID 10 barrier missed! " << std::hex << *pdata << std::dec << std::endl;
                 }
                 else
-                {
+                {   
+                    Int_t words = getbits(*pdata, 1, 1, 16);
                     pdata++; len++;
                     Int_t vme_geo = getbits(*pdata, 1, 1, 5);
                     Int_t vme_type = getbits(*pdata, 2, 12, 5);
@@ -1442,7 +1461,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                                 {
                                     if (value > 0)
                                     {
-                                        leading_v1290_main[vme_chn][multhit] = value;
+                                        leading_v1290_main[vme_chn][multihit] = value;
                                         //hVME_MAIN_TDC_V1290[vme_chn]->Fill(value);
                                     }
                                 }
@@ -1487,7 +1506,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                             {
                                 // not dealt with
                             }
-                            if (vme_type != 1 && vme_Type != 0 && vme_type != 3 && vme_type != 4 && vme_type != 17 && vme_type != 16 && vme_type != 24)
+                            if (vme_type != 1 && vme_type != 0 && vme_type != 3 && vme_type != 4 && vme_type != 17 && vme_type != 16 && vme_type != 24)
                             {
                                 std::cout<<"Error: ProcID 10 MTDC strange type: "<< vme_type << " (word " << i_word << " of " << words << "): "<< std::hex << *pdata << std::dec<<std::endl;
                             }
@@ -1605,11 +1624,11 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                             }
                             if (vme_type == 0 && in_event != 1)
                             {
-                                std::cout << "Error: ProcID 20 MTDC type 0 without header (word " << i_word << " of " << words << "): " << std::hex << *pdata << std::dec << std::endl
+                                std::cout << "Error: ProcID 20 MTDC type 0 without header (word " << i_word << " of " << words << "): " << std::hex << *pdata << std::dec << std::endl;
                             }
                             if (vme_type == 3 && in_event != 1)
                             {
-                                std::cout << "Error: ProcID 20 MTDC type 3 without header (word " << i_word << " of " << words << "): " << std::hex << *pdata << std::dec << std::endl
+                                std::cout << "Error: ProcID 20 MTDC type 3 without header (word " << i_word << " of " << words << "): " << std::hex << *pdata << std::dec << std::endl;
                             }
                             if (vme_type == 3 && in_event == 1)
                             { 

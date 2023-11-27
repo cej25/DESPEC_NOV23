@@ -248,6 +248,8 @@ private:
   Int_t vftx_trailing_ft[VFTX_N][VFTX_MAX_CHN][VFTX_MAX_HITS];
   Double_t vftx_trailing_time[VFTX_N][VFTX_MAX_CHN][VFTX_MAX_HITS];
   Int_t vftx_mult[VFTX_N][VFTX_MAX_CHN];
+  Int_t vftx_lead_mult[VFTX_N][VFTX_MAX_CHN];
+  Int_t vftx_trail_mult[VFTX_N][VFTX_MAX_CHN];
   // KW del
   // UShort_t vftx_cc[VFTX_N][VFTX_MAX_CHN][VFTX_MAX_HITS];
   // UShort_t vftx_ft[VFTX_N][VFTX_MAX_CHN][VFTX_MAX_HITS];
@@ -1047,7 +1049,7 @@ private:
     void Write_Setup_Parameters();
 
     Int_t getbits(Int_t, int, int, int);
-    Int_t get_bits(int, uint32_t, uint32_t)
+    Int_t get_bits(int, uint32_t, uint32_t);
 
 
     Int_t get2bits(Int_t, int, int, int);
