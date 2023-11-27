@@ -1837,6 +1837,10 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 if (((*pdata & 0xFF000000) >> 24) == 0b01000000)
                 {
                     no_of_words = *pdata & 0x00000FFF;
+                    if (no_of_words > 100)
+                    {
+                        std::cout << "data = " << *pdata << " (or in hex: " << std::hex << *pdata << std::dec << ") " << std::endl;  
+                    }
                     pdata++; len++;
                 }
                 else
@@ -1857,10 +1861,6 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     for (int i_wrd = 0; i_wrd < no_of_words - 1; i_wrd++)
                     {   
                         int MQDC_chnl_num = (*pdata >> 16) & 0x1F;
-                        if (MQDC_chnl_num < 0)
-                        {
-                            std::cout << "channel is negative, dumbass" << std::endl;
-                        }
                         int MQDC_ampltd = *pdata & 0xFFF;
 
                         mqdc32_raw[MQDC_chnl_num] = MQDC_ampltd;
