@@ -2295,9 +2295,10 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
      /**--------------------------------------  bPlastic TwinPeaks -----------------------------------**/
      /**----------------------------------------------------------------------------------------------**/ 
         
-    void EventAnlProc::Make_Plastic_Twinpeaks_Histos(){ 
+    void EventAnlProc::Make_Plastic_Twinpeaks_Histos()
+    { 
         
-         for (int i =1; i<4; i++)   
+         for (int i =1; i<bPLASTIC_DETECTORS + 1; i++)   
             { 
                 hbPlas_ToT_Sum_Slow[i] = MakeTH1('D', Form("bPlastic/Slow/ToT_Sum_Slow_Det.%2d",i), Form("bPlastic Sum ToT Slow Det. %2d",i), 4000, 0, 4000000);
                 
@@ -2307,9 +2308,9 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
              
           for(int j=0; j<bPLASTIC_CHAN_PER_DET; j++){  
               
-                hbPlas_Lead_T_Slow[i][j] = MakeTH1('D', Form("bPlastic/Slow/Lead/Lead T Slow Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 2000);
+                hbPlas_Lead_T_Slow[i][j] = MakeTH1('D', Form("bPlastic/Slow/Lead/Lead T Slow Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 20000); // 2500, 0, 2000
              
-                hbPlas_Lead_T_Fast[i][j] = MakeTH1('D', Form("bPlastic/Fast/Lead/Lead T Fast Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 2000);
+                hbPlas_Lead_T_Fast[i][j] = MakeTH1('D', Form("bPlastic/Fast/Lead/Lead T Fast Plas Det. %2d Ch.%2d",  i,j), Form("Lead - Time Det %2d Ch. %2d", i,j),2500, 0, 20000);
                
               if(i<3){//Take only cards with bPlast channels
             
@@ -2369,15 +2370,20 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
          fired_det1=false, fired_det2=false;    
          ZERO_ARRAY(bPlas_tot_hits);
 
-         for(int a=1; a<4; a++){
-                 for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++){  
-                     for(int k=0; k<bPLASTIC_TAMEX_HITS; k++){
-                        lead_bplas_fast[a][b][k]=0; 
-                        ToT_bplas_Slow[a][b][k] = 0;   
-                        ToT_bplas_Fast[a][b][k] = 0;   
-                     }
-                 }
-         }
+        // CEJ: 1-based indexing... come on. I will not change for now.
+        for(int a=1; a<bPLASTIC_DETECTORS + 1; a++)
+        {
+            for (int b = 0; b < bPLASTIC_CHAN_PER_DET; b++)
+            {  
+                for(int k=0; k<bPLASTIC_TAMEX_HITS; k++)
+                {
+                    lead_bplas_fast[a][b][k]=0; 
+                    ToT_bplas_Slow[a][b][k] = 0;   
+                    ToT_bplas_Fast[a][b][k] = 0;   
+                }
+            }
+        }
+         
          
         
      ///**---------------------------------------------LEAD (Fast) --------------------------------------------**/        
@@ -2385,7 +2391,8 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
               ///Loop over channels 
               pOutput->pbPlasDetNum_Fast= pInput->fbPlasDetNum_Fast;
            
-              for(int a=1; a<4; a++){ ///Detector number (this is crappy coding... A.K.M)
+              for(int a = 1; a < bPLASTIC_DETECTORS + 1; a++)
+              {
                     pOutput->pbPlas_FastChan[a]= pInput->fbPlas_FastChan[a];
                     pOutput->pbPlas_SlowChan[a]= pInput->fbPlas_SlowChan[a];
             
@@ -2475,7 +2482,7 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
                                                      
                 pOutput->pbPlast_Fast_Trail_N[a][b] = pInput->fbPlast_Fast_Trail_N[a][b]; 
                  pOutput->pbPlast_Slow_Trail_N[a][b] = pInput->fbPlast_Slow_Trail_N[a][b]; 
-                if(a<4 && b<bPLASTIC_CHAN_PER_DET){
+                if((a<bPLASTIC_DETECTORS + 1) && b<bPLASTIC_CHAN_PER_DET){
                for(int j=0; j< bPLASTIC_TAMEX_HITS; j++){ ///Hits 
                // if(j<20){
                     
