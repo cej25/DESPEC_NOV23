@@ -26,7 +26,7 @@ FrontBackWindow: 4400
 # Maximum energy difference for implants (in MeV)
 FrontBackEnergyH: 1000
 # Maximum energy difference for decays (in keV)
-#FrontBackEnergyL: 1750
+FrontBackEnergyL: 350
 
 #--------------------------
 # Analysis Options
@@ -54,13 +54,14 @@ DSSD: 1
 - RightRight: 6
 - X: Junction
 - Y: Ohmic
-- MEC: true
+- MEC: false
 
 #---------------------------
 # Scaler Mapping
 #---------------------------
 Scalers:
 - 1: Pulser
+- 2: FRS Accepted Trigger
 - 3: Time Machine Original
 - 4: Time Machine Delayed
 - 7: SC41 L

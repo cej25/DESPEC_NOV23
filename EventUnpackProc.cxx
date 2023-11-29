@@ -2916,7 +2916,7 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
         hAIDA_ADC[i][j][0] = MakeTH1('I',
           Form("AIDA/Unpacker/FEE%d/Fee%d_L_Channel%02d", i+1, i+1, j+1),
           Form("FEE %d Channel %2d (Low Energy)", i+1, j+1),
-          2000, -32768, 32767
+          65535, -32768, 32767
         );
       }
 
@@ -2984,7 +2984,7 @@ void EventUnpackProc::Fill_AIDA_Histos() {
     int adc = RAW->get_AIDA_ADC(i);
     int veto = RAW->get_AIDA_HighE_VETO(i) ? 1 : 0;
 
-//    hAIDA_ADC[fee][chan][veto]->Fill(adc - 32767);
+    hAIDA_ADC[fee][chan][veto]->Fill(adc - 32767);
 
     //cout<<"chan " << chan << endl;
   }
