@@ -24,4 +24,4 @@ echo "Array is $SLURM_ARRAY_TASK_ID"
 part=(  "${array[@]:$SLURM_ARRAY_TASK_ID:2}" ) # :5 number of files to put together -> Has to be the same in the 2 .sh scripts
 
 echo "Running Go4!"
-go4analysis -file ${part[*]} -enable-asf 1800 -asf /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/Nearline_Histograms/implanttest_30nov_${SLURM_ARRAY_TASK_ID}.root
+go4analysis -file ${part[*]} -step 1 -store /lustre/gamma/DESPEC_NOV23_FILES/trees/tree_implanttest_30nov_${SLURM_ARRAY_TASK_ID}.root 99 -disable-asf -maxtreesize 100g -step 2 -disable-step

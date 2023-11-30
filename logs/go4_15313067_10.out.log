@@ -1,0 +1,342 @@
+Start Singularity container /cvmfs/vae.gsi.de/vae22/containers/vae22-user_container_20230811T0945.sif
+Go4 version 602-00 enabled, path /cvmfs/eel.gsi.de/debian10-x86_64/go4/602-00
+DESPEC Kronos Started at Mon 27 Nov 2023 09:42:02 AM CET
+Analysing 17 Files
+Array is 10
+Running Go4!
+GO4-*> Reading library: libGo4UserAnalysis  
+GO4-*> Find user analysis class DESPECAnalysis  
+GO4-*> !!! Find constructor with prototype DESPECAnalysis::DESPECAnalysis(int, char**)  
+GO4-*> Process: new DESPECAnalysis(1, (char**)0x7ffed8137b60)  
+GO4-*> Welcome to Go4 Analysis Framework Release v6.2.0 (build 60200) !  
+**** DESPECAnalysis: Create Go4Analysis
+GO4-*> Analysis: Added analysis step Unpack  
+GO4-*> Analysis: Added analysis step Analysis  
+MHTDC_OR_TAC 0
+GO4-*> Analysis: Added analysis step Correlations  
+CalibParameter - reading calibration from: Plastic_TAMEX_Energy_Calibration.txt
+Reading Calib Parameters from BB7_FEBEX_Energy_Calibration_LowE.txt
+Reading Calib Parameters from BB7_FEBEX_Energy_Calibration_HighE.txt
+Reading Calib Parameters from BB7_TWINPEAKS_Energy_Calibration_LowE.txt!
+CorrelParameter - reading from Configuration_Files/DESPEC_General_Setup/Correlations_config.datset MUSIC parameters
+GO4-*> Main: starting analysis in batch mode ...    
+GO4-!> Fail to open AutoSave file /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/Nearline_Histograms/implanttest1_10.root  
+GO4-*> Analysis LoadObjects: Failed to load from file /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/Nearline_Histograms/implanttest1_10.root  
+GO4-*> TGo4MbsFile list:LmdFilesSelection-- opening new file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0009.lmd   
+GO4-*> Unpack-factory: Create input event for MBS  
+GO4-*> Event MbsEvent101 has source LmdFilesSelection class: TGo4MbsFile  
+GO4-*> Unpack-factory: Create event processor EventUnpackProc  
+**** EventUnpackProc: Create
+
+=====================================================
+	USED SYSTEMS
+-----------------------------------------------------
+	FRS
+	AIDA
+	PLASTIC
+	FATIMA_TAMEX
+=====================================================
+true for FRS
+true for AIDA
+true for PLASTIC
+true for FATIMA
+true for FATIMA_TAMEX
+true for GERMANIUM
+true for FINGER
+true for BEAM_MONITOR
+true for BB7_FEBEX
+true for BB7_TWINPEAKS
+true for BB7_MADC
+DESPEC Analysis: Creating AIDA Configuration
+/////////////////////////////////////////////////////
+AIDA Configuration: 8 FEEs, 1 DSSDs, 5 Scalers
+AIDA Options: MBS wide ucesb 
+ucesb Timestamps are shifted by 14000 ns
+AIDA Windows: Event: 2200 ns, Front/Back: 4400 ns
+AIDA Gates: Front/Back High: 1000 MeV, Low: 350 keV
+Analysis Options: ClusterImplants
+Analysis Thresholds: Nonsense: 400, Pulser: 700
+/////////////////////////////////////////////////////
+Loading BB7 TWINPEAKS Detector Map
+0 | 0
+0 | 1
+0 | 2
+0 | 3
+0 | 4
+0 | 5
+0 | 6
+0 | 7
+0 | 8
+0 | 9
+0 | 10
+0 | 11
+0 | 12
+0 | 13
+0 | 14
+0 | 15
+0 | 16
+0 | 17
+0 | 18
+0 | 19
+0 | 20
+0 | 21
+0 | 22
+0 | 23
+0 | 24
+0 | 25
+0 | 26
+0 | 27
+0 | 28
+0 | 29
+0 | 30
+0 | 31
+1 | 0
+1 | 1
+1 | 2
+1 | 3
+1 | 4
+1 | 5
+1 | 6
+1 | 7
+1 | 8
+1 | 9
+1 | 10
+1 | 11
+1 | 12
+1 | 13
+1 | 14
+1 | 15
+1 | 16
+1 | 17
+1 | 18
+1 | 19
+1 | 20
+1 | 21
+1 | 22
+1 | 23
+1 | 24
+1 | 25
+1 | 26
+1 | 27
+1 | 28
+1 | 29
+1 | 30
+1 | 31
+2 | 0
+2 | 1
+2 | 2
+2 | 3
+2 | 4
+2 | 5
+2 | 6
+2 | 7
+2 | 8
+2 | 9
+2 | 10
+2 | 11
+2 | 12
+2 | 13
+2 | 14
+2 | 15
+2 | 16
+2 | 17
+2 | 18
+2 | 19
+2 | 20
+2 | 21
+2 | 22
+2 | 23
+2 | 24
+2 | 25
+2 | 26
+2 | 27
+2 | 28
+2 | 29
+2 | 30
+2 | 31
+3 | 0
+3 | 1
+3 | 2
+3 | 3
+3 | 4
+3 | 5
+3 | 6
+3 | 7
+3 | 8
+3 | 9
+3 | 10
+3 | 11
+3 | 12
+3 | 13
+3 | 14
+3 | 15
+3 | 16
+3 | 17
+3 | 18
+3 | 19
+3 | 20
+3 | 21
+3 | 22
+3 | 23
+3 | 24
+3 | 25
+3 | 26
+3 | 27
+3 | 28
+3 | 29
+3 | 30
+3 | 31
+4 | 0
+4 | 1
+4 | 2
+4 | 3
+4 | 4
+4 | 5
+4 | 6
+4 | 7
+4 | 8
+4 | 9
+4 | 10
+4 | 11
+4 | 12
+4 | 13
+4 | 14
+4 | 15
+======================================================
+Setup Parameters List and Additional channel Mappings: 
+======================================================
+	WHITE RABBIT ENABLED 
+	FRS: NIM TAC used  
+
+////////////////////////////////////////////////////////
+	Number of bPlastic TAMEX Modules: 9
+	Number of bPlastic TAMEX Channels: 16
+	bPlastic SC41 L Analogue Channel:  7
+	bPlastic SC41 R Analogue Channel:  6
+	bPlastic Upstream OR Downstream Channel:  13
+	bPlastic Coin. Upstream Channel:  1
+	bPlastic Coin. Downstream Channel:  3
+
+////////////////////////////////////////////////////////
+	Number of FATIMA TAMEX Modules: 4
+	Number of FATIMA TAMEX Channels: 65
+	FATIMA VME Channels  51
+	FATIMA VME SC41 L Analogue Channel:  36
+	FATIMA VME SC41 R Analogue Channel:  37
+	FATIMA VME SC41 L Digital Channel:  38
+	FATIMA VME SC41 R Digital Channel:  39
+
+////////////////////////////////////////////////////////
+	Number of Germanium Detectors: 16
+	Number of Germanium FEBEX modules: 4
+
+////////////////////////////////////////////////////////
+GO4-*> AIDA: Loaded DSSD Strip Thresholds  
+USED...: 1
+USED...: 1
+USED...: 1
+USED...: 0
+USED...: 1
+USED...: 0
+USED...: 0
+USED...: 0
+USED...: 0
+USED...: 0
+USED...: 0
+GO4-*> Unpack-factory: Create output event UnpackStore  
+GO4-*> Event UnpackStore has source EventUnpackProc class: EventUnpackProc  
+GO4-*> Analysis-factory: Create input event UnpackStore  
+GO4-!> Event UnpackStore has no data source  
+GO4-*> Analysis-factory: Create event processor AnlProc  
+**** EventAnlProc: Create
+GO4-*> Analysis-factory: Create output event AnlEvent  
+GO4-*> Event AnlEvent has source AnlProc class: EventAnlProc  
+GO4-*> CorrelationsFactory: Create input event AnlEvent  
+GO4-!> Event AnlEvent has no data source  
+GO4-*> CorrelationsFactory: Create event processor CorrelProc  
+**** EventCorrelProc: Create
+ ===================================================================================
+ ======================== Correlations Setup File ==========================
+ ======= Configuration_Files/DESPEC_General_Setup/Correlations_config.dat =======
+ ===================================================================================
+		Active Correlations: 
+	FRS-AIDA:: 1
+	FRS-Germanium Short isomers:: 1, FRS-Germanium Long isomers: 1 (prompt gammas for LongCorr (1)) Include gamma-gamma matices? 0
+	FRS-Fatima Short isomers:: 0
+	Beta-delayed Gammas With bPlast Spill Off:: 1
+	Beta-delayed Gammas With AIDA:: 1  ,Ge Gamma-Gamma: 1 ,BDG with Fatima: 0 ,BDG Lifetimes 0
+	Z1 vs Z2 PID gate number for Z1Z2 AND X2/X4 AoQ analysis 1
+===================================================================================
+	AIDA FRS WR Time Gate::  10000 -- 20000 ns 
+ ===================================================================================
+	Germanium-FRS WR Time Gate:: 0 -- 1000 ns 
+ ===================================================================================
+	Germanium Gamma-Gamma Time gate::  -50 -- 50 ns 
+	Germanium Gamma-Gamma 2D Histogram Binning::  2000 -- 0 -- 2000
+ ===================================================================================
+		FRS Germanium Time Gate Long isomer
+	PID Gate Num: 7, Min T: 0, Max T: 2000000, Long Isomer Scale Time (from ns) 1000
+	Long Isomer Histogramming: (Num of Bins, Min, Max) (2000, 0, 2000)
+ ===================================================================================
+	FRS Fatima VME WR Time Gate-300 -- 100 --  TAMEX -400 -- 0
+ ===================================================================================
+	Fatima Gamma-Gamma Time gate (ns) -50 -- 50
+ ===================================================================================
+		Fatima Prompt Lifetime Analysis gates 
+	 PID Gate 6
+	Start Lifetime1 E gate:: 1378  -- 1460	Stop Lifetime1: 667  -- 711
+	Start Lifetime2 E Gate:: 670  -- 695	Stop Lifetime2: 305  -- 345
+	Start Lifetime3 E Gate:: 305  -- 345	Stop Lifetime3: 96  -- 118
+ ===================================================================================
+ ======================= Beta-delayed gamma conditions ============================= 
+	 Beta-delayed-Gammas FRS Gate type:: Z vs A/Q
+	AIDA Implant-Decay Time window::  Min T: 0.5s,  	 Max T: 5s 	 dT Histo Binning 450
+
+	AIDA(decays) Ge WR Time Gate:: 11000 -- 17000
+
+	AIDA(decays) Fatima WR Time Gate:: 11000 -- 18000
+
+	Aida Front-Back dT: 2000, Aida Front-Back dE: 2000
+
+	Aida Decay Energy Min-Max Front(keV): 0 -- 2000, Aida Decay Energy Min-Max Back(keV) 0 -- 2000
+
+	AIDA Implants bPlas WR Time Gate:: 7500 -- 19000
+
+	AIDA Decays bPlas WR Time Gate:: 12000 -- 18000
+
+	bPlastic ToT Gate limits::  4000 -- 60000
+
+ =============== Fatima Beta-Delayed Gamma Lifetime Analysis gates ================
+	 PID Gate:: 5
+	Start Lifetime1 E gate: 365  -- 413	Stop Lifetime1: 706  -- 743
+	Start Lifetime2 E Gate : 706  -- 743	Stop Lifetime2: 1315  -- 1382
+ ===================================================================================
+Configuration_Files/bPlast/Beta_Gates.txt
+GO4-*> CorrelationsFactory: Create output event CorrelEvent  
+GO4-*> Event CorrelEvent has source CorrelProc class: EventCorrelProc  
+GO4-*> Analysis --  Initializing EventClasses done.  
+DESPECAnalysis_FRS::Call Configuration_Files/FRS/FRS_Setups/setup_s450_011_2022.C script
+GO4-*> Analysis loop is starting...  
+GO4-*> Start file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0009.lmd tagfile:none first:0 last:0 delta:0  
+GO4-*> AIDA: Loaded ADC Offsets  
+GO4-*> AIDA: Loaded DSSD Gains  
+GO4-*> AIDA: Loaded ADC Clock Correction  
+Event 100000 Reached!!!    Data File Number : 0				Event 200000 Reached!!!    Data File Number : 0				Event 300000 Reached!!!    Data File Number : 0				Event 400000 Reached!!!    Data File Number : 0				Event 500000 Reached!!!    Data File Number : 0				Event 600000 Reached!!!    Data File Number : 0				Event 700000 Reached!!!    Data File Number : 0				Event 800000 Reached!!!    Data File Number : 0				Event 900000 Reached!!!    Data File Number : 0				Event 1000000 Reached!!!    Data File Number : 0				Event 1100000 Reached!!!    Data File Number : 0				Event 1200000 Reached!!!    Data File Number : 0				Event 1300000 Reached!!!    Data File Number : 0				Event 1400000 Reached!!!    Data File Number : 0				Event 1500000 Reached!!!    Data File Number : 0				Event 1600000 Reached!!!    Data File Number : 0				Event 1700000 Reached!!!    Data File Number : 0				Event 1800000 Reached!!!    Data File Number : 0				Event 1900000 Reached!!!    Data File Number : 0				Event 2000000 Reached!!!    Data File Number : 0				Event 2100000 Reached!!!    Data File Number : 0				Event 2200000 Reached!!!    Data File Number : 0				Event 2300000 Reached!!!    Data File Number : 0				Event 2400000 Reached!!!    Data File Number : 0				Event 2500000 Reached!!!    Data File Number : 0				Event 2600000 Reached!!!    Data File Number : 0				Event 2700000 Reached!!!    Data File Number : 0				Event 2800000 Reached!!!    Data File Number : 0				Event 2900000 Reached!!!    Data File Number : 0				Event 3000000 Reached!!!    Data File Number : 0				Event 3100000 Reached!!!    Data File Number : 0				Event 3200000 Reached!!!    Data File Number : 0				Event 3300000 Reached!!!    Data File Number : 0				Event 3400000 Reached!!!    Data File Number : 0				Event 3500000 Reached!!!    Data File Number : 0				Event 3600000 Reached!!!    Data File Number : 0				Event 3700000 Reached!!!    Data File Number : 0				Event 3800000 Reached!!!    Data File Number : 0				Event 3900000 Reached!!!    Data File Number : 0				Event 4000000 Reached!!!    Data File Number : 0				Event 4100000 Reached!!!    Data File Number : 0				Event 4200000 Reached!!!    Data File Number : 0				Event 4300000 Reached!!!    Data File Number : 0				Event 4400000 Reached!!!    Data File Number : 0				Event 4500000 Reached!!!    Data File Number : 0				Event 4600000 Reached!!!    Data File Number : 0				Event 4700000 Reached!!!    Data File Number : 0				Event 4800000 Reached!!!    Data File Number : 0				Event 4900000 Reached!!!    Data File Number : 0				Event 5000000 Reached!!!    Data File Number : 0				Event 5100000 Reached!!!    Data File Number : 0				Event 5200000 Reached!!!    Data File Number : 0				Event 5300000 Reached!!!    Data File Number : 0				Event 5400000 Reached!!!    Data File Number : 0				Event 5500000 Reached!!!    Data File Number : 0				Event 5600000 Reached!!!    Data File Number : 0				Event 5700000 Reached!!!    Data File Number : 0				Event 5800000 Reached!!!    Data File Number : 0				Event 5900000 Reached!!!    Data File Number : 0				Event 6000000 Reached!!!    Data File Number : 0				Event 6100000 Reached!!!    Data File Number : 0				Event 6200000 Reached!!!    Data File Number : 0				Event 6300000 Reached!!!    Data File Number : 0				Event 6400000 Reached!!!    Data File Number : 0				Event 6500000 Reached!!!    Data File Number : 0				Event 6600000 Reached!!!    Data File Number : 0				Event 6700000 Reached!!!    Data File Number : 0				Event 6800000 Reached!!!    Data File Number : 0				Event 6900000 Reached!!!    Data File Number : 0				Event 7000000 Reached!!!    Data File Number : 0				Event 7100000 Reached!!!    Data File Number : 0				Event 7200000 Reached!!!    Data File Number : 0				Event 7300000 Reached!!!    Data File Number : 0				Event 7400000 Reached!!!    Data File Number : 0				Event 7500000 Reached!!!    Data File Number : 0				Event 7600000 Reached!!!    Data File Number : 0				Event 7700000 Reached!!!    Data File Number : 0				Event 7800000 Reached!!!    Data File Number : 0				Event 7900000 Reached!!!    Data File Number : 0				Event 8000000 Reached!!!    Data File Number : 0				Event 8100000 Reached!!!    Data File Number : 0				Event 8200000 Reached!!!    Data File Number : 0				Event 8300000 Reached!!!    Data File Number : 0				Event 8400000 Reached!!!    Data File Number : 0				Event 8500000 Reached!!!    Data File Number : 0				Event 8600000 Reached!!!    Data File Number : 0				Event 8700000 Reached!!!    Data File Number : 0				Event 8800000 Reached!!!    Data File Number : 0				Event 8900000 Reached!!!    Data File Number : 0				Event 9000000 Reached!!!    Data File Number : 0				Event 9100000 Reached!!!    Data File Number : 0				Event 9200000 Reached!!!    Data File Number : 0				Event 9300000 Reached!!!    Data File Number : 0				Event 9400000 Reached!!!    Data File Number : 0				Event 9500000 Reached!!!    Data File Number : 0				Event 9600000 Reached!!!    Data File Number : 0				Event 9700000 Reached!!!    Data File Number : 0				Event 9800000 Reached!!!    Data File Number : 0				Event 9900000 Reached!!!    Data File Number : 0				Event 10000000 Reached!!!    Data File Number : 0				Event 10100000 Reached!!!    Data File Number : 0				Event 10200000 Reached!!!    Data File Number : 0				Event 10300000 Reached!!!    Data File Number : 0				Event 10400000 Reached!!!    Data File Number : 0				Event 10500000 Reached!!!    Data File Number : 0				Event 10600000 Reached!!!    Data File Number : 0				Event 10700000 Reached!!!    Data File Number : 0				Event 10800000 Reached!!!    Data File Number : 0				Event 10900000 Reached!!!    Data File Number : 0				Event 11000000 Reached!!!    Data File Number : 0				Event 11100000 Reached!!!    Data File Number : 0				Event 11200000 Reached!!!    Data File Number : 0				Event 11300000 Reached!!!    Data File Number : 0				Event 11400000 Reached!!!    Data File Number : 0				Event 11500000 Reached!!!    Data File Number : 0				Event 11600000 Reached!!!    Data File Number : 0				Event 11700000 Reached!!!    Data File Number : 0				Event 11800000 Reached!!!    Data File Number : 0				Event 11900000 Reached!!!    Data File Number : 0				Event 12000000 Reached!!!    Data File Number : 0				Event 12100000 Reached!!!    Data File Number : 0				Event 12200000 Reached!!!    Data File Number : 0				Event 12300000 Reached!!!    Data File Number : 0				Event 12400000 Reached!!!    Data File Number : 0				Event 12500000 Reached!!!    Data File Number : 0				Event 12600000 Reached!!!    Data File Number : 0				Event 12700000 Reached!!!    Data File Number : 0				Event 12800000 Reached!!!    Data File Number : 0				Event 12900000 Reached!!!    Data File Number : 0				Event 13000000 Reached!!!    Data File Number : 0				Event 13100000 Reached!!!    Data File Number : 0				Event 13200000 Reached!!!    Data File Number : 0				Event 13300000 Reached!!!    Data File Number : 0				Event 13400000 Reached!!!    Data File Number : 0				Event 13500000 Reached!!!    Data File Number : 0				Event 13600000 Reached!!!    Data File Number : 0				Event 13700000 Reached!!!    Data File Number : 0				Event 13800000 Reached!!!    Data File Number : 0				Event 13900000 Reached!!!    Data File Number : 0				GO4-*> End file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0009.lmd  
+GO4-*> TGo4MbsFile list:LmdFilesSelection-- opening new file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0010.lmd   
+GO4-*> Start file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0010.lmd tagfile:none first:0 last:0 delta:0  
+GO4-*> AIDA: Loaded ADC Offsets  
+GO4-*> AIDA: Loaded DSSD Gains  
+GO4-*> AIDA: Loaded ADC Clock Correction  
+Event 14000000 Reached!!!    Data File Number : 0				Event 14100000 Reached!!!    Data File Number : 0				Event 14200000 Reached!!!    Data File Number : 0				Event 14300000 Reached!!!    Data File Number : 0				Event 14400000 Reached!!!    Data File Number : 0				Event 14500000 Reached!!!    Data File Number : 0				Event 14600000 Reached!!!    Data File Number : 0				Event 14700000 Reached!!!    Data File Number : 0				Event 14800000 Reached!!!    Data File Number : 0				Event 14900000 Reached!!!    Data File Number : 0				Event 15000000 Reached!!!    Data File Number : 0				Event 15100000 Reached!!!    Data File Number : 0				Event 15200000 Reached!!!    Data File Number : 0				Event 15300000 Reached!!!    Data File Number : 0				Event 15400000 Reached!!!    Data File Number : 0				Event 15500000 Reached!!!    Data File Number : 0				Event 15600000 Reached!!!    Data File Number : 0				Event 15700000 Reached!!!    Data File Number : 0				Event 15800000 Reached!!!    Data File Number : 0				Event 15900000 Reached!!!    Data File Number : 0				Event 16000000 Reached!!!    Data File Number : 0				Event 16100000 Reached!!!    Data File Number : 0				Event 16200000 Reached!!!    Data File Number : 0				Event 16300000 Reached!!!    Data File Number : 0				Event 16400000 Reached!!!    Data File Number : 0				Event 16500000 Reached!!!    Data File Number : 0				Event 16600000 Reached!!!    Data File Number : 0				Event 16700000 Reached!!!    Data File Number : 0				Event 16800000 Reached!!!    Data File Number : 0				Event 16900000 Reached!!!    Data File Number : 0				Event 17000000 Reached!!!    Data File Number : 0				Event 17100000 Reached!!!    Data File Number : 0				Event 17200000 Reached!!!    Data File Number : 0				Event 17300000 Reached!!!    Data File Number : 0				Event 17400000 Reached!!!    Data File Number : 0				Event 17500000 Reached!!!    Data File Number : 0				Event 17600000 Reached!!!    Data File Number : 0				Event 17700000 Reached!!!    Data File Number : 0				Event 17800000 Reached!!!    Data File Number : 0				Event 17900000 Reached!!!    Data File Number : 0				Event 18000000 Reached!!!    Data File Number : 0				Event 18100000 Reached!!!    Data File Number : 0				Event 18200000 Reached!!!    Data File Number : 0				Event 18300000 Reached!!!    Data File Number : 0				Event 18400000 Reached!!!    Data File Number : 0				Event 18500000 Reached!!!    Data File Number : 0				Event 18600000 Reached!!!    Data File Number : 0				Event 18700000 Reached!!!    Data File Number : 0				Event 18800000 Reached!!!    Data File Number : 0				Event 18900000 Reached!!!    Data File Number : 0				Event 19000000 Reached!!!    Data File Number : 0				Event 19100000 Reached!!!    Data File Number : 0				Event 19200000 Reached!!!    Data File Number : 0				Event 19300000 Reached!!!    Data File Number : 0				Event 19400000 Reached!!!    Data File Number : 0				Event 19500000 Reached!!!    Data File Number : 0				Event 19600000 Reached!!!    Data File Number : 0				Event 19700000 Reached!!!    Data File Number : 0				Event 19800000 Reached!!!    Data File Number : 0				Event 19900000 Reached!!!    Data File Number : 0				Event 20000000 Reached!!!    Data File Number : 0				Event 20100000 Reached!!!    Data File Number : 0				Event 20200000 Reached!!!    Data File Number : 0				Event 20300000 Reached!!!    Data File Number : 0				Event 20400000 Reached!!!    Data File Number : 0				Event 20500000 Reached!!!    Data File Number : 0				Event 20600000 Reached!!!    Data File Number : 0				Event 20700000 Reached!!!    Data File Number : 0				Event 20800000 Reached!!!    Data File Number : 0				Event 20900000 Reached!!!    Data File Number : 0				Event 21000000 Reached!!!    Data File Number : 0				Event 21100000 Reached!!!    Data File Number : 0				Event 21200000 Reached!!!    Data File Number : 0				Event 21300000 Reached!!!    Data File Number : 0				Event 21400000 Reached!!!    Data File Number : 0				Event 21500000 Reached!!!    Data File Number : 0				Event 21600000 Reached!!!    Data File Number : 0				Event 21700000 Reached!!!    Data File Number : 0				Event 21800000 Reached!!!    Data File Number : 0				Event 21900000 Reached!!!    Data File Number : 0				Event 22000000 Reached!!!    Data File Number : 0				Event 22100000 Reached!!!    Data File Number : 0				Event 22200000 Reached!!!    Data File Number : 0				Event 22300000 Reached!!!    Data File Number : 0				Event 22400000 Reached!!!    Data File Number : 0				Event 22500000 Reached!!!    Data File Number : 0				Event 22600000 Reached!!!    Data File Number : 0				Event 22700000 Reached!!!    Data File Number : 0				Event 22800000 Reached!!!    Data File Number : 0				Event 22900000 Reached!!!    Data File Number : 0				Event 23000000 Reached!!!    Data File Number : 0				Event 23100000 Reached!!!    Data File Number : 0				Event 23200000 Reached!!!    Data File Number : 0				Event 23300000 Reached!!!    Data File Number : 0				Event 23400000 Reached!!!    Data File Number : 0				Event 23500000 Reached!!!    Data File Number : 0				Event 23600000 Reached!!!    Data File Number : 0				Event 23700000 Reached!!!    Data File Number : 0				Event 23800000 Reached!!!    Data File Number : 0				Event 23900000 Reached!!!    Data File Number : 0				Event 24000000 Reached!!!    Data File Number : 0				Event 24100000 Reached!!!    Data File Number : 0				Event 24200000 Reached!!!    Data File Number : 0				Event 24300000 Reached!!!    Data File Number : 0				Event 24400000 Reached!!!    Data File Number : 0				Event 24500000 Reached!!!    Data File Number : 0				Event 24600000 Reached!!!    Data File Number : 0				Event 24700000 Reached!!!    Data File Number : 0				Event 24800000 Reached!!!    Data File Number : 0				Event 24900000 Reached!!!    Data File Number : 0				Event 25000000 Reached!!!    Data File Number : 0				Event 25100000 Reached!!!    Data File Number : 0				Event 25200000 Reached!!!    Data File Number : 0				Event 25300000 Reached!!!    Data File Number : 0				Event 25400000 Reached!!!    Data File Number : 0				Event 25500000 Reached!!!    Data File Number : 0				Event 25600000 Reached!!!    Data File Number : 0				Event 25700000 Reached!!!    Data File Number : 0				Event 25800000 Reached!!!    Data File Number : 0				Event 25900000 Reached!!!    Data File Number : 0				Event 26000000 Reached!!!    Data File Number : 0				Event 26100000 Reached!!!    Data File Number : 0				Event 26200000 Reached!!!    Data File Number : 0				Event 26300000 Reached!!!    Data File Number : 0				Event 26400000 Reached!!!    Data File Number : 0				Event 26500000 Reached!!!    Data File Number : 0				Event 26600000 Reached!!!    Data File Number : 0				Event 26700000 Reached!!!    Data File Number : 0				Event 26800000 Reached!!!    Data File Number : 0				Event 26900000 Reached!!!    Data File Number : 0				Event 27000000 Reached!!!    Data File Number : 0				Event 27100000 Reached!!!    Data File Number : 0				Event 27200000 Reached!!!    Data File Number : 0				Event 27300000 Reached!!!    Data File Number : 0				Event 27400000 Reached!!!    Data File Number : 0				Event 27500000 Reached!!!    Data File Number : 0				Event 27600000 Reached!!!    Data File Number : 0				Event 27700000 Reached!!!    Data File Number : 0				Event 27800000 Reached!!!    Data File Number : 0				Event 27900000 Reached!!!    Data File Number : 0				Event 28000000 Reached!!!    Data File Number : 0				Event 28100000 Reached!!!    Data File Number : 0				Event 28200000 Reached!!!    Data File Number : 0				Event 28300000 Reached!!!    Data File Number : 0				GO4-*> End file: /lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0006_0010.lmd  
+GO4-*> End of event source TGo4MbsFile: name:LmdFilesSelection msg:End of files list  
+**** DESPECAnalysis: PostLoop
+Last event: 0 Total events: 0
+GO4-*> Go4 EventEndException  appeared in 28361801 cycle.  
+**** DESPECAnalysis: Delete
+GO4-*> Opening AutoSave file /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/Nearline_Histograms/implanttest1_10.root with RECREATE mode  
+GO4-*> AutoSave file /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/Nearline_Histograms/implanttest1_10.root was closed.  
+**** EventUnpackProc: Delete instance
+**** EventAnlProc: Delete
+**** EventCorrelProc: Delete
+GO4-*> Main: analysis batch done  
+GO4-*> Main: THE END  
