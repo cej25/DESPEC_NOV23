@@ -237,7 +237,7 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
       hAIDA_WRTM_FatTAMEX = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-Fatima_TAMEX","White Rabbit AIDA WR TM - Fatima_TAMEX",10000,-10000,10000,"WR dT(AIDA TM WR - Fatima_TAMEX)[ns]", "Counts");
      }
      
-      hAIDA_WRTM_bPlast = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-bPlast","White Rabbit AIDA WR TM - bPlast",10000,-10000,10000,"WR dT(AIDA TM WR - bPlast)[ns]", "Counts");
+      hAIDA_WRTM_bPlast = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-bPlast","White Rabbit AIDA WR TM - bPlast",10000,-10000,30000,"WR dT(AIDA TM WR - bPlast)[ns]", "Counts");
 
       // CEJ: so for our "trick".. bPlast + Germanium data can be used for:
       // BB7_TWINPEAKS-Germanium

@@ -1,2 +1,0 @@
-terminate called after throwing an instance of 'TGo4EventEndException'
-/var/spool/slurm/d/job15313147/slurm_script: line 27: 948673 Aborted                 (core dumped) go4analysis -file ${part[*]} -step 1 -store /lustre/gamma/DESPEC_NOV23_NEARLINE/Cluster_Submission/trees/tree_implanttest1_${SLURM_ARRAY_TASK_ID}.root 99 -disable-asf -maxtreesize 100g -step 2 -disable-step

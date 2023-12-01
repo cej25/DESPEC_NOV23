@@ -1275,6 +1275,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
     len = 0;
     lenMax = (psubevt->GetDlen() - 2) / 2;
 
+
+    //if (psubevt->Trigger())
     switch(psubevt->GetProcid())
     {
         case 30: // FRS User Crate
@@ -1557,7 +1559,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                             std::cout << "Issue in unpacking ProcID 20, exiting!" << std::endl;
                             break;
                         }
-                        pdata++; len++; 
+                        pdata++; len++; i_word++;
                         // skip last words of V7x5 (these do not appear in the RIO data)
                         for (int i = 0; i < (words - i_word); i++)
                         {
@@ -1577,7 +1579,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 {
                     Int_t words = getbits(*pdata, 1, 1, 16);
                     pdata++; len++;
-                    if (*pdata = 0xFFFFFFFF || *(pdata+1) == 0xFFFFFFFF)
+                    if (*pdata == 0xFFFFFFFF || *(pdata+1) == 0xFFFFFFFF)
                     {
                         pdata += 2;
                         words -= 2;
@@ -1589,7 +1591,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     if (vme_type == 8)
                     {
                         bool in_event = 0;
-                        for (int i_word = 2; i_word < words; i_word++)
+                        for (int i_word = 2; i_word <= words; i_word++)
                         {
                             vme_type = getbits(*pdata, 2, 12, 5);
                             if (vme_type == 1)
@@ -1758,7 +1760,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                     std::cout << "Error: ProcID barrier missed! " << std::hex << *pdata << std::dec << std::endl;
                 }
 
-                Int_t no_of_words;
+                Int_t no_of_words = 0;
                 
                 // MTDC-32 header
                 if (((*pdata & 0xFF000000) >> 24) == 0b01000000)
@@ -1857,7 +1859,6 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 {
                     Clear_MQDC_32();
 
-                    std::cout << "procid 40 number of words: " << no_of_words << std::endl;
                     for (int i_wrd = 0; i_wrd < no_of_words - 1; i_wrd++)
                     {   
                         int MQDC_chnl_num = (*pdata >> 16) & 0x1F;

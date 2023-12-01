@@ -468,12 +468,13 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                     pdata = Detector_Systems[7]->get_pdata();
                     Detector_Systems[7]->get_Event_data(RAW);
                         }
+
                     
         
-       if(PrcID_Conv!=7){ // CEJ add trigger here if in doubt
+       if(PrcID_Conv!=7 && fOutput->fTrigger != 2){ // CEJ: skipping trigger 3 evts for FRS?
            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
             Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now for BB7_FEBEX
+            Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
 
         ///get mbs stream data from unpacker (pointer copy solution)
             pdata = Detector_Systems[PrcID_Conv]->get_pdata();

@@ -68,8 +68,8 @@
 ## 10. bPlast - FATIMA(VME)  ##
 -350 -150
 
-## 11. bPlast - FATIMA(TAMEX) ## CEJ: was -300 to -150
--300 60
+## 11. bPlast - FATIMA(TAMEX) ##
+-300 -150
 
 ## 12. bPlast - Germanium  ##
 -1000 0
@@ -90,8 +90,8 @@
 -150 -125
 ## 18. AIDA(Time Machine) - FATIMA (VME)  
 -400 -300
-## 19. AIDA(Time Machine) - FATIMA (TAMEX)  CEJ: was -360 to -260
--250 -200
+## 19. AIDA(Time Machine) - FATIMA (TAMEX)  
+-360 -260
 ## 20.  AIDA(Time Machine) - bPlast 
 -160 -80
 ## 21. bPlast(Time Machine) - BB7 LAYER TWINPEAKS
