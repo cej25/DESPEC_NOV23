@@ -23,6 +23,8 @@ CorrelParameter::CorrelParameter()
     GSetup_corr_Beta_Gamma_Gamma=false;
     GSetup_corr_Beta_Gamma_Fatima=false;
     GSetup_corr_Beta_Gamma_Fatima_LT=false;
+
+    GSetup_corr_bPlast_AIDA = false;
     
     GZ1Z2_Gate=0;
    

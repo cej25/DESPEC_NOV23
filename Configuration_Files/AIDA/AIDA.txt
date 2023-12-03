@@ -26,7 +26,7 @@ FrontBackWindow: 4400
 # Maximum energy difference for implants (in MeV)
 FrontBackEnergyH: 1000
 # Maximum energy difference for decays (in keV)
-FrontBackEnergyL: 350
+#FrontBackEnergyL: 1750
 
 #--------------------------
 # Analysis Options
