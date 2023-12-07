@@ -1557,6 +1557,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                         if (vme_type != 4)
                         {
                             std::cout << "Issue in unpacking ProcID 20, exiting!" << std::endl;
+                            std::cout << "word was " << *pdata << " with type " << vme_type << std::endl;
                             break;
                         }
                         pdata++; len++; i_word++;
@@ -1708,12 +1709,12 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                         pdata++; len++;
                         ClearVftx();
                         pdata++; len++; // skip header
-                        int channel;
-                        int word;
+                        //int channel;
+                        //int word;
                         int module = 0;
-                        for (word = 0; word < words-1; word++)
+                        for (int word = 0; word < words-1; word++)
                         {
-                            channel = getbits(*pdata, 2, 10, 5);
+                            int channel = getbits(*pdata, 2, 10, 5);
                             bool trailing = channel % 2;
                             channel /= 2;
                             
@@ -1757,7 +1758,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 }
                 else
                 {
-                    std::cout << "Error: ProcID barrier missed! " << std::hex << *pdata << std::dec << std::endl;
+                    std::cout << "Error: ProcID 40 barrier missed! " << std::hex << *pdata << std::dec << std::endl;
                 }
 
                 Int_t no_of_words = 0;
@@ -1861,8 +1862,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
 
                     for (int i_wrd = 0; i_wrd < no_of_words - 1; i_wrd++)
                     {   
-                        int MQDC_chnl_num = (*pdata >> 16) & 0x1F;
-                        int MQDC_ampltd = *pdata & 0xFFF;
+                        Int_t MQDC_chnl_num = (*pdata >> 16) & 0x1F; // int
+                        Int_t MQDC_ampltd = *pdata & 0xFFF; // int
 
                         mqdc32_raw[MQDC_chnl_num] = MQDC_ampltd;
 
@@ -1897,21 +1898,16 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
 //----------------------- SORT STUFF ------------------------------//
 //-----------------------------------------------------------------//
 
-void FRS_Detector_System::FRS_Sort(){
-    ///CLEAR arrays to avoid multicounting for each proc ID
-//         if(psubevt->GetProcid() == 25){
-//
-//         }
+void FRS_Detector_System::FRS_Sort()
+{
+      ///CLEAR arrays to avoid multicounting for each proc ID
 
 
+      // CEJ: why was array clearing not done properly?
+      // I will remove ProcID check for clearing for now.
+      
       ///Clear for main crate
-      if(psubevt->GetProcid() == 10){
-//           for (int n=0; n<32; n++){
-//             scaler_frs[n]=0;
-//            }
-//            for(int o =0; o<64; o++){
-//             sc_long[o]=0;
-//             }
+      //      if(psubevt->GetProcid() == 10){       
            if(skip==true){
                tdc_sc41l[0] = 0;
                 tdc_sc41r[0] = 0;
@@ -1928,11 +1924,10 @@ void FRS_Detector_System::FRS_Sort(){
                 tdc_sc11[0]  = 0;
             for(int i=0; i<21; i++){
                 for (int j=0; j<32;j++){
-//                    //vme_tpc[i][j]=0;
-//                   // vme_frs[i][j]=0;
+            //                    //vme_tpc[i][j]=0;
+          //                   // vme_frs[i][j]=0;
                    vme_main[i][j]=0;
                    vme_tof[i][j]=0;
-
 
                 }
            }
@@ -2022,10 +2017,10 @@ void FRS_Detector_System::FRS_Sort(){
         
                 }
 
-        }
+//        }
 
         //Clear for case 30
-        if(psubevt->GetProcid()==30){
+  //      if(psubevt->GetProcid()==30){
 //
            for(int i=0; i<21; i++){
                for (int j=0; j<32;j++){
@@ -2051,8 +2046,8 @@ void FRS_Detector_System::FRS_Sort(){
         dt_22l_81l=0;
         dt_22r_81r=0;
 
-        }
-   if(psubevt->GetProcid()==25||psubevt->GetProcid()==30||psubevt->GetProcid()==35){
+//        }
+   //if(psubevt->GetProcid()==25||psubevt->GetProcid()==30||psubevt->GetProcid()==35){
        for(int i=0; i<10; i++){
     tdc_sc41l[i] = 0;
     tdc_sc41r[i] = 0;
@@ -2121,16 +2116,16 @@ void FRS_Detector_System::FRS_Sort(){
 //        TRaw_vftx[i]=0;
 // 
 //     }
-    }
+ //   }
 
-      if(psubevt->GetProcid()==20||psubevt->GetProcid()==25){
+      //if(psubevt->GetProcid()==20||psubevt->GetProcid()==25){
 //        for (int n=0; n<32; n++){
 //             scaler_frs[n]=0;
 //            }
 //            for(int o =0; o<64; o++){
 //             sc_long[o]=0;
 //             }
-      }
+     // }
 
 //     if(EventFlag == 0x100){
 //     for(int i = 0; i < 4; ++i) ts_word[i] = vme_frs[20][i];
@@ -2199,8 +2194,9 @@ void FRS_Detector_System::FRS_Sort(){
 //     sc_long[32+i] = scaler_main[i]; //main crate
 //
 //        }
-    if (psubevt->GetProcid() == 30 && psubevt->GetType() == 12)
-    {
+    // CEJ: no ProcID check in FRS code... 
+    //if (psubevt->GetProcid() == 30 && psubevt->GetType() == 12)
+    //{
       for(int i = 0 ;i < 32; ++i){
 
         sc_long[i]  = scaler_frs[i]; //frs crate
@@ -2208,7 +2204,7 @@ void FRS_Detector_System::FRS_Sort(){
         sc_long[32+i] = scaler_main[i]; //main crate
        // cout<<"scaler_main " << scaler_main[i] << " i " << i << endl;
      }
-    }
+    //}
 
   /* ### TA Ionization Chamber dE:  */
 
@@ -2850,8 +2846,9 @@ void FRS_Detector_System::FRS_Calib(){
 //
 //     }
  // cout<<"psubevt->GetProcid() " <<psubevt->GetProcid() << "  psubevt->GetType()  " << psubevt->GetType()  << endl;
-       if (psubevt->GetProcid() == 30 && psubevt->GetType() == 12)
-   {
+ // CEJ: FRS code has no Procid check!
+ //      if (psubevt->GetProcid() == 30 && psubevt->GetType() == 12) // CEJ: don't need GetType anymore for sure
+ //  {
 //      cout<<"TEST " << endl;
       if(13 == trigger || 12 == trigger|| 10 == trigger || 11 ==trigger) return; // skip spill trigger
 
@@ -2896,7 +2893,7 @@ void FRS_Detector_System::FRS_Calib(){
       for(int ii=0; ii<64; ii++){
         scaler_previous[ii] = sc_long[ii];
       }
-   }
+//  }
  
 //////////////////////////////////////////////////////////////////
 ///  ***********TPC Analysis*************************** //////////
