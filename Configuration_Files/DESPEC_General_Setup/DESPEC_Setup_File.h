@@ -57,8 +57,8 @@
 #define FATIMA_TAMEX_CHANNELS 65
 #define FATIMA_TAMEX_SC41L  3
 #define FATIMA_TAMEX_SC41R  4 
-#define FATIMA_TAMEX_SC41L_Digi  51
-#define FATIMA_TAMEX_SC41R_Digi  52
+#define FATIMA_TAMEX_SC41L_Digi  1 //51 //CEJ: changing for testing
+#define FATIMA_TAMEX_SC41R_Digi  2 //52 //".."
 #define FatTAMEX_TimeMachineCh1 1
 #define FatTAMEX_TimeMachineCh2 2
 
@@ -121,8 +121,8 @@
 //Add ge trigger
 
 ///bPlast Time Machine Channels
-#define bPlastTimeMachineCh1 34
-#define bPlastTimeMachineCh2 35
+#define bPlastTimeMachineCh1 1 //34 // CEJ: changing for testing
+#define bPlastTimeMachineCh2 2 //35 // "..."
 ///bPlastic reference channels
 #define bPlastRefCh_Det1 0
 #define bPlastRefCh_Det2 0

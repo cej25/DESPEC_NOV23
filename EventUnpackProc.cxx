@@ -276,11 +276,10 @@ void EventUnpackProc::UserPostLoop()
 
 EventUnpackProc::~EventUnpackProc()
 {
-
- delete[] Detector_Systems;
-  delete RAW;
- delete WR;
-  cout << "**** EventUnpackProc: Delete instance" << endl;
+    delete[] Detector_Systems;
+    delete RAW;
+    delete WR;
+    std::cout << "**** EventUnpackProc: Delete instance" << std::endl;
 }
 
 //----------------------------------------------------------
@@ -875,7 +874,9 @@ for (int i=0; i<10; i++){
         int bPlasdetnum_fast=-1;
         int bPlasdetnum_slow=-1;
         
-     if (Used_Systems[2]&& PrcID_Conv==2){
+     if (Used_Systems[2]&& PrcID_Conv==2)
+     {
+          
 
          ///----------------------------------------------------------///
                         /**Output bPlast Twin peaks TAMEX **/                          
@@ -1753,8 +1754,8 @@ void EventUnpackProc::load_BB7_TWINPEAKS_AllocationFile()
         file.ignore(ignore, '\n');
 
         BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)] = std::make_pair(bb7_twinpeaks_side, bb7_twinpeaks_strip);
-
-        std::cout << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].first << " | " << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].second << std::endl;
+        // CEJ print only for checks
+        // std::cout << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].first << " | " << BB7_TWINPEAKS_Map[std::make_pair(bb7_twinpeaks_mod, bb7_twinpeaks_chan)].second << std::endl;
 
     }
 }
