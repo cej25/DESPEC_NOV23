@@ -55,12 +55,12 @@
 #define FATIMA_TAMEX_MODULES 4
 #define FATIMA_TAMEX_HITS 50
 #define FATIMA_TAMEX_CHANNELS 65
-#define FATIMA_TAMEX_SC41L  49
-#define FATIMA_TAMEX_SC41R  50 
+#define FATIMA_TAMEX_SC41L  3
+#define FATIMA_TAMEX_SC41R  4 
 #define FATIMA_TAMEX_SC41L_Digi  51
 #define FATIMA_TAMEX_SC41R_Digi  52
-#define FatTAMEX_TimeMachineCh1 13
-#define FatTAMEX_TimeMachineCh2 14
+#define FatTAMEX_TimeMachineCh1 1
+#define FatTAMEX_TimeMachineCh2 2
 
 // BB7 LAYER
 #define BB7_DETECTORS 1
@@ -96,6 +96,7 @@
 ///bPLASTIC 
 ///1:twin peaks,  0 for pQDC 
 #define bPLASTIC_TWINPEAKS 1
+#define bPLASTIC_DETECTORS 1 // 
 ///TAMEX: 3 for narrow, 9 for wide
 #define bPLASTIC_TAMEX_MODULES 9
 #define bPLASTIC_TAMEX_HITS 5
@@ -107,12 +108,12 @@
 ///bPlastic Downstream Detector
 #define bPLASTIC_DOWNSTREAM_DET 2
 ///bPlast Additional signals Module Num
-#define bPLASTIC_ADDITIONAL_CH_MOD 2
+#define bPLASTIC_ADDITIONAL_CH_MOD 1
 ///bPlast Additional signals Channel Num
 #define bPLASTIC_FATTAMEX 9
 #define bPLASTIC_FATVME 8
-#define SC41L_bPLASTIC 7
-#define SC41R_bPLASTIC 6
+#define SC41L_bPLASTIC 36
+#define SC41R_bPLASTIC 37
 #define bPLASTIC_OR_UP_DOWN 13
 #define bPLASTIC_UP_COIN 1
 #define bPLASTIC_DOWN_COIN 3
@@ -120,8 +121,8 @@
 //Add ge trigger
 
 ///bPlast Time Machine Channels
-#define bPlastTimeMachineCh1 1
-#define bPlastTimeMachineCh2 2
+#define bPlastTimeMachineCh1 34
+#define bPlastTimeMachineCh2 35
 ///bPlastic reference channels
 #define bPlastRefCh_Det1 0
 #define bPlastRefCh_Det2 0

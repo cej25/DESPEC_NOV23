@@ -1,0 +1,2 @@
+/lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0007_0001.lmd
+/lustre/gamma/DESPEC_NOV23_FILES/ts/it1_0007_0002.lmd

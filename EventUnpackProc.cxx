@@ -468,12 +468,13 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                     pdata = Detector_Systems[7]->get_pdata();
                     Detector_Systems[7]->get_Event_data(RAW);
                         }
+
                     
         
-       if(PrcID_Conv!=7){ // CEJ add trigger here if in doubt
+       if(PrcID_Conv!=7 && fOutput->fTrigger != 2){ // CEJ: skipping trigger 3 evts for FRS?
            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
             Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata); // CEJ: this is a problem right now for BB7_FEBEX
+            Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
 
         ///get mbs stream data from unpacker (pointer copy solution)
             pdata = Detector_Systems[PrcID_Conv]->get_pdata();
@@ -796,7 +797,7 @@ for (int i=0; i<10; i++){
 	    //  cout<<"chan_fat_fast_lead " << chan_fat_fast_lead <<" i " << i << " j " << j <<" (RAW->get_FATIMA_physical_channel(i, j)+1)/2 " <<(RAW->get_FATIMA_physical_channel(i, j)+1)/2<< endl;
                     int N1_fast = fOutput->fFat_Fast_Lead_N[chan_fat_fast_lead]++;
            if( RAW->get_FATIMA_lead_T(i,j)>0){
-                    fOutput->fFat_Lead_Fast[0][0] = RAW->get_FATIMA_lead_T(i,j);
+                    fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] = RAW->get_FATIMA_lead_T(i,j);
                    // cout<<"fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] " <<fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast] << " chan_fat_fast_lead " <<chan_fat_fast_lead << " N1_fast " << N1_fast << endl;
            }
                     //cout<<"FAST LEAD RAW->get_FATIMA_physical_channel(i, j) " << RAW->get_FATIMA_physical_channel(i, j) << " chan_fat_fast_lead " <<chan_fat_fast_lead << " N1_fast " <<N1_fast << " fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast]  " <<fOutput->fFat_Lead_Fast[chan_fat_fast_lead][N1_fast]  << " i " << i << " j " << j << endl;
@@ -932,6 +933,7 @@ for (int i=0; i<10; i++){
                             }
                     }
               }///End of lead hits
+
               
                if(j % 2 == 1){ ///TRAIL 
                               ///Fast trail channels even
@@ -1512,7 +1514,11 @@ for (int i=0; i<10; i++){
                                             continue;
                                         }*/
                                         int N1_fast_bb7 = fOutput->fBB7_TWINPEAKS_Fast_Trail_N[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip]++;
-                                        fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        if (N1_fast_bb7 < 5)
+                                        {
+                                            fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
+                                        }
+                                        //fOutput->fBB7_TWINPEAKS_Fast_Trail[BB7_TWINPEAKS_Side][BB7_TWINPEAKS_Strip][N1_fast_bb7] = RAW->get_BB7_TWINPEAKS_trail_T(i, j);
                                         
                                     }
                                 } // fast trails
