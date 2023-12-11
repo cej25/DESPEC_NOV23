@@ -481,6 +481,8 @@ private:
       Float_t AoQ_shift_TPC_value[200];
       Float_t AoQ_shift_Sci21_value[200];
       Float_t AoQ_shift_Sci22_value[200];
+
+      uint64_t travmus_wr;
       
 //         Float_t FRS_WR_a[200];
 //    Float_t FRS_WR_b[200];
@@ -1054,7 +1056,7 @@ private:
 
     Int_t get2bits(Int_t, int, int, int);
 
-
+    uint64_t TimeStampExtract_TravMus(TGo4MbsSubEvent* psubevt);
 
     Bool_t Check_WinCond(Float_t P, Float_t* V);
     Bool_t Check_WinCond_Multi(Float_t P, Float_t** V, int cond_num);

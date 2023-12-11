@@ -1888,9 +1888,86 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
         } // end of ProcID 40
         break;
 
-        // CEJ: TPAT still to come...
+        case 35:
+        {
+            // Travelling MUSIC crate
+            
+            // -- timestamp extract --  // do we to do it like this? 
+            travmus_wr = TimeStampExtract_TravMus(psubevt);
+            pdata += 5;
+            len += 5;
+            if (getbits(*pdata, 2, 1, 16) != 62752)
+            {   
+                // wtf is myevent
+                //std::cout << "Error - Event Number: " << myevent << ", ProcID 35 barrier missed! " << *pdata << std::endl;
+            }
+            else
+            { 
+                // MDPP module
+                pdata++; len++;
+                Int_t header = *pdata;
+                Int_t nword_mdpp = (header & 0x3FF);
+                pdata++; len++;
+
+                // main data
+                for (int ii = 0; ii < nword_mdpp; ii++)
+                {
+                    int tmp_data = *pdata;
+                    if (((tmp_data >> 28) & 0xF) == 1)
+                    {
+                        int tmp_data = *pdata;
+                        int ch = ((tmp_data >> 16) & 0x1F);
+                        int trigger = ((tmp_data >> 21) & 0x1);
+                        if (trigger == 0)
+                        {
+                            if (0 <= ch && ch <= 15)
+                            {
+                                int adc_data = (tmp_data & 0xFFFF);
+                                if (vme_trmu_adc[ch] <= 0)
+                                {
+                                    vme_trmu_adc[ch] = adc_data;
+                                }
+                            }
+                            else if (16 <= ch && ch <= 31)
+                            {
+                                int tdc_data = (tmp_data & 0xFFFF);
+                                if (vme_trmu_tdc[ch-16] <= 0)
+                                {
+                                    vme_trmu_tdc[ch-16] = tdc_data;
+                                }
+                            }
+                        }
+                        else if (trigger == 1)
+                        {
+                            int trigger_data = (tmp_data & 0xFFFF);
+                            vme_trmu_trigger[ch] = trigger_data;
+                        }
+                    }
+                    else if (((tmp_data >> 28) & 0xF) == 2)
+                    {
+                        // ext time stamp
+                    }
+                    else if (tmp_data == 0x0)
+                    {
+                        // dummy
+                    }
+                    else if (((tmp_data >> 30) & 0x3) == 3)
+                    {
+                        // end counter
+                    }
+                    else
+                    {
+                        // unknown data
+                    }
+                    pdata++; len++;
+                }
+            } // end of MDPP module
+        } // end of ProcID 35
+        break;
 
     } // end switch ProcID
+
+    //return kTRUE
 
 }
 
@@ -5624,4 +5701,29 @@ const char* FRS_Detector_System::get_filename(){
     const char* filename;
     filename = TGo4Analysis::Instance()->GetInputFileName();
     return filename;
+}
+
+
+uint64_t FRS_Detector_System::TimeStampExtract_TravMus(TGo4MbsSubEvent* psubevt) {
+  Int_t *pdata = psubevt->GetDataField();
+  Int_t len = 0;
+  Int_t lenMax = (psubevt->GetDlen()-2)/2;
+  uint32_t wr_id = get_bits(*pdata++,0,11); len++;
+if(! (wr_id == 0x200)) { //CEJ: does 200 ever clash?
+	printf("travmus WR ID not 0x200 while trying to match it ...! It is %x\n", wr_id);
+	return 0;
+}
+if(! ((*pdata & 0xffff0000) == 0x03e10000)) {
+	printf("travmus not matching LoLo of WR ...! It is %x\n", *pdata);
+	return 0;
+}
+	uint64_t wr_ts = 
+		((uint64_t)(*pdata++ & 0xffff)) |
+		((uint64_t)(*pdata++ & 0xffff) << 16) |
+		((uint64_t)(*pdata++ & 0xffff) << 32) |
+		((uint64_t)(*pdata++ & 0xffff) << 48);
+	len += 4;
+
+ // event_out->travmus_wr = travmus_wr; 
+  return wr_ts;
 }
