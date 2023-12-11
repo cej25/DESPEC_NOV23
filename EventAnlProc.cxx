@@ -2602,7 +2602,7 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
          hFat_lead_lead_fast_ref[i] =   MakeTH1('D', Form("FATIMA_TAMEX/Fast/LeadRef-Lead/Lead-Lead Fast Time Ref Ch1- Ch.%2d",i), Form("RefLead-Lead time. %2d",i), 1000,-10000,10000);
          hFat_lead_lead_slow_ref[i] =   MakeTH1('D', Form("FATIMA_TAMEX/Slow/LeadRef-Lead/Lead-Lead Slow Time Ref Ch1- Ch.%2d",i), Form("RefLead-Lead time. %2d",i), 1000,-10000,10000);
          
-        // hFat_ToT_Fast_det[i]=   MakeTH1('D', Form("FATIMA_TAMEX/Fast/ToT/ToT Fast Ch.%2d",i), Form("ToT Fast %2d",i), 5000,0,150000);      
+          hFat_ToT_Fast_det[i]=   MakeTH1('D', Form("FATIMA_TAMEX/Fast/ToT/ToT Fast Ch.%2d",i), Form("ToT Fast %2d",i), 5000,0,150000);      
          
          hFat_ToT_Slow_det[i]=   MakeTH1('D', Form("FATIMA_TAMEX/Slow/ToT/ToT Slow Ch.%2d",i), Form("ToT Slow %2d",i), 15000,0,150000);     
          
@@ -2805,16 +2805,20 @@ void EventAnlProc::Process_Fatima_Tamex_Histos(EventUnpackStore* pInput, EventAn
                            ToT_fast_fat[i][j]= CYCLE_TIME*ToT_fast_fat[i][j];                         
                        }    
                        ///Gain matching  
-               // pOutput-> pFat_ToTCalib[i][j] = fCal->Afat_TAMEX_ZAoQ[i]* ToT_fat[i][j] + fCal->Bfat_TAMEX_ZAoQ[i];
+              // pOutput-> pFat_ToTCalib[i][j] = fCal->Afat_TAMEX_ZAoQ[i]* ToT_fat[i][j] + fCal->Bfat_TAMEX_ZAoQ[i];
                pOutput-> pFat_Fast_ToTCalib[i][j] =ToT_fast_fat[i][j];
                        if(ToT_fast_fat[i][j]>0) {
-                       // hFat_ToT_Fast_det[i] ->Fill(ToT_fast_fat[i][j]*0.1);   
+                        hFat_ToT_Fast_det[i] ->Fill(ToT_fast_fat[i][j]*0.1);   
                         
-//                        if(i!=FatVME_TimeMachineCh1 && i!=FatVME_TimeMachineCh2 && i!=FATIMA_TAMEX_SC41L && i!=FATIMA_TAMEX_SC41R && i!=FATIMA_TAMEX_SC41L_Digi && i!=FATIMA_TAMEX_SC41R_Digi) hFat_ToT_Fast_Sum->Fill(ToT_fast_fat[i][j]*0.1);   
-//                       
+                        //if(i!=FatVME_TimeMachineCh1 && i!=FatVME_TimeMachineCh2 && i!=FATIMA_TAMEX_SC41L && i!=FATIMA_TAMEX_SC41R && i!=FATIMA_TAMEX_SC41L_Digi && i!=FATIMA_TAMEX_SC41R_Digi) hFat_ToT_Fast_Sum->Fill(ToT_fast_fat[i][j]*0.1);   
+
+                        if (i != FATIMA_TAMEX_SC41L && i != FATIMA_TAMEX_SC41R && i != FatTAMEX_TimeMachineCh1 && i != FatTAMEX_TimeMachineCh2)
+                        {
+                            hFat_ToT_Fast_Sum->Fill(ToT_fast_fat[i][j]*0.1);
+                        }
+
                        hFat_tamex_hit_pattern->Fill(i);  
                       
-                    
                        ///Fill the Channel map and multiplicity here
                           Fat_tot_hits[i]++; 
                           hFat_tamex_multiplicity->Fill(Fat_tot_hits[i]);

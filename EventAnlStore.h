@@ -196,20 +196,20 @@ class EventAnlStore : public TGo4EventElement {
 
       Int_t pbPlasDetNum_Fast;
       Int_t pbPlasDetNum_Slow;
-      Int_t pbPlas_FastChan[4];
-      Int_t pbPlas_SlowChan[4];
-      Int_t pbPlas_Fast_Lead_N[4][bPLASTIC_CHAN_PER_DET];
-      Int_t pbPlas_Slow_Lead_N[4][bPLASTIC_CHAN_PER_DET];
-      Double_t pbPlas_FastLeadT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-      Double_t pbPlas_SlowLeadT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Int_t pbPlas_FastChan[bPLASTIC_TAMEX_MODULES];
+      Int_t pbPlas_SlowChan[bPLASTIC_TAMEX_MODULES];
+      Int_t pbPlas_Fast_Lead_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+      Int_t pbPlas_Slow_Lead_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+      Double_t pbPlas_FastLeadT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Double_t pbPlas_SlowLeadT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
       Int_t pbPlas_FastLeadHits;
       Int_t pbPlas_SlowLeadHits;
-      Int_t pbPlast_Fast_Trail_N[4][bPLASTIC_CHAN_PER_DET];
-      Int_t pbPlast_Slow_Trail_N[4][bPLASTIC_CHAN_PER_DET];
-      Double_t pbPlas_Fast_TrailT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-      Double_t pbPlas_Slow_TrailT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-      Double_t pbPlas_Fast_ToTCalib[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-      Double_t pbPlas_Slow_ToTCalib[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Int_t pbPlast_Fast_Trail_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+      Int_t pbPlast_Slow_Trail_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+      Double_t pbPlas_Fast_TrailT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Double_t pbPlas_Slow_TrailT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Double_t pbPlas_Fast_ToTCalib[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+      Double_t pbPlas_Slow_ToTCalib[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
 
       // BB7 output
       Int_t pBB7_TWINPEAKS_FastStrip[BB7_SIDES];
