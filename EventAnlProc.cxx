@@ -2619,7 +2619,10 @@ AidaHit EventAnlProc::ClusterPairToHit(std::pair<AidaCluster, AidaCluster> const
 
            //hFat_FRSFatTamdT_vs_ToT_ch11 = MakeTH2('D',"FATIMA_TAMEX/FRS-FATTAM_dT_LR_vs_SlowToT","",10000,-5000,200000,500,0,4000);
 
-         // hFat_Lead_Lead_Fast_T=  MakeTH1('D', "FATIMA_TAMEX/Test_dT", "Fatima Hit pattern",1000,-105000,105000);  
+         // hFat_Lead_Lead_Fast_T=  MakeTH1('D', "FATIMA_TAMEX/Test_dT", "Fatima Hit pattern",1000,-105000,105000); 
+
+          // CEJ : Bis wanted E vs dT(SC41 - detector time) // left or right is ok
+          // MakeTH2 
  }
  
  
@@ -2630,26 +2633,26 @@ void EventAnlProc::Process_Fatima_Tamex_Histos(EventUnpackStore* pInput, EventAn
          
          hits_fat_lead=0;
          hits_fat_trail=0;
-                 for (int i = 0; i < 66; i++){
-                    
-                    Fat_tot_hits[i] = 0;
-                     for(int j=0; j<FATIMA_TAMEX_HITS; j++){
-                        lead_slow_fat[i][j]=0; 
-                        lead_fast_fat[i][j]=0; 
-                        ToT_slow_fat[i][j] = 0; 
-                        ToT_slow_fat_calib[i][j] = 0; 
-                        ToT_fast_fat[i][j] = 0; 
-                        lead_lead_slow_fat_Ref1[i][j]=0;
-                        lead_lead_fast_fat_Ref1[i][j]=0;
+        for (int i = 0; i < 66; i++){
+          
+          Fat_tot_hits[i] = 0;
+            for(int j=0; j<FATIMA_TAMEX_HITS; j++){
+              lead_slow_fat[i][j]=0; 
+              lead_fast_fat[i][j]=0; 
+              ToT_slow_fat[i][j] = 0; 
+              ToT_slow_fat_calib[i][j] = 0; 
+              ToT_fast_fat[i][j] = 0; 
+              lead_lead_slow_fat_Ref1[i][j]=0;
+              lead_lead_fast_fat_Ref1[i][j]=0;
 
 
 //                         SC41L_ANA_lead_fat[i][j] = 0;  
 //                         SC41R_ANA_lead_fat[i][j] = 0;  
 //                         SC41L_DIG_lead_fat[i][j] = 0;  
 //                         SC41R_DIG_lead_fat[i][j] = 0;  
-                     }
-                 }
-         
+            }
+        }
+
          for(int i=0; i<FATIMA_TAMEX_HITS; i++){
          FatTam_Fast_RefCh0[i] =0;
          FatTam_Slow_RefCh0[i] =0;
@@ -2719,6 +2722,7 @@ void EventAnlProc::Process_Fatima_Tamex_Histos(EventUnpackStore* pInput, EventAn
 
         if(FatTam_Fast_RefCh0[j]>0 && lead_fast_fat[i][j]>0){
             lead_lead_fast_fat_Ref1[i][j] = (FatTam_Fast_RefCh0[j] -  lead_fast_fat[i][j])*CYCLE_TIME; 
+            //std::cout << "ref time difference value: " << (FatTam_Fast_RefCh0[j] -  lead_fast_fat[i][j])*CYCLE_TIME << std::endl;
 
         }
 

@@ -290,6 +290,8 @@ class EventCorrelProc : public TGo4EventProcessor {
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position[MAX_FRS_GATE][3];
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position_stopped[MAX_FRS_GATE][3];
 
+      // CEJ: AIDA vs FRS 
+      TH2 *hAIDA_FRS_x_vs_x4;
 
       // CEJ: implant correlations with bplast
       std::vector<TH2*> hAIDA_implants_e_bPlas_SlowToT;

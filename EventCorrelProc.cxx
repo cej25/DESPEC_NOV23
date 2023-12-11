@@ -234,7 +234,7 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
      if(Used_Systems[3]==1 || Used_Systems[4] ==1){
       hAIDA_WRTM_FatVME = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-Fatima_VME","White Rabbit AIDA WR TM - Fatima_VME",10000,-10000,10000,"WR dT(AIDA TM WR - Fatima_VME)[ns]", "Counts");
 
-      hAIDA_WRTM_FatTAMEX = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-Fatima_TAMEX","White Rabbit AIDA WR TM - Fatima_TAMEX",10000,-10000,10000,"WR dT(AIDA TM WR - Fatima_TAMEX)[ns]", "Counts");
+      hAIDA_WRTM_FatTAMEX = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-Fatima_TAMEX","White Rabbit AIDA WR TM - Fatima_TAMEX",10000,-10000,20000,"WR dT(AIDA TM WR - Fatima_TAMEX)[ns]", "Counts");
      }
      
       hAIDA_WRTM_bPlast = MakeTH1('I',"WR/AIDA/Timemachine_AIDA-bPlast","White Rabbit AIDA WR TM - bPlast",10000,-10000,30000,"WR dT(AIDA TM WR - bPlast)[ns]", "Counts");
@@ -337,6 +337,8 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 
         if(cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c]!=0 && cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c]!=0)
         {
+	
+	//cout <<  cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c] - cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] << endl;
             //cout<<"cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] " <<cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c] << endl;
             bPlast_TimeMachine_dT[c] = (cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh2][c] - cInputMain->pbPlas_FastLeadT[bPLASTIC_ADDITIONAL_CH_MOD][bPlastTimeMachineCh1][c])*5;
 
@@ -525,6 +527,8 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
 	  double xmax = 37.8;
 	  if (conf->Wide()) xmax = 113.4;
 
+     hAIDA_FRS_x_vs_x4 = MakeTH2('F', "Correlations/AIDA-FRS/Implants/All/PosX_vs_IDx4", "AIDA X position vs FRS ID x4 Position", 200, -20, 20, 200, -20, 20);
+
 
      for (int i = 0; i < conf->DSSDs(); ++i)
   {
@@ -710,39 +714,44 @@ void EventCorrelProc::Process_bPlast_BB7(EventAnlStore* cInputMain, EventCorrelS
       for (auto& cInputRef : cInputMain->pAida)
      {
        auto* cInput = &cInputRef;
-       //std::cout << "print this every time you go through the loop please" << std::endl;
        ///AIDA Implants
          std::vector<AidaHit> hits = cInput->Implants;
 //
         for (auto& i : hits)
-      {
-         AidaHit hit = i;
-          /// AIDA implant DEAD TIME
-       if (hit.Time > 0) {
+        {
+            AidaHit hit = i;
+            /// AIDA implant DEAD TIME
+            if (hit.Time > 0) 
+            {
 
-        if (lastAIDAWR == 0) {
-          lastAIDAWR = hit.Time;
-        } else {
+                if (lastAIDAWR == 0) {
+                lastAIDAWR = hit.Time;
+                } else {
 
-        hAida_Implant_deadtime->Fill((long long)(hit.Time - lastAIDAWR)/1000);
-          lastAIDAWR = hit.Time;
-        }
-      }///End of AIDA Implant deadtime
+                hAida_Implant_deadtime->Fill((long long)(hit.Time - lastAIDAWR)/1000);
+                lastAIDAWR = hit.Time;
+                }
+            }///End of AIDA Implant deadtime
 
-      //AIDA Implant - FRS WR dT
-        if(hit.Time>0 && cInputMain->pFRS_WR>0)hA_Imp_FRS_dT -> Fill(hit.Time-cInputMain->pFRS_WR);
+            //AIDA Implant - FRS WR dT
+            if(hit.Time>0 && cInputMain->pFRS_WR>0)hA_Imp_FRS_dT -> Fill(hit.Time-cInputMain->pFRS_WR);
 
-     if(hit.Time-cInputMain->pFRS_WR > fCorrel->GFRS_AIDA_TLow && hit.Time-cInputMain->pFRS_WR < fCorrel->GFRS_AIDA_THigh){
+            if(hit.Time-cInputMain->pFRS_WR > fCorrel->GFRS_AIDA_TLow && hit.Time-cInputMain->pFRS_WR < fCorrel->GFRS_AIDA_THigh){
 
-      for(int gate=0; gate<MAX_FRS_GATE;gate++){
 
-    ///Gate on FRS Z vs AoQ -> AIDA Implantation
-          if(cInputMain->pFRS_ZAoQ_pass[gate]==true ){
+            // CEJ: fill AIDA xPosition vs X4 position
+            hAIDA_FRS_x_vs_x4->Fill(hit.PosX, cInputMain->pFRS_ID_x4);
+            
 
-         hA_FRS_ZAoQ_implants_strip_xy[gate][hit.DSSD - 1]->Fill(hit.StripX, hit.StripY);
-         hA_FRS_ZAoQ_implants_e[gate][hit.DSSD - 1]->Fill(hit.Energy);
-         hA_FRS_ZAoQ_implants_position[gate][hit.DSSD - 1]->Fill(hit.PosX, hit.PosY);
-               }
+            for(int gate=0; gate<MAX_FRS_GATE;gate++){
+
+            ///Gate on FRS Z vs AoQ -> AIDA Implantation
+            if(cInputMain->pFRS_ZAoQ_pass[gate]==true )
+            {
+                hA_FRS_ZAoQ_implants_strip_xy[gate][hit.DSSD - 1]->Fill(hit.StripX, hit.StripY);
+                hA_FRS_ZAoQ_implants_e[gate][hit.DSSD - 1]->Fill(hit.Energy);
+                hA_FRS_ZAoQ_implants_position[gate][hit.DSSD - 1]->Fill(hit.PosX, hit.PosY);
+            }
 
        ///Gate on FRS Z1 Z2  -> AIDA Implantation
         if(cInputMain->pFRS_Z_Z2_pass[gate]==true ){
@@ -1986,7 +1995,7 @@ dT_frsfat_prompt = ((cInputMain->pFat_TDC_T[k]-cInputMain->pSC40[0])*0.025);
         ///bPlastic Spill-off/on gammas (only Twinpeaks tamex for 2022)
         //Loop on bPlast
        
-         for(int a=1; a<3; a++){ ///Detector number
+         for(int a=1; a<bPLASTIC_DETECTORS; a++){ ///Detector number // CEJ: this was 3, 11.12.23, changed to bPLASTIC_DETECTORS
             for (int b = 0; b <bPLASTIC_CHAN_PER_DET; b++){  ///Channel number
                 for (int c = 0; c < bPLASTIC_TAMEX_HITS; c++){
 

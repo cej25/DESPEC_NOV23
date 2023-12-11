@@ -108,7 +108,7 @@
 ///bPlastic Downstream Detector
 #define bPLASTIC_DOWNSTREAM_DET 2
 ///bPlast Additional signals Module Num
-#define bPLASTIC_ADDITIONAL_CH_MOD 4 // 4 = 5th card // 2 = 2nd det?
+#define bPLASTIC_ADDITIONAL_CH_MOD 2 // 4 = 5th card // 2 = 2nd det?
 ///bPlast Additional signals Channel Num
 #define bPLASTIC_FATTAMEX 9
 #define bPLASTIC_FATVME 8
@@ -121,8 +121,8 @@
 //Add ge trigger
 
 ///bPlast Time Machine Channels
-#define bPlastTimeMachineCh1 1 // 34 // CEJ: changing for testing
-#define bPlastTimeMachineCh2 0 // 35 // "..."
+#define bPlastTimeMachineCh1 3 // 1
+#define bPlastTimeMachineCh2 2 // 0
 ///bPlastic reference channels
 #define bPlastRefCh_Det1 0
 #define bPlastRefCh_Det2 0
