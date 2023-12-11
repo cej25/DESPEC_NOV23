@@ -2335,6 +2335,7 @@ void FRS_Detector_System::FRS_Sort()
      tpc_nhit_dt[i][2] = 0;   for(int j=0; j<64; j++){ tpc_dt[i][2][j] = -1; }
      tpc_nhit_dt[i][3] = 0;   for(int j=0; j<64; j++){ tpc_dt[i][3][j] = -1; }
 
+      // CEJ: we have a segfault starting here
      tpc_nhit_lt[i][0] = 0;  for(int j=0; j<64; j++){ tpc_lt[i][0][j] = 0; }
      tpc_nhit_lt[i][1] = 0;  for(int j=0; j<64; j++){ tpc_lt[i][1][j] = 0; }
      tpc_nhit_rt[i][0] = 0;  for(int j=0; j<64; j++){ tpc_rt[i][0][j] = 0; }

@@ -244,25 +244,25 @@ public:
 
          Int_t  fbPlasDetNum_Fast;
        Int_t  fbPlasDetNum_Slow;
-       Int_t  fbPlas_FastChan[4];
-       Int_t  fbPlas_SlowChan[4];
-       Int_t  fbPlast_Fast_Lead_N[4][bPLASTIC_CHAN_PER_DET];
-       Int_t  fbPlast_Slow_Lead_N[4][bPLASTIC_CHAN_PER_DET];
-       Int_t  fbPlast_Fast_Trail_N[4][bPLASTIC_CHAN_PER_DET];
-       Int_t  fbPlast_Slow_Trail_N[4][bPLASTIC_CHAN_PER_DET];
-       Double_t fbPlast_Fast_Lead[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-       Double_t fbPlast_Slow_Lead[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-       Double_t fbPlast_Fast_Trail[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-       Double_t fbPlast_Slow_Trail[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Int_t  fbPlas_FastChan[bPLASTIC_TAMEX_MODULES];
+       Int_t  fbPlas_SlowChan[bPLASTIC_TAMEX_MODULES];
+       Int_t  fbPlast_Fast_Lead_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Int_t  fbPlast_Slow_Lead_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Int_t  fbPlast_Fast_Trail_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Int_t  fbPlast_Slow_Trail_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Double_t fbPlast_Fast_Lead[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Double_t fbPlast_Slow_Lead[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Double_t fbPlast_Fast_Trail[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Double_t fbPlast_Slow_Trail[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
        
         //bPlas TAMEX
        Long64_t fbPlas_WR;
        Int_t  fbPlasDetNum;
-       Int_t fbPlasChan[4];
-       Int_t fbPlas_PMT_Lead_N[4][bPLASTIC_CHAN_PER_DET];
-       Int_t fbPlas_PMT_Trail_N[4][bPLASTIC_CHAN_PER_DET];
-       Double_t fbPlas_Lead_PMT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
-       Double_t fbPlas_Trail_PMT[4][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Int_t fbPlasChan[bPLASTIC_TAMEX_MODULES];
+       Int_t fbPlas_PMT_Lead_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Int_t fbPlas_PMT_Trail_N[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET];
+       Double_t fbPlas_Lead_PMT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
+       Double_t fbPlas_Trail_PMT[bPLASTIC_TAMEX_MODULES][bPLASTIC_CHAN_PER_DET][bPLASTIC_TAMEX_HITS];
 
    ClassDef(EventUnpackStore,1)
 };

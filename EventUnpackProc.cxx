@@ -470,17 +470,17 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
 
                     
         
-       if(PrcID_Conv!=7 && fOutput->fTrigger != 2){ // CEJ: skipping trigger 3 evts for FRS?
-           //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
-            Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
-            Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
+                        if(PrcID_Conv!=7 && fOutput->fTrigger != 3 && fOutput->fTrigger != 2){ // CEJ: skipping trigger 3 evts for FRS?
+                            //cout<<"2 fOutput->fTrigger "<< fOutput->fTrigger << " PrcID_Conv " << PrcID_Conv <<endl;
+                              Detector_Systems[PrcID_Conv]->Process_MBS(psubevt);
+                              Detector_Systems[PrcID_Conv]->Process_MBS(pdata);
 
-        ///get mbs stream data from unpacker (pointer copy solution)
-            pdata = Detector_Systems[PrcID_Conv]->get_pdata();
+                          ///get mbs stream data from unpacker (pointer copy solution)
+                              pdata = Detector_Systems[PrcID_Conv]->get_pdata();
 
-        ///get data from subevent and send to RAW
-            Detector_Systems[PrcID_Conv]->get_Event_data(RAW);
-                }
+                          ///get data from subevent and send to RAW
+                              Detector_Systems[PrcID_Conv]->get_Event_data(RAW);
+                                  }
             }
 
         //=================================================================
@@ -497,7 +497,7 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
                                                 /** Output FRS **/
         ///--------------------------------------------------------------------------------------------///
 
-   if (Used_Systems[0] && PrcID_Conv==0){
+   if (Used_Systems[0] && PrcID_Conv==0 && fOutput->fTrigger != 3 && fOutput->fTrigger != 2){
 
         ///MUSIC
        if(PrcID==20){
@@ -1692,9 +1692,9 @@ void EventUnpackProc::load_FatTamex_Allocationfile(){
 void EventUnpackProc::load_bPlasticTamex_Allocationfile(){
 
   const char* format = "%d %d %d %d";
-  ifstream data("Configuration_Files/bPlast/bPlast_TAMEX_allocation.txt");
+  ifstream data("Configuration_Files/bPlast/bPlast_TAMEX_allocation_2.txt"); // CEJ bPlast allocation
   if(data.fail()){
-    cerr << "Could not find bPlast_TAMEX_allocation file!" << endl;
+    cerr << "Could not find bPlast_TAMEX_allocation_2 file!" << endl;
     exit(0);
   }
 
