@@ -1307,8 +1307,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                 }
             } // end of V830 // CEJ: is this a V820 or V830??
 
-
-            while (len < lenMax)
+            for (int ii = 0; ii < 4; ii++) // process 2x V775 and 2x V785
+            //while (len < lenMax)
             {
                 // CAEN V775 and V785
                 {
@@ -1360,13 +1360,14 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
         } // end of ProcID 30
         break;
 
+        // CEJ: 11.12.23 case 30 seems same now
+
         case 10: // FRS Main Crate
         {
             // TS extractor
-            for (int ii = 0; ii < 5; ii++)
-            {
-                pdata++; len++;
-            }
+            wr_main = TimeStampExtract_Main(psubevt);
+            pdata += 5;
+            len += 5;
 
             // CAEN V820
             {
@@ -1520,6 +1521,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
         } // end of ProcID 10
         break;
 
+        // CEJ: 11.12.23 case 10 looks okay
+
         case 20: // TPC crate
         {
             for (int ii = 0; ii < 2; ii++) // read out 2 of them
@@ -1574,7 +1577,14 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
             {
                 if (getbits(*pdata, 2, 1, 16) != 62752)
                 {
-                    std::cout << "Error: ProcID 20 barrier missed! " << std::hex << *pdata << std::dec << std::endl;
+                    if (getbits(*pdata, 2, 1, 16) == 62848)
+                    {
+                        // 0xF58000 MVLC flag
+                    }
+                    else
+                    {
+                        std::cout << "Error: ProcID 20 barrier V1190 missed! " << std::hex << *pdata << std::dec << std::endl;
+                    }
                 }
                 else
                 {
@@ -1677,6 +1687,8 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
             } // end of V1190
         } // end of ProcID 20
         break;
+
+        // maybe TPC case is ok now?
 
         case 40: // VFTX at S2
         {
@@ -5704,6 +5716,31 @@ const char* FRS_Detector_System::get_filename(){
     return filename;
 }
 
+
+uint64_t FRS_Detector_System::TimeStampExtract_Main(TGo4MbsSubEvent* psubevt) 
+{
+    Int_t *pdata = psubevt->GetDataField();
+    Int_t len = 0;
+  // Int_t vme_chn; //usually redefined for each crate
+    Int_t lenMax = (psubevt->GetDlen()-2)/2;
+    //decide to print the WR identifier
+    uint32_t wr_id = get_bits(*pdata++,0,11); len++;
+  if(! (wr_id == 0x100)) {
+    printf("FRS WR ID not 0x100 while trying to match it ...! It is %x\n", wr_id);
+    return 0;
+  }
+  if(! ((*pdata & 0xffff0000) == 0x03e10000)) {
+    printf("FRS not matching LoLo of WR ...! It is %x\n", *pdata);
+    return 0;
+  }
+    uint64_t frs_wr = 
+      ((uint64_t)(*pdata++ & 0xffff)) |
+      ((uint64_t)(*pdata++ & 0xffff) << 16) |
+      ((uint64_t)(*pdata++ & 0xffff) << 32) |
+      ((uint64_t)(*pdata++ & 0xffff) << 48);
+    len += 4;
+    return frs_wr;
+}
 
 uint64_t FRS_Detector_System::TimeStampExtract_TravMus(TGo4MbsSubEvent* psubevt) {
   Int_t *pdata = psubevt->GetDataField();
