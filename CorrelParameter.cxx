@@ -37,6 +37,8 @@ CorrelParameter::CorrelParameter()
     GAIDA_Imp_bPlas_THigh = 0;
     GAIDA_bPlas_TLow = 0;
     GAIDA_bPlas_THigh = 0;
+    GBB7_bPlas_TLow = 0;
+    GBB7_bPlas_THigh = 0;
     GFRS_Ge_TLow = 0;
     GFRS_Ge_THigh = 0;
     GbPlas_Fat_TLow=0;
@@ -153,6 +155,8 @@ CorrelParameter::CorrelParameter(const Text_t* name)
          GAIDA_Imp_bPlas_THigh = 10000;
          GAIDA_bPlas_TLow = -1000;
          GAIDA_bPlas_THigh = 1000;
+         GBB7_bPlas_TLow = -1000;
+         GBB7_bPlas_THigh = 1000;
          GbPlas_Fat_TLow=-1000;
          GbPlas_Fat_THigh=1000;
          GbPlas_Fattam_TLow=-1000;
@@ -320,9 +324,11 @@ else {
        // 21. bPlast TimeMachine - BB7 TWINPEAKS WR Time Gate
        if (IsData(file)) file >> GbPlast_TM_BB7_TWINPEAKS_TLow >> GbPlast_TM_BB7_TWINPEAKS_THigh;
 
+      // 22. bPlast vs BB7 (TAMEX TP)
        if (IsData(file)) file >> GAIDA_TM_BB7_TWINPEAKS_TLow >> GAIDA_TM_BB7_TWINPEAKS_THigh;
        
-       
+      // 23. bPlast vs BB7 FEBEX
+        if (IsData(file)) file >> GBB7_bPlas_TLow >> GBB7_bPlas_THigh;
        
        /// Gamma-Gamma Germanium Time gate 
         if(IsData(file)) file >> GGe1_Ge2_Low >>GGe1_Ge2_High;

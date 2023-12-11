@@ -647,6 +647,11 @@ void EventCorrelProc::Make_bPlast_AIDA_Histos()
     }
 }
 
+void EventCorrelProc::Make_bPlast_BB7_Histos()
+{   
+    hBB7_implants_e_bPlas_SlowToT = MakeTH2('F', "Correlations/BB7-bPlast/BB7_Implants_bPlast_SlowToT", "BB7 Implant E vs bPlast Slow ToT",  2000, 0, 100000, 10000, 0., 4000000.);
+}
+
 
 void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
 {
@@ -654,8 +659,8 @@ void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrel
     for (auto & cInputRef : cInputMain->pAida)
     {
         auto * cInput = &cInputRef;
-        // CEJ: this should be implants, but we see none for now, so using Decay branch.
-        std::vector<AidaHit> ImplantHits = cInput->Decays;
+        // CEJ: this should be implants, but we see none for now, so using Decay branch (17.11.23)
+        std::vector<AidaHit> ImplantHits = cInput->Implants;
         //std::cout << "here 1?" << std::endl;
         for (auto & i : ImplantHits)
         { 
@@ -665,20 +670,36 @@ void EventCorrelProc::Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrel
             //std::cout << "here? 3" << std::endl;
 
             if(hit.Time - cInputMain->pbPLAS_WR > fCorrel->GAIDA_bPlas_TLow && hit.Time - cInputMain->pbPLAS_WR < fCorrel->GAIDA_bPlas_THigh)
-            {
-                //if 
-                //{ 
-                    //std::cout << "here? 2" << std::endl;
-                    
+            {  
                     hAIDA_implants_e_bPlas_SlowToT[hit.DSSD-1]->Fill(hit.Energy, cInputMain->pbPlas_Slow_ToTCalib[1][0][0]);
-                //}
             }
 
         }
     }
 }
+ 
+// BB7 FEBEX
+void EventCorrelProc::Process_bPlast_BB7(EventAnlStore* cInputMain, EventCorrelStore* cOutput)
+{
+    for (auto & cInputRef : cInputMain->pBB7_FEBEX)
+    {
+        auto * cInput = &cInputRef;
+        //
+        std::vector<BB7_FEBEX_Hit> ImplantHits = cInput->Implants;
 
-
+        for (auto & i : ImplantHits)
+        {
+            BB7_FEBEX_Hit hit = i;
+            
+            // CEJ: still need GBB7_bPlas_TLow,GBB7_bPlas_THigh 
+            if (hit.Time = cInputMain->pbPLAS_WR > fCorrel->GBB7_bPlas_TLow && hit.Time - cInputMain->pbPLAS_WR < fCorrel->GBB7_bPlas_THigh)
+            {   
+                // CEJ: still only correlating with a single "detector"
+                hBB7_implants_e_bPlas_SlowToT->Fill(hit.Energy, cInputMain->pbPlas_Slow_ToTCalib[1][0][0]);
+            }
+        }
+    }
+}
 
 
 /**----------------------------------------------------------------------------------------------**/

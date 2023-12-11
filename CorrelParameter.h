@@ -22,6 +22,7 @@ public:
  Bool_t GSetup_corr_Beta_Gamma_bPlastSpillOff;
  Bool_t GSetup_corr_Beta_Gamma, GSetup_corr_Beta_Gamma_Gamma, GSetup_corr_Beta_Gamma_Fatima, GSetup_corr_Beta_Gamma_Fatima_LT;
  Bool_t GSetup_corr_bPlast_AIDA;
+ Bool_t GSetup_corr_bPlast_BB7;
  
  Int_t GZ1Z2_Gate;
  
@@ -108,7 +109,8 @@ public:
  Int_t GbPlast_TM_BB7_TWINPEAKS_TLow, GbPlast_TM_BB7_TWINPEAKS_THigh;
  // 22.
  Int_t GAIDA_TM_BB7_TWINPEAKS_TLow, GAIDA_TM_BB7_TWINPEAKS_THigh;
- // febex
+ // 23.
+ Int_t GBB7_bPlas_TLow, GBB7_bPlas_THigh;
  
  Int_t GbPlast_Egate_low, GbPlast_Egate_high;
 // Int_t GbPlast_GAL_TLow, GbPlast_GAL_THigh;

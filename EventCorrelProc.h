@@ -136,6 +136,9 @@ class EventCorrelProc : public TGo4EventProcessor {
     void Make_bPlast_AIDA_Histos();
     void Process_bPlast_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput);
 
+    void Make_bPlast_BB7_Histos();
+    void Process_bPlast_BB7(EventAnlStore* cInputMain, EventCorrelStore* cOutput);
+
     void Process_FRS_BB7_FEBEX(EventAnlStore* cInput, EventCorrelStore* cOutput);
     void Process_FRS_BB7_TWINPEAKS(EventAnlStore* cInput, EventCorrelStore* cOutput);
 
@@ -287,7 +290,10 @@ class EventCorrelProc : public TGo4EventProcessor {
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position[MAX_FRS_GATE][3];
       TH2 *hA_FRS_Z1Z2_x4AoQ_implants_position_stopped[MAX_FRS_GATE][3];
 
+
+      // CEJ: implant correlations with bplast
       std::vector<TH2*> hAIDA_implants_e_bPlas_SlowToT;
+      TH2 *hBB7_implants_e_bPlas_SlowToT;
 
       std::vector<TH2*> hA_FRS_ZAoQ_implants_pos_xy;
      // std::vector<TH1*> hA_FRS_ZAoQ_implants_e;
