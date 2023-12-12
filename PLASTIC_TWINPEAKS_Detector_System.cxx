@@ -194,20 +194,23 @@ void PLASTIC_TWINPEAKS_Detector_System::Process_TAMEX(){
         cerr << "TAMEX WORD: " << hex << *pdata << endl;
      //   exit(0);
     }
+    // CEJ adding exception 11.12.23
+    else
+    {
+        //next word
+        pdata++;
+        //get trigger
+        get_trigger();
+        //move on to leading and trailing edges
+        if(am_fired[tamex_iter] > 3) get_edges();
+        else no_edges[tamex_iter] = true;
 
-    //next word
-    pdata++;
-    //get trigger
-    get_trigger();
-    //move on to leading and trailing edges
-    if(am_fired[tamex_iter] > 3) get_edges();
-    else no_edges[tamex_iter] = true;
-
-    //check errors
-    //if(!no_edges[tamex_iter]) pdata++;
-   // check_error();
-    //checking trailer
-    check_trailer();
+        //check errors
+        //if(!no_edges[tamex_iter]) pdata++;
+    // check_error();
+        //checking trailer
+        check_trailer();
+    }
 }
 
 //---------------------------------------------------------------

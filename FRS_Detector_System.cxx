@@ -1275,6 +1275,76 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
     len = 0;
     lenMax = (psubevt->GetDlen() - 2) / 2;
 
+    if (psubevt->GetProcid() == 10)
+    {
+        // main crate clearing
+        for(int i=0; i<21; i++){
+                for (int j=0; j<32;j++){
+            //                    //vme_tpc[i][j]=0;
+          //                   // vme_frs[i][j]=0;
+                   vme_main[i][j]=0;
+                   vme_tof[i][j]=0; // CEJ: not filled
+
+                }
+           }
+    }
+    else if (psubevt->GetProcid() == 20)
+    {
+        // tpc crate clearing
+         for(int h=0; h<128; h++){
+                nhit_v1190_tpcs2[h]=0;
+                 for(int k=0; k<64; k++){
+                    leading_v1190_tpcs2[h][k]=0;
+                 }
+            }
+
+            for(int i=0; i<21; i++){
+               for (int j=0; j<32;j++){
+                   vme_tpcs2[i][j]=0;
+               }
+           }
+
+    }
+    else if (psubevt->GetProcid() == 30)
+    {
+        // user crate clearing
+        for(int i=0; i<21; i++){
+               for (int j=0; j<32;j++){
+                   vme_frs[i][j]=0;
+                  
+               }
+           }
+    }
+    else if (psubevt->GetProcid() == 40)
+    {
+        // VFTX clearing
+         for(int i=0;i<VFTX_MAX_HITS; i++){
+    // KW rem
+    //for(int i=0;i<32; i++){
+      // end KW
+      TRaw_vftx_21l[i]=0;
+      TRaw_vftx_21r[i]=0;
+      TRaw_vftx_22l[i]=0;
+      TRaw_vftx_22r[i]=0;
+      TRaw_vftx_41l[i]=0;
+      TRaw_vftx_41r[i]=0;
+      TRaw_vftx_42l[i]=0;
+      TRaw_vftx_42r[i]=0;
+      //     TRaw_vftx_sofia_l=0;
+      //     TRaw_vftx_sofia_r=0;
+      // }
+      
+    }
+
+    }
+
+   /* for(int h=0; h<128; h++){
+                nhit_v1190_tpcs2[h]=0;
+                 for(int k=0; k<64; k++){
+                    leading_v1190_tpcs2[h][k]=0;
+                 }
+            }*/
+
 
     //if (psubevt->Trigger())
     switch(psubevt->GetProcid())
@@ -1624,6 +1694,7 @@ void FRS_Detector_System::FRS_Unpack(TGo4MbsSubEvent* psubevent)
                                         multihit = nhit_v1190_tpcs2[vme_chn];
                                         leading_v1190_tpcs2[vme_chn][multihit] = value;
                                         nhit_v1190_tpcs2[vme_chn]++;
+                                       // std::cout << "actual raw data for nhit v1190: " << nhit_v1190_tpcs2[vme_chn] << std::endl;
                                     }
                                     // hVME_TPCS2_V1190All->Fill(vme_chn, value);
                                 }
@@ -1996,7 +2067,7 @@ void FRS_Detector_System::FRS_Sort()
       // I will remove ProcID check for clearing for now.
       
       ///Clear for main crate
-      //      if(psubevt->GetProcid() == 10){       
+           if(psubevt->GetProcid() == 20){       
            if(skip==true){
                tdc_sc41l[0] = 0;
                 tdc_sc41r[0] = 0;
@@ -2011,7 +2082,7 @@ void FRS_Detector_System::FRS_Sort()
                 tdc_sc31l[0] = 0;
                 tdc_sc31r[0] = 0;
                 tdc_sc11[0]  = 0;
-            for(int i=0; i<21; i++){
+          /*  for(int i=0; i<21; i++){
                 for (int j=0; j<32;j++){
             //                    //vme_tpc[i][j]=0;
           //                   // vme_frs[i][j]=0;
@@ -2019,7 +2090,7 @@ void FRS_Detector_System::FRS_Sort()
                    vme_tof[i][j]=0;
 
                 }
-           }
+           }*/
             
         tpc_x_s4 = -999;
         tpc_y_s4 = -999;
@@ -2035,22 +2106,24 @@ void FRS_Detector_System::FRS_Sort()
                     ts_word[g]=0;
             }
 
-           }///end skip
-           for(int h=0; h<128; h++){
+           }/// OLD END SKIP HERE
+           // CEJ: removing this zeroing, temporarily
+          
+          /* for(int h=0; h<128; h++){
                 nhit_v1190_tpcs2[h]=0;
                  for(int k=0; k<64; k++){
                     leading_v1190_tpcs2[h][k]=0;
                  }
-            }
+            }*/
 
-           for(int i=0; i<21; i++){
+          /* for(int i=0; i<21; i++){
                for (int j=0; j<32;j++){
                    vme_tpcs2[i][j]=0;
                    vme_tpcs4[i][j]=0;
                    vme_frs[i][j]=0;
                   // vme_main[i][j]=0;
                }
-           }
+           }*/
         id_x2=999;
         id_x4 =999;
         id_AoQ=0;
@@ -2106,17 +2179,17 @@ void FRS_Detector_System::FRS_Sort()
         
                 }
 
-//        }
+        } // procid 10 case
 
         //Clear for case 30
   //      if(psubevt->GetProcid()==30){
 //
-           for(int i=0; i<21; i++){
+        /*  for(int i=0; i<21; i++){
                for (int j=0; j<32;j++){
 
                    vme_main[i][j]=0;
                }
-           }
+           }*/
 
         dt_21l_21r =0;
         dt_41l_41r =0;
@@ -2177,7 +2250,7 @@ void FRS_Detector_System::FRS_Sort()
     de_31r = 0;
   //  if(psubevt->GetSubtype() ==1){
     // KW add
-    for(int i=0;i<VFTX_MAX_HITS; i++){
+   /* for(int i=0;i<VFTX_MAX_HITS; i++){
     // KW rem
     //for(int i=0;i<32; i++){
       // end KW
@@ -2193,7 +2266,7 @@ void FRS_Detector_System::FRS_Sort()
       //     TRaw_vftx_sofia_r=0;
       // }
       
-    }
+    }*/
 //          if(psubevt->GetSubtype() !=1){
 //     TRaw_vftx_21l=0;
 //     TRaw_vftx_21r=0;
@@ -2395,35 +2468,64 @@ void FRS_Detector_System::FRS_Sort()
    tpc_l[3][1]= vme_tpcs2[12][30] & 0xfff;
    tpc_r[3][1]= vme_tpcs2[12][31] & 0xfff;
 
+    //TPC 5  at S4 (TPC 41) in air
+    tpc_a[4][0]=vme_tpcs2[13][0] & 0xfff;
+    tpc_a[4][1]=vme_tpcs2[13][1] & 0xfff;
+    tpc_a[4][2]=vme_tpcs2[13][2] & 0xfff;
+    tpc_a[4][3]=vme_tpcs2[13][3] & 0xfff;
+    tpc_l[4][0]=vme_tpcs2[13][4] & 0xfff;
+    tpc_r[4][0]=vme_tpcs2[13][5] & 0xfff;
+    tpc_l[4][1]=vme_tpcs2[13][6] & 0xfff;
+    tpc_r[4][1]=vme_tpcs2[13][7] & 0xfff;
+
   //TPC 5  at S4 (TPC 41) in air
-   tpc_a[4][0]= vme_tpcs2[2][0] & 0xfff;
+   /*tpc_a[4][0]= vme_tpcs2[2][0] & 0xfff;
    tpc_a[4][1]= vme_tpcs2[2][1] & 0xfff;
    tpc_a[4][2]= vme_tpcs2[2][2] & 0xfff;
    tpc_a[4][3]= vme_tpcs2[2][3] & 0xfff;
    tpc_l[4][0]= vme_tpcs2[2][4] & 0xfff;
    tpc_r[4][0]= vme_tpcs2[2][5] & 0xfff;
    tpc_l[4][1]= vme_tpcs2[2][6] & 0xfff;
-   tpc_r[4][1]= vme_tpcs2[2][7] & 0xfff;
+   tpc_r[4][1]= vme_tpcs2[2][7] & 0xfff;*/
 
   //TPC 6 at S4 (TPC 42) in air
-   tpc_a[5][0]= vme_tpcs2[2][8] & 0xfff;
+  tpc_a[5][0]=vme_tpcs2[13][8] & 0xfff;
+  tpc_a[5][1]=vme_tpcs2[13][9] & 0xfff;
+  tpc_a[5][2]=vme_tpcs2[13][10] & 0xfff;
+  tpc_a[5][3]=vme_tpcs2[13][11] & 0xfff;
+  tpc_l[5][0]=vme_tpcs2[13][12] & 0xfff;
+  tpc_r[5][0]=vme_tpcs2[13][13] & 0xfff;
+  tpc_l[5][1]=vme_tpcs2[13][14] & 0xfff;
+  tpc_r[5][1]=vme_tpcs2[13][15] & 0xfff;
+
+  //TPC 6 at S4 (TPC 42) in air
+   /*tpc_a[5][0]= vme_tpcs2[2][8] & 0xfff;
    tpc_a[5][1]= vme_tpcs2[2][9] & 0xfff;
    tpc_a[5][2]= vme_tpcs2[2][10] & 0xfff;
    tpc_a[5][3]= vme_tpcs2[2][11] & 0xfff;
    tpc_l[5][0]= vme_tpcs2[2][12] & 0xfff;
    tpc_r[5][0]= vme_tpcs2[2][13] & 0xfff;
    tpc_l[5][1]= vme_tpcs2[2][14] & 0xfff;
-   tpc_r[5][1]= vme_tpcs2[2][15] & 0xfff;
+   tpc_r[5][1]= vme_tpcs2[2][15] & 0xfff;*/
+
+    tpc_a[6][0]=vme_tpcs2[13][16] & 0xfff;
+    tpc_a[6][1]=vme_tpcs2[13][17] & 0xfff;
+    tpc_a[6][2]=vme_tpcs2[13][18] & 0xfff;
+    tpc_a[6][3]=vme_tpcs2[13][19] & 0xfff;
+    tpc_l[6][0]=vme_tpcs2[13][20] & 0xfff;
+    tpc_r[6][0]=vme_tpcs2[13][21] & 0xfff;
+    tpc_l[6][1]=vme_tpcs2[13][22] & 0xfff;
+    tpc_r[6][1]=vme_tpcs2[13][23] & 0xfff;
 
   //TPC at S3 (TPC 31) (checkSB)
-   tpc_a[6][0]= vme_tpcs2[2][16] & 0xfff;
+   /*tpc_a[6][0]= vme_tpcs2[2][16] & 0xfff;
    tpc_a[6][1]= vme_tpcs2[2][17] & 0xfff;
    tpc_a[6][2]= vme_tpcs2[2][18] & 0xfff;
    tpc_a[6][3]= vme_tpcs2[2][19] & 0xfff;
    tpc_l[6][0]= vme_tpcs2[2][20] & 0xfff;
    tpc_r[6][0]= vme_tpcs2[2][21] & 0xfff;
    tpc_l[6][1]= vme_tpcs2[2][22] & 0xfff;
-   tpc_r[6][1]= vme_tpcs2[2][23] & 0xfff;
+   tpc_r[6][1]= vme_tpcs2[2][23] & 0xfff;*/
 
 
  //TDC
@@ -2443,10 +2545,12 @@ void FRS_Detector_System::FRS_Sort()
     for(int j=0; j<2; j++){
       //Left side
       tpc_nhit_lt[itpc][j] = nhit_v1190_tpcs2[ (v1190_channel_lt[itpc][j]) ];
+      //std::cout << "tpc_nhit_lt[itpc][j]: " << tpc_nhit_lt[itpc][j] << std::endl;
       for(int ihit=0; ihit<(tpc_nhit_lt[itpc][j]); ihit++){
         if(ihit<64){
           tpc_lt[itpc][j][ihit] = leading_v1190_tpcs2[ (v1190_channel_lt[itpc][j]) ][ihit];
-
+          //std::cout << "are we in THIS loop?" << std::endl;
+          // no, we're not in that loop
         }
         else tpc_lt[itpc][j][ihit]=0;
       }
@@ -2496,12 +2600,39 @@ void FRS_Detector_System::FRS_Sort()
     de_31l = 0;
     de_31r = 0;
 
+
+    /* ### SCI dE:  */
+  de_41l = vme_main[14][13] & 0xfff; //src->vme_main[11][0] & 0xfff;
+  de_41r = vme_main[14][1] & 0xfff;
+  de_21l = vme_main[14][2] & 0xfff;
+  de_21r = vme_main[14][3] & 0xfff;
+  de_42l = vme_main[14][4] & 0xfff;
+  de_42r = vme_main[14][5] & 0xfff;
+
+  de_31l = vme_main[14][9] & 0xfff;
+  de_31r = vme_main[14][10] & 0xfff;
+  de_43l = vme_main[14][11] & 0xfff;
+  de_43r = vme_main[14][12] & 0xfff;
+  //  tgt->de_81l = src->vme_main[11][13] & 0xfff; // changed on 21/Feb/2020 23:00
+  //  tgt->de_81l = src->vme_main[4][15] & 0xfff; // changed on 21/Feb/2020 23:00
+  de_81l = vme_main[14][6] & 0xfff; // changed on 16.03.21 19:30
+  de_81r = vme_main[14][14] & 0xfff;
+  
+  //  tgt->de_22l = src->vme_main[4][0] & 0xfff; // changed on 17/Feb/2021
+  de_22l = vme_main[14][15] & 0xfff; // changed on 17 Feb 2021, ch0 QDC seems to have a problem
+  de_22r = vme_main[14][8] & 0xfff;
+  // CEJ: uncomment later if needed
+  //de_M01l = vme_main[14][17] & 0xfff;
+ // de_M01r = vme_main[14][18] & 0xfff;
+
+
+
     /// SCI dE:
     /* ### SCI dE:  */
 //     for(int i=0; i<32; i++){int test2 = vme_main[4][i] & 0xfff;
 //         cout<<" vme_main[4][i] "  << vme_main[4][i] <<" test2 " << test2 <<" i " << i <<"  psubevt->GetProcid() " << psubevt->GetProcid()<< endl;
 //     }
-  de_41l = vme_main[4][13] & 0xfff; //vme_main[11][0] & 0xfff;
+  /*de_41l = vme_main[4][13] & 0xfff; //vme_main[11][0] & 0xfff;
   de_41r = vme_main[4][1] & 0xfff;
   de_21l = vme_main[4][2] & 0xfff;
 
@@ -2522,7 +2653,7 @@ void FRS_Detector_System::FRS_Sort()
 
 //  de_22l = vme_main[4][0] & 0xfff; // changed on 17/Feb/2021
   de_22l = vme_main[4][15] & 0xfff; // changed on 17 Feb 2021, ch0 QDC seems to have a problem
-  de_22r = vme_main[4][8] & 0xfff;
+  de_22r = vme_main[4][8] & 0xfff;*/
 
 
 
@@ -2774,27 +2905,30 @@ void FRS_Detector_System::FRS_Sort()
     tdc_sc41l[i] = leading_v1290_main[0][i];
     tdc_sc41r[i] = leading_v1290_main[1][i];
     tdc_sc21l[i] = leading_v1290_main[2][i];
-   // cout<<"leading_v1290_main[2][i] " <<leading_v1290_main[2][i] << endl;
     tdc_sc21r[i] = leading_v1290_main[3][i];
-    tdc_sc42l[i] = leading_v1290_main[10][i]; //changed mapping 03.03.21
+    tdc_sc42l[i] = leading_v1290_main[4][i]; //changed mapping 05.05.22
     tdc_sc42r[i] = leading_v1290_main[15][i]; //changed mapping 03.03.21
     tdc_sc43l[i] = leading_v1290_main[6][i];
     tdc_sc43r[i] = leading_v1290_main[7][i];
     tdc_sc81l[i] = leading_v1290_main[8][i];
     tdc_sc81r[i] = leading_v1290_main[9][i];
-    //tdc_sc31l[i] = leading_v1290_main[10][i]; //changed mapping 03.03.21
+    tdc_sc31l[i] = leading_v1290_main[10][i]; //changed mapping 05.05.22
     tdc_sc31r[i] = leading_v1290_main[11][i];
     tdc_sc11[i]  = leading_v1290_main[12][i];
     tdc_sc22l[i] = leading_v1290_main[13][i];
     tdc_sc22r[i]  = leading_v1290_main[14][i];
+    // CEJ: uncomment if needed later
+    //tdc_scM01l[i] = leading_v1290_main[16][i]; //changed mapping 07.05.21
+    //tdc_scM01r[i] = leading_v1290_main[17][i]; //changed mapping 07.05.21
+    //tgt->tdc_sc_cave_c[i] = src->leading_v1290_main[5][i]; //newly defined, changed mapping 05.05.22
   }
 
 
  //---MUSIC configuration. 2x TUM-MUSIC from FRS crate and 1 TRavel-MUsic from TRMU crate (2020/Jan/23, YT)
        for(int i=0;i<8;i++)
         {
-          music_e1[i] = (vme_frs[3][i]) & 0xfff;   //
-          music_e2[i] = (vme_frs[3][8+i]) & 0xfff; // Travel-MUSIC (from special VME crate)
+          music_e1[i] = (vme_frs[10][i]) & 0xfff;   //
+          music_e2[i] = (vme_frs[10][8+i]) & 0xfff; // Travel-MUSIC (from special VME crate)
           music_e3[i] = (vme_trmu_adc[i]); //
 
           music_t1[i] = leading_v1290_main[16+i][0] & 0xfff; //TUM-MUSIC
@@ -3058,10 +3192,15 @@ for(int i=0; i<8; i++){
    bool checkrange5=0;
   for(int i=0;i<7;i++)
     {
-
+  
+  //std::cout << "tpc_nhit_lt[i][0]: " << tpc_nhit_lt[i][0] << std::endl;
+  // above always 0, checking
   for(int ihit=0; ihit<(tpc_nhit_lt[i][0] && ihit<64); ihit++){
 
          Int_t thisdata = tpc_lt[i][0][ihit];
+        //std::cout << "this data: " << thisdata << std::endl;
+
+
          Int_t currently_selected = tpc_lt_s[i][0];
         // cout<<"3 tpc_lt_s " <<tpc_lt_s[i][0]<< " thisdata " <<thisdata<< "i " << i << endl;
           if(thisdata>tpc->lim_lt[i][0][0] && thisdata<tpc->lim_lt[i][0][1]) checkrange1=true;
@@ -3134,6 +3273,8 @@ for(int i=0; i<8; i++){
     {
 
       /// calculate control sums
+      // ok... csum is always -999999999
+      //std::cout << "tpc_lt_s[i][0]: " <<  tpc_lt_s[i][0] << " - tpc_rt_s[i][0]: " << tpc_rt_s[i][0] << " - tpc_dt_s[i][j]: " << tpc_dt_s[i][j] << std::endl;
      if(j < 2 && tpc_lt_s[i][0]>0 && tpc_rt_s[i][0]>0 && tpc_dt_s[i][j]>0){
         tpc_csum[i][j] = (tpc_lt_s[i][0] + tpc_rt_s[i][0]- 2*tpc_dt_s[i][j]);
 
@@ -3146,6 +3287,10 @@ for(int i=0; i<8; i++){
                tpc_csum[i][j] = -9999999;
             }
 
+
+      // here is where our conditions are not being changed to true
+      // lim_csum1 windows are being read in correctly from setup_file
+      //std::cout << "tpc_csum[i][0]: " << tpc_csum[i][0] << std::endl;
      if(tpc_csum[i][0]> tpc->lim_csum1[i][0] && tpc_csum[i][0]<tpc->lim_csum1[i][1]) {b_tpc_csum[i][0]=true;
 
      }
@@ -3206,6 +3351,8 @@ for(int i=0; i<8; i++){
 
         for(int j=0;j<4;j++){
           if (b_tpc_csum[i][j] &&  b_tpc_timeref[index_timeref]){
+           // std::cout << "we must not meet this condition" << std::endl;
+            // yep, never. following b_tpc_csum[i][j] and b_tpc_timeref[index_timeref]
             tpc_yraw[i][j] = tpc_dt_s[i][j] - tpc_timeref_s[index_timeref];
             tmp_tpc_y[j] =  (tpc_yraw[i][j])*(tpc->y_factor[i][j]) + (tpc->y_offset[i][j]);
             sumy +=   tmp_tpc_y[j];
@@ -3214,6 +3361,7 @@ for(int i=0; i<8; i++){
         }
         if(county>0){
             tpc_y[i] = sumy/((double)county);
+            // never true?
 
         }
 
@@ -3223,6 +3371,7 @@ for(int i=0; i<8; i++){
 
         }else{
           b_tpc_xy[i] = kFALSE;
+          
         }
 
          //TPC anode amplitude quick analysis
@@ -3367,7 +3516,7 @@ for(int i=0; i<8; i++){
   //=====================================================
   if (b_tpc_xy[4]&&b_tpc_xy[5])
     {
-
+    // std::cout << "we must not be in here" << std::endl;
       tpc_angle_x_s4 = (tpc_x[5] - tpc_x[4])/dist_TPC41_TPC42*1000.;
     
       tpc_angle_y_s4 = (tpc_y[5] - tpc_y[4])/dist_TPC41_TPC42*1000.;
@@ -4519,6 +4668,8 @@ for (int k=0;k<10;k++){
   }
   // S4 only 1 possibility =  TPC4142
   if(b_tpc_xy[4] && b_tpc_xy[5]){
+   // std::cout << "we actually make it here?" << std::endl;
+    // no, following b_tpc_xy[4] and/or [5]
     id_x4 = tpc_x_s4;
     id_a4 = tpc_angle_x_s4;
     id_y4 = tpc_y_s4;

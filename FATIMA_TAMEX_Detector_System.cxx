@@ -203,23 +203,27 @@ void FATIMA_TAMEX_Detector_System::Process_TAMEX(){
         cerr << "TAMEX WORD: " << hex << *pdata << endl;
      //   exit(0);
     }
+    // CEJ: adding to prevent crashes???
+    else
+    {
 
-    //next word
-    pdata++;
-    //get trigger
-    get_trigger();
-    //move on to leading and trailing edges
-    if(am_fired[tamex_iter] > 3) get_edges();
-    else no_edges[tamex_iter] = true;
+        //next word
+        pdata++;
+        //get trigger
+        get_trigger();
+        //move on to leading and trailing edges
+        if(am_fired[tamex_iter] > 3) get_edges();
+        else no_edges[tamex_iter] = true;
 
- //   get_epoch();
-    
-    
-    //check errors
-    //if(!no_edges[tamex_iter]) pdata++;
-   // check_error();
-    //checking trailer
-    check_trailer();
+        //   get_epoch();
+        
+        
+        //check errors
+        //if(!no_edges[tamex_iter]) pdata++;
+        // check_error();
+        //checking trailer
+        check_trailer();
+    }
 }
 
 //---------------------------------------------------------------

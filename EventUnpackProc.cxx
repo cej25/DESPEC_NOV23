@@ -2626,7 +2626,8 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
   if(TPC_Y_angle_s2_foc_23_24!=-999)hTPC_AY_S2_TPC_23_24->Fill(TPC_Y_angle_s2_foc_23_24);
   if(TPC_X_s2_foc_23_24!=-999 && TPC_X_angle_s2_foc_23_24!=-999) hTPC_X_AX_S2_TPC_23_24->Fill(TPC_X_s2_foc_23_24, TPC_X_angle_s2_foc_23_24);
   if(TPC_Y_s2_foc_23_24!=-999 && TPC_Y_angle_s2_foc_23_24!=-999)hTPC_Y_AY_S2_TPC_23_24->Fill(TPC_Y_s2_foc_23_24, TPC_Y_angle_s2_foc_23_24);
-      
+  
+  //std::cout << "X s4 focus value" <<  TPC_X_s4 << std::endl; 
   hTPC_X_S4->Fill(TPC_X_s4);
   hTPC_Y_S4->Fill(TPC_Y_s4);
   hTPC_AX_S4->Fill(TPC_X_angle_s4);
@@ -2655,6 +2656,7 @@ void EventUnpackProc::Fill_FRS_Histos(int PrcID, int Type, int SubType){
     if(sci_tof3_calib!=0) hSCI_Tof3_calib->Fill(sci_tof3_calib);
     if(sci_tof5_calib!=0) hSCI_Tof5_calib->Fill(sci_tof5_calib);
   }
+
   if(PrcID==35 && SubType==1){
 
     if(ID_x2!=0) hID_x2->Fill(ID_x2);
