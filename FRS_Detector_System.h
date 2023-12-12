@@ -334,7 +334,7 @@ private:
     Int_t         smaxtrig ;
 
     // scaler readings
-    UInt_t sc_long[64]; //changed from 32 to 64 (10.07.2018)
+    UInt_t sc_long[66]; //changed from 64 to 66 (11.12.2023)
     //UInt_t* sc_long2;
 
 

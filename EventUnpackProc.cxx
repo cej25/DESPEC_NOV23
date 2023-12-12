@@ -410,7 +410,8 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
             pdata = WR->get_pdata(); // CEJ: perhaps the issue stems from here after reading whiterabbit?
 
             ///Temp WR Skip fix
-           if(PrcID ==10|| PrcID == 30 || PrcID==20 || PrcID == 25 || PrcID==41)WR_d=0;
+          if(PrcID ==10|| PrcID == 30 || PrcID==20 || PrcID == 40)WR_d = 0;
+           //if(PrcID ==10|| PrcID == 30 || PrcID==20 || PrcID == 25 || PrcID==41)WR_d=0;
 
            if(WR_d==0) fOutput->fFRS_WR = WR_tmp; //FRS
            if(WR_d==1) fOutput->fAIDA_WR = WR_tmp; //AIDA
@@ -563,6 +564,7 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
 //         fOutput->fFRS_sci_tofrr3 = RAW->get_FRS_tofrr3();
 //         fOutput->fFRS_sci_tof3 = RAW->get_FRS_tof3();
         ///ID 2 4
+  
    if(RAW->get_FRS_x2()!=0)      fOutput->fFRS_ID_x2 = RAW->get_FRS_x2();
    if(RAW->get_FRS_y2()!=0)      fOutput->fFRS_ID_y2 = RAW->get_FRS_y2();
    if(RAW->get_FRS_a2()!=0)      fOutput->fFRS_ID_a2 = RAW->get_FRS_a2();
@@ -572,6 +574,8 @@ Bool_t EventUnpackProc::BuildEvent(TGo4EventElement* dest)
    if(RAW->get_FRS_y4()!=0)      fOutput->fFRS_ID_y4 = RAW->get_FRS_y4();
    if(RAW->get_FRS_a4()!=0)      fOutput->fFRS_ID_a4 = RAW->get_FRS_a4();
    if(RAW->get_FRS_b4()!=0)      fOutput->fFRS_ID_b4 = RAW->get_FRS_b4();
+
+
             ///SCI dT
 //         fOutput->fFRS_sci_dt_21l_21r = RAW->get_FRS_dt_21l_21r();
 //         fOutput->fFRS_sci_dt_41l_41r = RAW->get_FRS_dt_41l_41r();

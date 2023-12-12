@@ -369,7 +369,10 @@ Bool_t EventCorrelProc::BuildEvent(TGo4EventElement* dest)
     cOutput->cAIDA_TM_WR = aida_t_o;
      ///Now fill for WR TM gating
      if(aida_t_o){
-        if(cInputMain->pFRS_WR)   hAIDA_WRTM_FRS ->Fill(aida_t_o-cInputMain->pFRS_WR);
+        if(cInputMain->pFRS_WR)   
+        {   
+            hAIDA_WRTM_FRS ->Fill(aida_t_o-cInputMain->pFRS_WR);
+        }
         if(cInputMain->pGe_WR)    hAIDA_WRTM_Ge ->Fill(aida_t_o-cInputMain->pGe_WR);
           ///Check if FATIMA is used
      if(Used_Systems[3]==1 || Used_Systems[4] ==1){
@@ -708,7 +711,6 @@ void EventCorrelProc::Process_bPlast_BB7(EventAnlStore* cInputMain, EventCorrelS
 
 /**----------------------------------------------------------------------------------------------**/
  void EventCorrelProc::Process_FRS_AIDA(EventAnlStore* cInputMain, EventCorrelStore* cOutput){
-
      TAidaConfiguration const* conf = TAidaConfiguration::GetInstance();
      //Branches from AnlProc
       for (auto& cInputRef : cInputMain->pAida)
@@ -734,10 +736,10 @@ void EventCorrelProc::Process_bPlast_BB7(EventAnlStore* cInputMain, EventCorrelS
             }///End of AIDA Implant deadtime
 
             //AIDA Implant - FRS WR dT
+           //std::cout << cInputMain->pFRS_WR << std::endl;
             if(hit.Time>0 && cInputMain->pFRS_WR>0)hA_Imp_FRS_dT -> Fill(hit.Time-cInputMain->pFRS_WR);
 
             if(hit.Time-cInputMain->pFRS_WR > fCorrel->GFRS_AIDA_TLow && hit.Time-cInputMain->pFRS_WR < fCorrel->GFRS_AIDA_THigh){
-
 
             // CEJ: fill AIDA xPosition vs X4 position
             hAIDA_FRS_x_vs_x4->Fill(hit.PosX, cInputMain->pFRS_ID_x4);

@@ -96,8 +96,10 @@ void EventAnlStore::Clear(Option_t *t)
     ZERO_ARRAY(pz1_vftx_2241);
     ZERO_ARRAY(pz2_vftx_2241);
     ZERO_ARRAY(pvcor_vftx_2241);
+
+   // pFRS_WR = 0;
   }
-  pFRS_WR = 0;
+
   // for(int i=0; i< 50; i++){
   //Fatima QDC ID
   if (pFAT_WR != 0) {
